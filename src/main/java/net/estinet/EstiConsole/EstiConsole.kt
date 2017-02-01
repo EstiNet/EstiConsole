@@ -38,7 +38,3 @@ fun disable(){
     */
 
 }
-
-class EstiConsole{
-
-}

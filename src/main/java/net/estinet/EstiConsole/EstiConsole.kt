@@ -1,12 +1,16 @@
 package net.estinet.EstiConsole
 
+import com.sun.xml.internal.fastinfoset.util.StringArray
+import java.util.*
+
 
 var version: String = "0.0.1-BETA"
 var mode: Modes = Modes.SPIGOT
+var commands = ArrayList<ConsoleCommand>()
 
 fun main(args: Array<String>) {
     println("EstiConsole $version starting up...")
-    enable(args);
+    enable(args)
 }
 
 fun enable(args: Array<String>){
@@ -22,7 +26,7 @@ fun enable(args: Array<String>){
     }
     if(isMode){
         println("Mode selected: $mode")
-
+        startCommandProcess()
     }
     else{
         println("[Error] Incorrect mode specified!")
@@ -36,5 +40,27 @@ fun disable(){
     /*
     * Disable Processes:
     */
+}
 
+fun startCommandProcess(){
+    while(true){
+        val input = System.console().readLine()
+        val inputParsed = input.split(" ")
+        if(inputParsed[0].toLowerCase() == "esticonsole" || inputParsed[0].toLowerCase() == "ec"){
+            var foundValue = false
+            for(cc in commands){
+                if(cc.cName.toLowerCase() == inputParsed[1]){
+                    val args = ArrayList<String>()
+                    val i = 0
+                    while(i < inputParsed.size){
+                        if(i != 0 && i != 1) args.add(inputParsed[i])
+                    }
+                    cc.run(args)
+                    foundValue = true
+                    break
+                }
+            }
+            if(!foundValue) println("")
+        }
+    }
 }

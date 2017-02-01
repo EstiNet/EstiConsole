@@ -1,5 +1,7 @@
 package net.estinet.EstiConsole
 
-/**
- * Created by Devin on 2017-02-01.
- */
+open class ConsoleCommand{
+    // Name of Command
+    var cName = "command"
+
+}

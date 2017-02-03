@@ -7,16 +7,15 @@ import java.util.*
 object EstiConsole {
     var version: String = "v0.0.1-BETA"
     var javaProcess: Process? = null
-    var writer: BufferedWriter? = null
+    var writer: PrintWriter? = null
     fun println(output: String) {
         System.out.println("${Locale.getLocale(LocaleType.PREFIX)} $output")
     }
     fun sendJavaInput(input: String) {
         try {
-            writer?.write(input)
+            writer?.write("$input\n")
             writer?.flush()
-            writer?.close()
-            EstiConsole.writer = BufferedWriter(OutputStreamWriter(EstiConsole.javaProcess?.outputStream))
+            writer = PrintWriter(OutputStreamWriter(javaProcess?.outputStream))
         } catch(e: NullPointerException){
             println("Oh noes! Can't send output to java process! Is it offline?")
         }
@@ -101,7 +100,7 @@ fun startJavaProcess() {
     try {
         val process: Process = pb.start()
         EstiConsole.javaProcess = process
-        EstiConsole.writer = BufferedWriter(OutputStreamWriter(EstiConsole.javaProcess?.outputStream))
+        EstiConsole.writer = PrintWriter(OutputStreamWriter(EstiConsole.javaProcess?.outputStream))
         val lsr = LogStreamReader(process.inputStream)
         val thread = Thread(lsr, "LogStreamReader")
         thread.start()

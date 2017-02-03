@@ -8,12 +8,13 @@ import java.io.File
 object EstiConsole {
     var version: String = "v0.0.1-BETA"
     var javaProcess: Process? = null
-    fun println(output: String){
+    fun println(output: String) {
         System.out.println("${Locale.getLocale(LocaleType.PREFIX)} $output")
     }
-    fun sendJavaInput(input: String){
+
+    fun sendJavaInput(input: String) {
         val copyJavaProcess = javaProcess
-        if(copyJavaProcess != null) copyJavaProcess.outputStream.bufferedWriter().write(input)
+        if (copyJavaProcess != null) copyJavaProcess.outputStream.bufferedWriter().write(input)
         else println("Oh noes! Can't send output to java process!")
     }
 }
@@ -32,7 +33,7 @@ var max_ram = "2G"
 /*
  * Command Initializer
  */
-fun setupCommands(){
+fun setupCommands() {
     commands.add(HelpCommand())
     commands.add(VersionCommand())
     commands.add(StopCommand())
@@ -50,7 +51,7 @@ fun main(args: Array<String>) {
     enable()
 }
 
-fun enable(){
+fun enable() {
     /*
      * Startup Processes:
      */
@@ -58,30 +59,29 @@ fun enable(){
     System.out.println("Setting up configuration...")
     setupConfiguration()
     var isMode = false
-    for(value in Modes.values()){
-        if(stmode == value.toString()){
+    for (value in Modes.values()) {
+        if (stmode == value.toString()) {
             isMode = true
             mode = value
         }
     }
-    if(isMode){
+    if (isMode) {
         System.out.println("Mode selected: $mode")
         System.out.println("Welcome to EstiConsole.")
         val lambda = { startCommandProcess() }
         val thr: Thread = Thread(lambda)
         thr.start()
-        println("Starting Java process...")
+        EstiConsole.println("Starting Java process...")
         startJavaProcess()
-    }
-    else{
+    } else {
         println(Locale.getLocale(LocaleType.ERR_ON_START))
-        println("[Error] Incorrect mode specified!")
-        println("Exiting program...")
+        EstiConsole.println("[Error] Incorrect mode specified!")
+        EstiConsole.println("Exiting program...")
         System.exit(0)
     }
 }
 
-fun disable(){
+fun disable() {
     println(Locale.getLocale(LocaleType.DISABLING))
     /*
     * Disable Processes:
@@ -90,7 +90,7 @@ fun disable(){
     System.exit(0)
 }
 
-fun startJavaProcess(){
+fun startJavaProcess() {
     val pb = ProcessBuilder("java", "-Xms$min_ram", "-Xmx$max_ram", "-XX:+UseConcMarkSweepGC", "-XX:+UseParNewGC", "-XX:+CMSIncrementalPacing", "-XX:ParallelGCThreads=2", "-XX:+AggressiveOpts", "-d64", "-server", "-jar", serverJarName)
     pb.directory(File("./"))
     try {
@@ -104,39 +104,37 @@ fun startJavaProcess(){
     }
 }
 
-fun startCommandProcess(){
-    while(true){
+fun startCommandProcess() {
+    while (true) {
         val input = System.console().readLine()
         System.out.println(input)
         val inputParsed = input.split(" ")
-        if(inputParsed[0].toLowerCase() == "esticonsole" || inputParsed[0].toLowerCase() == "ec"){
+        if (inputParsed[0].toLowerCase() == "esticonsole" || inputParsed[0].toLowerCase() == "ec") {
             println("oh yea")
             var foundValue = false
-            for(cc in commands){
-                if(cc.cName.toLowerCase() == inputParsed[1]){
-                    val args = ArrayList<String>()
-                    val i = 0
-                    while(i < inputParsed.size){
-                        if(i != 0 && i != 1) args.add(inputParsed[i])
+            if (inputParsed.size < 2) {
+                for (cc in commands) {
+                    println(cc.cName)
+                    if (cc.cName.toLowerCase() == inputParsed[1]) {
+                        val args = ArrayList<String>()
+                        val i = 0
+                        while (i < inputParsed.size) {
+                            if (i != 0 && i != 1) args.add(inputParsed[i])
+                        }
+                        cc.run(args)
+                        foundValue = true
+                        break
                     }
-                    cc.run(args)
-                    foundValue = true
-                    break
                 }
             }
-            if(!foundValue) println("Do /ec help for help!")
-        }
-        else{
+            if (!foundValue) println("Do /ec help for help!")
+        } else {
             println("oh no")
             EstiConsole.sendJavaInput(input)
         }
     }
 }
 
-fun parseJavaOutput(output: String){
+fun parseJavaOutput(output: String) {
 
-}
-
-fun println(output: String){
-    System.out.println("${Locale.getLocale(LocaleType.PREFIX)} $output")
 }

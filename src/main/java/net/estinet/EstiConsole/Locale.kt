@@ -9,11 +9,11 @@ object Locale{
     fun load(){
         default.add("Unknown command! Do /ec help for help!")
         default.add("[EstiConsole]")
-        default.add("EstiConsole ${EstiConsole.version} turning off...")
-        default.add("EstiConsole ${EstiConsole.version} is off. Goodbye!")
-        default.add("EstiConsole ${EstiConsole.version} starting up...")
-        default.add("EstiConsole ${EstiConsole.version} is online!")
-        default.add("Error while starting EstiConsole ${EstiConsole.version}")
+        default.add("EstiConsole \${EstiConsole.version} turning off...")
+        default.add("EstiConsole \${EstiConsole.version} is off. Goodbye!")
+        default.add("EstiConsole \${EstiConsole.version} starting up...")
+        default.add("EstiConsole \${EstiConsole.version} is online!")
+        default.add("Error while starting EstiConsole \${EstiConsole.version}")
     }
     fun setupLocale(){
         load()
@@ -43,6 +43,6 @@ object Locale{
         }
     }
     fun getLocale(type: LocaleType): String{
-        return phrases.get(type.ordinal)
+        return phrases.get(type.ordinal).replace("\${EstiConsole.version}", EstiConsole.version)
     }
 }

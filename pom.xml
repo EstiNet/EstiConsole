@@ -6,7 +6,7 @@
 
     <groupId>net.estinet.EstiConsole</groupId>
     <artifactId>EstiConsole</artifactId>
-    <version>0.0.1-BETA</version>
+    <version>1.0.0</version>
 
     <properties>
         <kotlin.version>1.0.6</kotlin.version>

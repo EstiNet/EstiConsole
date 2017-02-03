@@ -162,7 +162,7 @@ fun startJavaProcess() {
 
 fun startCommandProcess() {
     while (true) {
-        console.setPrompt("> ");
+        console.setPrompt(">");
         val input = console.readLine()
         val inputParsed = input.split(" ")
         if (inputParsed[0].toLowerCase() == "esticonsole" || inputParsed[0].toLowerCase() == "ec") {

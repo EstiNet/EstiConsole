@@ -41,6 +41,8 @@ fun setupCommands() {
     commands.add(HelpCommand())
     commands.add(VersionCommand())
     commands.add(StopCommand())
+    commands.add(StartCommand())
+    commands.add(KillCommand())
 }
 
 /*
@@ -98,7 +100,7 @@ fun disable() {
 }
 
 fun startJavaProcess() {
-    val pb = ProcessBuilder("java", "-Xms$min_ram", "-Xmx$max_ram", "-XX:+UseConcMarkSweepGC", "-XX:+UseParNewGC", "-XX:+CMSIncrementalPacing", "-XX:ParallelGCThreads=2", "-XX:+AggressiveOpts", "-d64", "-nojline", "-server", "-jar", serverJarName)
+    val pb = ProcessBuilder("java", "-Xms$min_ram", "-Xmx$max_ram", "-XX:+UseConcMarkSweepGC", "-XX:+UseParNewGC", "-XX:+CMSIncrementalPacing", "-XX:ParallelGCThreads=2", "-XX:+AggressiveOpts", "-d64", "-server", "-jar", serverJarName, "-o true" , "-nojline")
     pb.directory(File("./"))
     try {
         val process: Process = pb.start()

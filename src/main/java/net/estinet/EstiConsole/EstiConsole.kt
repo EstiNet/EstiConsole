@@ -1,12 +1,23 @@
 package net.estinet.EstiConsole
 
-import com.sun.xml.internal.fastinfoset.util.StringArray
+import net.estinet.EstiConsole.commands.*
 import java.util.*
 
-
-var version: String = "v0.0.1-BETA"
+object EstiConsole {
+    var version: String = "v0.0.1-BETA"
+}
 var mode: Modes = Modes.SPIGOT
 var commands = ArrayList<ConsoleCommand>()
+
+var port = 6921
+var password = "pass123"
+var serverJarName = "minecraft_server.jar"
+var stmode = "SPIGOT"
+
+fun setupCommands(){
+    commands.add(HelpCommand())
+    commands.add(VersionCommand())
+}
 
 fun main(args: Array<String>) {
     println(Locale.getLocale(LocaleType.ENABLING))
@@ -17,9 +28,11 @@ fun enable(args: Array<String>){
     /*
      * Startup Processes:
      */
+    println("Setting up configuration...")
+    setupConfiguration()
     var isMode = false
     for(value in Modes.values()){
-        if(args[0] == value.toString()){
+        if(stmode == value.toString()){
             isMode = true
             mode = value
         }
@@ -28,8 +41,7 @@ fun enable(args: Array<String>){
         println("Mode selected: $mode")
         println("Setting up Locale...")
         Locale.setupLocale()
-        println("Setting up Configuration...")
-
+        println("Welcome to EstiConsole.")
         startCommandProcess()
     }
     else{

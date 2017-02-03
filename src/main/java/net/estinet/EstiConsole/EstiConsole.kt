@@ -15,8 +15,10 @@ object EstiConsole {
         try {
             writer?.write(input)
             writer?.flush()
+            writer?.close()
+            EstiConsole.writer = BufferedWriter(OutputStreamWriter(EstiConsole.javaProcess?.outputStream))
         } catch(e: NullPointerException){
-            println("Oh noes! Can't send output to java process!")
+            println("Oh noes! Can't send output to java process! Is it offline?")
         }
     }
 }

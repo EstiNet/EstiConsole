@@ -107,8 +107,10 @@ fun startJavaProcess(){
 fun startCommandProcess(){
     while(true){
         val input = System.console().readLine()
+        System.out.println(input)
         val inputParsed = input.split(" ")
         if(inputParsed[0].toLowerCase() == "esticonsole" || inputParsed[0].toLowerCase() == "ec"){
+            println("oh yea")
             var foundValue = false
             for(cc in commands){
                 if(cc.cName.toLowerCase() == inputParsed[1]){
@@ -125,6 +127,7 @@ fun startCommandProcess(){
             if(!foundValue) println("Do /ec help for help!")
         }
         else{
+            println("oh no")
             EstiConsole.sendJavaInput(input)
         }
     }

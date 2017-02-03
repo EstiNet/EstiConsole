@@ -18,12 +18,13 @@ object Locale{
     fun setupLocale(){
         load()
         var f: File = File("languages.properties")
-        var output: OutputStream = FileOutputStream(f)
+        var output: OutputStream? = null
         try{
             if(!f.exists()) f.createNewFile()
-            var prop: Properties = Properties()
-            var input: InputStream = FileInputStream(f)
+            val prop: Properties = Properties()
+            val input: InputStream = FileInputStream(f)
             prop.load(input)
+            output = FileOutputStream(f)
             for(type in LocaleType.values()){
                 if (prop.getProperty(type.toString().toLowerCase()) == null)
                     prop.setProperty(type.toString().toLowerCase(), default.get(type.ordinal))

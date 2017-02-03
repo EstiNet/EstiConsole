@@ -108,19 +108,17 @@ fun startJavaProcess() {
 fun startCommandProcess() {
     while (true) {
         val input = System.console().readLine()
-        System.out.println(input)
         val inputParsed = input.split(" ")
         if (inputParsed[0].toLowerCase() == "esticonsole" || inputParsed[0].toLowerCase() == "ec") {
-            println("oh yea")
             var foundValue = false
-            if (inputParsed.size > 2) {
+            if (inputParsed.size >= 2) {
                 for (cc in commands) {
-                    println(cc.cName)
                     if (cc.cName.toLowerCase() == inputParsed[1]) {
                         val args = ArrayList<String>()
-                        val i = 0
+                        var i = 0
                         while (i < inputParsed.size) {
                             if (i != 0 && i != 1) args.add(inputParsed[i])
+                            i++
                         }
                         cc.run(args)
                         foundValue = true

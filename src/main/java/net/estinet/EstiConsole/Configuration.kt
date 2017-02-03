@@ -5,13 +5,14 @@ import java.io.*
 
 fun setupConfiguration() {
     val f = File("esticonsole.properties")
-    //if (!f.exists()) f.createNewFile()
+    if (!f.exists()) f.createNewFile()
     val prop = Properties()
-    val output: OutputStream = FileOutputStream(f)
+    var output: FileOutputStream? = null
+    var reader: InputStreamReader? = null
     try {
-        val inputstream: InputStream = FileInputStream(f)
-        prop.load(inputstream)
-        println(prop.getProperty("port"))
+        reader = InputStreamReader(FileInputStream(f))
+        prop.load(reader)
+        output = FileOutputStream(f)
         if (prop.getProperty("port") == null) {
             println("Input EstiConsole port (not minecraft server port) (Default: 6921):")
             var input = System.console().readLine()
@@ -54,12 +55,13 @@ fun setupConfiguration() {
             if (input == "") input = "2G"
             prop.setProperty("max_ram", input)
         }
-        prop.store(output, null)
     } catch (io: IOException) {
         io.printStackTrace()
     } finally {
         try {
-            output.close()
+            prop.store(output, null)
+            if(reader != null) reader.close()
+            if(output != null) output.close()
         } catch (e: IOException) {
             e.printStackTrace()
         }

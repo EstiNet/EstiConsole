@@ -8,7 +8,7 @@ import java.util.*
 class StopCommand() : ConsoleCommand() {
     init {
         super.cName = "stop"
-        super.desc = "Stops the EstiConsole server."
+        super.desc = "Stops the java process (not the console)."
     }
     override fun run(args: ArrayList<String>){
         disable()

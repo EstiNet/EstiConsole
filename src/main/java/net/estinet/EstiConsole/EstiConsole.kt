@@ -43,6 +43,7 @@ fun setupCommands() {
     commands.add(StopCommand())
     commands.add(StartCommand())
     commands.add(KillCommand())
+    commands.add(ConsoleStopCommand())
 }
 
 /*

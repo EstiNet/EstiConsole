@@ -2,10 +2,9 @@ package net.estinet.EstiConsole.commands
 
 import net.estinet.EstiConsole.ConsoleCommand
 import net.estinet.EstiConsole.EstiConsole
-import net.estinet.EstiConsole.commands
 import java.util.*
 
-class KillCommand() : ConsoleCommand() {
+class KillCommand : ConsoleCommand() {
     init {
         super.cName = "kill"
         super.desc = "Kills the java process (if online)."

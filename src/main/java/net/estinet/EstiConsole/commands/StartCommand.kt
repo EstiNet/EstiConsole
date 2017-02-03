@@ -10,6 +10,7 @@ class StartCommand : ConsoleCommand() {
         super.desc = "Starts the java process. Turns on auto-start."
     }
     override fun run(args: ArrayList<String>){
+        EstiConsole.autoStartOnStop = true
         if(EstiConsole.javaProcess!!.isAlive) EstiConsole.println("Java process already online!")
         else net.estinet.EstiConsole.startJavaProcess()
     }

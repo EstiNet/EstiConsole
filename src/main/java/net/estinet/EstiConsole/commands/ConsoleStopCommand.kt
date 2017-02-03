@@ -9,8 +9,7 @@ class ConsoleStopCommand : ConsoleCommand() {
         super.desc = "Stops the EstiConsole server."
     }
     override fun run(args: ArrayList<String>){
-        if(mode == Modes.BUNGEE) EstiConsole.sendJavaInput("end")
-        else if (mode == Modes.SPIGOT) EstiConsole.sendJavaInput("stop")
+        disable()
     }
 }
 

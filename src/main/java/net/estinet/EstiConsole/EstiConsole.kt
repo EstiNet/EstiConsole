@@ -6,7 +6,7 @@ import java.io.*
 import java.util.*
 
 object EstiConsole {
-    var version: String = "v0.0.1-BETA"
+    var version: String = "v1.0.0"
     var javaProcess: Process? = null
     var writer: PrintWriter? = null
     var autoStartOnStop = false
@@ -46,6 +46,7 @@ fun setupCommands() {
     commands.add(StartCommand())
     commands.add(KillCommand())
     commands.add(ConsoleStopCommand())
+    commands.add(RestartCommand())
 }
 
 /*
@@ -99,12 +100,25 @@ fun disable() {
     /*
     * Disable Processes:
     */
-    println(Locale.getLocale(LocaleType.DISABLED))
+    EstiConsole.autoStartOnStop = false
     AnsiConsole.systemUninstall()
+    println(Locale.getLocale(LocaleType.DISABLED))
     System.exit(0)
 }
 
+private fun startJavaProcessPluginFetch(){
+    val update = File("update")
+    val plugins = File("plugins")
+    for(file in update.listFiles()){
+        if(serverJarName == file.name){
+            File(serverJarName).delete()
+            
+        }
+    }
+}
+
 fun startJavaProcess() {
+    startJavaProcessPluginFetch()
     val pb = ProcessBuilder("java", "-Xms$min_ram", "-Xmx$max_ram", "-XX:+UseConcMarkSweepGC", "-XX:+UseParNewGC", "-XX:+CMSIncrementalPacing", "-XX:ParallelGCThreads=2", "-XX:+AggressiveOpts", "-d64", "-server", "-jar", serverJarName, "-o true" , "-nojline")
     pb.directory(File("./"))
     try {

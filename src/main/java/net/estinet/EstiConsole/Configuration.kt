@@ -4,6 +4,18 @@ import java.util.*
 import java.io.*
 
 fun setupConfiguration() {
+
+    /*
+     * Setup plugin files.
+     */
+
+    val update = File("update")
+    if(!update.isDirectory()) update.mkdir()
+
+    /*
+     * Setup EstiConsole properties.
+     */
+
     val f = File("esticonsole.properties")
     if (!f.exists()) f.createNewFile()
     val prop = Properties()

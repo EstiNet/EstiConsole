@@ -3,15 +3,14 @@ package net.estinet.EstiConsole.commands
 import net.estinet.EstiConsole.*
 import java.util.*
 
-class StopCommand : ConsoleCommand() {
+class RestartCommand : ConsoleCommand() {
     init {
-        super.cName = "stop"
-        super.desc = "Stops the java process (not the console). Turns off auto-start."
+        super.cName = "restart"
+        super.desc = "Restarts the Java process. Turns on auto-start."
     }
     override fun run(args: ArrayList<String>){
-        EstiConsole.autoStartOnStop = false
+        EstiConsole.autoStartOnStop = true
         if(mode == Modes.BUNGEE) EstiConsole.sendJavaInput("end")
         else if (mode == Modes.SPIGOT) EstiConsole.sendJavaInput("stop")
     }
 }
-

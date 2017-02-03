@@ -1,21 +1,23 @@
 package net.estinet.EstiConsole
 
 import net.estinet.EstiConsole.commands.*
+import java.io.*
 import java.util.*
-import java.io.IOException
-import java.io.File
 
 object EstiConsole {
     var version: String = "v0.0.1-BETA"
     var javaProcess: Process? = null
+    var writer: BufferedWriter? = null
     fun println(output: String) {
         System.out.println("${Locale.getLocale(LocaleType.PREFIX)} $output")
     }
-
     fun sendJavaInput(input: String) {
-        val copyJavaProcess = javaProcess
-        if (copyJavaProcess != null) copyJavaProcess.outputStream.bufferedWriter().write(input)
-        else println("Oh noes! Can't send output to java process!")
+        try {
+            writer?.write(input)
+            writer?.flush()
+        } catch(e: NullPointerException){
+            println("Oh noes! Can't send output to java process!")
+        }
     }
 }
 
@@ -95,9 +97,10 @@ fun startJavaProcess() {
     val pb = ProcessBuilder("java", "-Xms$min_ram", "-Xmx$max_ram", "-XX:+UseConcMarkSweepGC", "-XX:+UseParNewGC", "-XX:+CMSIncrementalPacing", "-XX:ParallelGCThreads=2", "-XX:+AggressiveOpts", "-d64", "-server", "-jar", serverJarName)
     pb.directory(File("./"))
     try {
-        val p = pb.start()
-        EstiConsole.javaProcess = p
-        val lsr = LogStreamReader(p.inputStream)
+        val process: Process = pb.start()
+        EstiConsole.javaProcess = process
+        EstiConsole.writer = BufferedWriter(OutputStreamWriter(EstiConsole.javaProcess?.outputStream))
+        val lsr = LogStreamReader(process.inputStream)
         val thread = Thread(lsr, "LogStreamReader")
         thread.start()
     } catch (e: IOException) {
@@ -128,7 +131,6 @@ fun startCommandProcess() {
             }
             if (!foundValue) println("Do /ec help for help!")
         } else {
-            println("oh no")
             EstiConsole.sendJavaInput(input)
         }
     }

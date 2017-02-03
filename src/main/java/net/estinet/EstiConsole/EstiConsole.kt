@@ -9,6 +9,8 @@ object EstiConsole {
     var version: String = "v0.0.1-BETA"
     var javaProcess: Process? = null
     var writer: PrintWriter? = null
+    var autoStartOnStop = false
+
     fun println(output: String) {
         System.out.println("${Locale.getLocale(LocaleType.PREFIX)} $output")
     }
@@ -53,7 +55,7 @@ fun setupCommands() {
 fun main(args: Array<String>) {
     System.out.println("EstiConsole.")
     Runtime.getRuntime().addShutdownHook(Thread(ShutdownHook()))
-    AnsiConsole.systemInstall();
+    AnsiConsole.systemInstall()
     System.out.println("Setting up Locale...")
     Locale.setupLocale()
     System.out.println(Locale.getLocale(LocaleType.ENABLING))
@@ -82,6 +84,8 @@ fun enable() {
         thr.start()
         EstiConsole.println("Starting Java process...")
         startJavaProcess()
+        val th1 = Thread(ServerTimer())
+        th1.start()
     } else {
         println(Locale.getLocale(LocaleType.ERR_ON_START))
         EstiConsole.println("[Error] Incorrect mode specified!")
@@ -96,7 +100,7 @@ fun disable() {
     * Disable Processes:
     */
     println(Locale.getLocale(LocaleType.DISABLED))
-    AnsiConsole.systemUninstall();
+    AnsiConsole.systemUninstall()
     System.exit(0)
 }
 

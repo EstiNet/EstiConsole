@@ -17,7 +17,7 @@ object Locale{
     }
     fun setupLocale(){
         load()
-        var f: File = File("languages.properties")
+        val f: File = File("languages.properties")
         var output: OutputStream? = null
         try{
             if(!f.exists()) f.createNewFile()

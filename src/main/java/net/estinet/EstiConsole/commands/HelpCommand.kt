@@ -4,7 +4,7 @@ import net.estinet.EstiConsole.ConsoleCommand
 import net.estinet.EstiConsole.commands
 import java.util.*
 
-class HelpCommand() : ConsoleCommand() {
+class HelpCommand : ConsoleCommand() {
     init {
         super.cName = "help"
         super.desc = "Displays help for EstiConsole commands."

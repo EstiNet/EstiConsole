@@ -10,5 +10,6 @@ fun setupCommands(){
 open class ConsoleCommand{
     // Name of Command
     var cName = "command"
+    var desc = "I am a command"
     open fun run(args: ArrayList<String>){}
 }

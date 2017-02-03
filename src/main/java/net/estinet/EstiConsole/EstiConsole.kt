@@ -26,7 +26,10 @@ fun enable(args: Array<String>){
     }
     if(isMode){
         println("Mode selected: $mode")
+        println("Setting up Locale...")
         Locale.setupLocale()
+        println("Setting up Configuration...")
+
         startCommandProcess()
     }
     else{
@@ -64,11 +67,11 @@ fun startCommandProcess(){
                     break
                 }
             }
-            if(!foundValue) println("")
+            if(!foundValue) println("") //TODO Must call command in java console
         }
     }
 }
 
 fun println(output: String){
-    println(Locale.getLocale("${Locale.getLocale(LocaleType.PREFIX)} $output"))
+    println("${Locale.getLocale(LocaleType.PREFIX)} $output")
 }

@@ -3,7 +3,6 @@ package net.estinet.EstiConsole
 import java.util.*
 import java.io.*
 
-
 fun setupConfiguration(){
     val f = File("esticonsole.properties")
     if(!f.exists())
@@ -31,6 +30,12 @@ fun setupConfiguration(){
             var input = System.console().readLine()
             if(input == "") input = "SPIGOT"
             prop.setProperty("mode", input)
+        }
+        else if(prop.getProperty("server_name") == null){
+            println("Input the server name (Default: Server):")
+            var input = System.console().readLine()
+            if(input == "") input = "Server"
+            prop.setProperty("server_name", input)
         }
         else if(prop.getProperty("password") == null){
             println("Input the password for EstiConsole connections (Default: pass123):")
@@ -63,6 +68,7 @@ fun loadConfiguration(){
         serverJarName = prop.getProperty("server_jar_name")
         stmode = prop.getProperty("mode")
         password = prop.getProperty("password")
+        serverName = prop.getProperty("server_name")
     } catch (ex: IOException) {
         ex.printStackTrace()
     } finally {

@@ -12,6 +12,7 @@ var commands = ArrayList<ConsoleCommand>()
 var port = 6921
 var password = "pass123"
 var serverJarName = "minecraft_server.jar"
+var serverName = "Server"
 var stmode = "SPIGOT"
 
 fun setupCommands(){
@@ -21,14 +22,15 @@ fun setupCommands(){
 
 fun main(args: Array<String>) {
     println(Locale.getLocale(LocaleType.ENABLING))
-    enable(args)
+    enable()
 }
 
-fun enable(args: Array<String>){
+fun enable(){
     /*
      * Startup Processes:
      */
-    println("Setting up configuration...")
+    setupCommands()
+    System.out.println("Setting up configuration...")
     setupConfiguration()
     var isMode = false
     for(value in Modes.values()){
@@ -38,11 +40,13 @@ fun enable(args: Array<String>){
         }
     }
     if(isMode){
-        println("Mode selected: $mode")
-        println("Setting up Locale...")
+        System.out.println("Mode selected: $mode")
+        System.out.println("Setting up Locale...")
         Locale.setupLocale()
-        println("Welcome to EstiConsole.")
+        System.out.println("Welcome to EstiConsole.")
         startCommandProcess()
+        println("Starting Java process...")
+
     }
     else{
         println(Locale.getLocale(LocaleType.ERR_ON_START))

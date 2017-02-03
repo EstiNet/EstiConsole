@@ -16,17 +16,17 @@ object Locale{
         default.add("Error while starting EstiConsole ${EstiConsole.version}")
     }
     fun setupLocale(){
+        load()
         var f: File = File("languages.properties")
         var output: OutputStream = FileOutputStream(f)
         try{
-            if(f.exists())
-                f.createNewFile()
+            if(!f.exists()) f.createNewFile()
             var prop: Properties = Properties()
             var input: InputStream = FileInputStream(f)
             prop.load(input)
             for(type in LocaleType.values()){
-                if(!prop.containsKey(type.toString().toLowerCase()))
-                    prop.put(type.toString().toLowerCase(), default.get(type.ordinal))
+                if (prop.getProperty(type.toString().toLowerCase()) == null)
+                    prop.setProperty(type.toString().toLowerCase(), default.get(type.ordinal))
                 phrases.add(prop.getProperty(type.toString().toLowerCase()))
             }
         prop.store(output, null)

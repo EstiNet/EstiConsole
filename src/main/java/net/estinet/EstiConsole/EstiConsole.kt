@@ -43,7 +43,10 @@ fun setupCommands(){
  */
 
 fun main(args: Array<String>) {
-    println(Locale.getLocale(LocaleType.ENABLING))
+    System.out.println("EstiConsole.")
+    System.out.println("Setting up Locale...")
+    Locale.setupLocale()
+    System.out.println(Locale.getLocale(LocaleType.ENABLING))
     enable()
 }
 
@@ -63,8 +66,6 @@ fun enable(){
     }
     if(isMode){
         System.out.println("Mode selected: $mode")
-        System.out.println("Setting up Locale...")
-        Locale.setupLocale()
         System.out.println("Welcome to EstiConsole.")
         startCommandProcess()
         println("Starting Java process...")

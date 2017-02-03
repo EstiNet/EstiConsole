@@ -3,74 +3,71 @@ package net.estinet.EstiConsole
 import java.util.*
 import java.io.*
 
-fun setupConfiguration(){
+fun setupConfiguration() {
     val f = File("esticonsole.properties")
-    if(!f.exists())
+    if (!f.exists())
         f.createNewFile()
     val prop = Properties()
-    var output: OutputStream? = null
-    val inputstream: InputStream? = null
+    val output: OutputStream = FileOutputStream("esticonsole.properties")
+    val inputstream: InputStream = FileInputStream("esticonsole.properties");
     try {
         prop.load(inputstream)
-        output = FileOutputStream("esticonsole.properties")
-        if(prop.getProperty("port") == null) {
+        if (prop.getProperty("port") == null) {
             println("Input EstiConsole port (not minecraft server port) (Default: 6921):")
             var input = System.console().readLine()
-            if(input == "") input = "6921"
+            if (input == "") input = "6921"
             prop.setProperty("port", input)
         }
-        if(prop.getProperty("server_jar_name") == null){
+        if (prop.getProperty("server_jar_name") == null) {
             println("Input server jar name (Default: minecraft_server.jar):")
             var input = System.console().readLine()
-            if(input == "") input = "minecraft_server.jar"
+            if (input == "") input = "minecraft_server.jar"
             prop.setProperty("server_jar_name", input)
         }
-        if(prop.getProperty("mode") == null){
+        if (prop.getProperty("mode") == null) {
             println("Input the mode you want EstiConsole to run in (Default: SPIGOT):")
             var input = System.console().readLine()
-            if(input == "") input = "SPIGOT"
+            if (input == "") input = "SPIGOT"
             prop.setProperty("mode", input)
         }
-        if(prop.getProperty("server_name") == null){
+        if (prop.getProperty("server_name") == null) {
             println("Input the server name (Default: Server):")
             var input = System.console().readLine()
-            if(input == "") input = "Server"
+            if (input == "") input = "Server"
             prop.setProperty("server_name", input)
         }
-        if(prop.getProperty("password") == null){
+        if (prop.getProperty("password") == null) {
             println("Input the password for EstiConsole connections (Default: pass123):")
             var input = System.console().readLine()
-            if(input == "") input = "pass123"
+            if (input == "") input = "pass123"
             prop.setProperty("password", input)
         }
-        if(prop.getProperty("min_ram") == null){
+        if (prop.getProperty("min_ram") == null) {
             println("Input the minimum amount of RAM for the server (Default: 512M):")
             var input = System.console().readLine()
-            if(input == "") input = "512M"
+            if (input == "") input = "512M"
             prop.setProperty("min_ram", input)
         }
-        if(prop.getProperty("max_ram") == null){
+        if (prop.getProperty("max_ram") == null) {
             println("Input the maximum amount of RAM for the server (Default: 2G):")
             var input = System.console().readLine()
-            if(input == "") input = "2G"
+            if (input == "") input = "2G"
             prop.setProperty("max_ram", input)
         }
         prop.store(output, null)
     } catch (io: IOException) {
         io.printStackTrace()
     } finally {
-        if (output != null) {
-            try {
-                output.close()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-            loadConfiguration()
+        try {
+            output.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
+        loadConfiguration()
     }
 }
 
-fun loadConfiguration(){
+fun loadConfiguration() {
     val prop = Properties()
     var input: InputStream? = null
     try {

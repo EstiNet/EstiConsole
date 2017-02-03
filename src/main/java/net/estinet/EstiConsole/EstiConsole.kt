@@ -113,7 +113,7 @@ fun startCommandProcess() {
         if (inputParsed[0].toLowerCase() == "esticonsole" || inputParsed[0].toLowerCase() == "ec") {
             println("oh yea")
             var foundValue = false
-            if (inputParsed.size < 2) {
+            if (inputParsed.size > 2) {
                 for (cc in commands) {
                     println(cc.cName)
                     if (cc.cName.toLowerCase() == inputParsed[1]) {

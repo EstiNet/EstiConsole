@@ -5,7 +5,7 @@ import java.io.*
 
 fun setupConfiguration() {
     val f = File("esticonsole.properties")
-    if (!f.exists()) f.createNewFile()
+    //if (!f.exists()) f.createNewFile()
     val prop = Properties()
     val output: OutputStream = FileOutputStream(f)
     try {

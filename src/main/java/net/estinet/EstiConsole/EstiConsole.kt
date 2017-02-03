@@ -151,7 +151,7 @@ fun startJavaProcess() {
         val process: Process = pb.start()
         EstiConsole.javaProcess = process
         EstiConsole.writer = PrintWriter(OutputStreamWriter(EstiConsole.javaProcess?.outputStream))
-        val lsr = LogStreamReader(process.inputStream)
+        val lsr = LogStreamReader(process.inputStream, process.errorStream)
         val thread = Thread(lsr, "LogStreamReader")
         thread.start()
         EstiConsole.autoStartOnStop = true

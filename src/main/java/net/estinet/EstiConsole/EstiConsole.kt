@@ -154,6 +154,7 @@ fun startJavaProcess() {
         val lsr = LogStreamReader(process.inputStream)
         val thread = Thread(lsr, "LogStreamReader")
         thread.start()
+        EstiConsole.autoStartOnStop = true
     } catch (e: IOException) {
         e.printStackTrace()
     }

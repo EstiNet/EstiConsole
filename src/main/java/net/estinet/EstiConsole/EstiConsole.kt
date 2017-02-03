@@ -45,6 +45,7 @@ fun setupCommands() {
 
 fun main(args: Array<String>) {
     System.out.println("EstiConsole.")
+    Runtime.getRuntime().addShutdownHook(Thread(ShutdownHook()))
     System.out.println("Setting up Locale...")
     Locale.setupLocale()
     System.out.println(Locale.getLocale(LocaleType.ENABLING))

@@ -3,6 +3,7 @@ package net.estinet.EstiConsole
 import net.estinet.EstiConsole.commands.*
 import org.fusesource.jansi.AnsiConsole
 import java.io.*
+import java.nio.file.Files
 import java.util.*
 
 object EstiConsole {
@@ -107,18 +108,29 @@ fun disable() {
 }
 
 private fun startJavaProcessPluginFetch(){
-    val update = File("update")
-    val plugins = File("plugins")
+    val update = File("./update")
+    val plugins = File("./plugins")
     for(file in update.listFiles()){
+        println("${file.name} ")
         if(serverJarName == file.name){
+            EstiConsole.println("Updating java process jar $serverJarName...")
             File(serverJarName).delete()
-            
+            Files.copy(file.toPath(), File(file.name).toPath())
+            File(file.name).delete()
+        }
+        else if(plugins.listFiles().contains(File("plugins/${file.name}"))){
+            EstiConsole.println("Updating plugin $file...")
+            File("plugins/${file.name}").delete()
+            Files.copy(file.toPath(), File("plugins/${file.name}").toPath())
+            File(file.name).delete()
         }
     }
 }
 
 fun startJavaProcess() {
+    EstiConsole.println("Fetching update folder...")
     startJavaProcessPluginFetch()
+    EstiConsole.println("Starting jar...")
     val pb = ProcessBuilder("java", "-Xms$min_ram", "-Xmx$max_ram", "-XX:+UseConcMarkSweepGC", "-XX:+UseParNewGC", "-XX:+CMSIncrementalPacing", "-XX:ParallelGCThreads=2", "-XX:+AggressiveOpts", "-d64", "-server", "-jar", serverJarName, "-o true" , "-nojline")
     pb.directory(File("./"))
     try {

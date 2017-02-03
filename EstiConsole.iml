@@ -95,5 +95,14 @@
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.0.6" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-runtime:1.0.6" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jetbrains.kotlin:kotlin-test:1.0.6" level="project" />
+    <orderEntry type="module-library">
+      <library name="Maven: org.fusesource.jansi:jansi:1.11">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/src/main/resources/jansi.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

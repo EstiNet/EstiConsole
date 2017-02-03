@@ -1,10 +1,15 @@
 package net.estinet.EstiConsole
 
+import jline.Terminal
+import jline.console.ConsoleReader
 import net.estinet.EstiConsole.commands.*
 import org.fusesource.jansi.AnsiConsole
 import java.io.*
 import java.nio.file.Files
 import java.util.*
+import jline.console.CursorBuffer
+
+
 
 object EstiConsole {
     var version: String = "v1.0.0"
@@ -13,7 +18,9 @@ object EstiConsole {
     var autoStartOnStop = false
 
     fun println(output: String) {
+        stashLine()
         System.out.println("${Locale.getLocale(LocaleType.PREFIX)} $output")
+        unstashLine()
     }
     fun sendJavaInput(input: String) {
         try {
@@ -37,6 +44,9 @@ var stmode = "SPIGOT"
 var min_ram = "512M"
 var max_ram = "2G"
 
+var console: ConsoleReader = ConsoleReader()
+private var stashed: CursorBuffer? = null
+
 /*
  * Command Initializer
  */
@@ -55,12 +65,12 @@ fun setupCommands() {
  */
 
 fun main(args: Array<String>) {
-    System.out.println("EstiConsole.")
+    println("EstiConsole.")
     Runtime.getRuntime().addShutdownHook(Thread(ShutdownHook()))
     AnsiConsole.systemInstall()
-    System.out.println("Setting up Locale...")
+    println("Setting up Locale...")
     Locale.setupLocale()
-    System.out.println(Locale.getLocale(LocaleType.ENABLING))
+    println(Locale.getLocale(LocaleType.ENABLING))
     enable()
 }
 
@@ -69,7 +79,7 @@ fun enable() {
      * Startup Processes:
      */
     setupCommands()
-    System.out.println("Setting up configuration...")
+    println("Setting up configuration...")
     setupConfiguration()
     var isMode = false
     for (value in Modes.values()) {
@@ -79,8 +89,8 @@ fun enable() {
         }
     }
     if (isMode) {
-        System.out.println("Mode selected: $mode")
-        System.out.println("Welcome to EstiConsole.")
+        println("Mode selected: $mode")
+        println("Welcome to EstiConsole.")
         val lambda = { startCommandProcess() }
         val thr: Thread = Thread(lambda)
         thr.start()
@@ -109,20 +119,24 @@ fun disable() {
 
 private fun startJavaProcessPluginFetch(){
     val update = File("./update")
-    val plugins = File("./plugins")
     for(file in update.listFiles()){
-        println("${file.name} ")
+        val p = File("plugins/${file.name}")
+        //println("${file.name} ${File("plugins/${file.name}")} $serverJarName")
         if(serverJarName == file.name){
             EstiConsole.println("Updating java process jar $serverJarName...")
             File(serverJarName).delete()
             Files.copy(file.toPath(), File(file.name).toPath())
-            File(file.name).delete()
+            file.delete()
         }
-        else if(plugins.listFiles().contains(File("plugins/${file.name}"))){
+        else if(p.exists()){
             EstiConsole.println("Updating plugin $file...")
-            File("plugins/${file.name}").delete()
-            Files.copy(file.toPath(), File("plugins/${file.name}").toPath())
-            File(file.name).delete()
+            p.delete()
+            Files.copy(file.toPath(), p.toPath())
+            file.delete()
+        }
+        else{
+            Files.copy(file.toPath(), p.toPath())
+            file.delete()
         }
     }
 }
@@ -131,7 +145,7 @@ fun startJavaProcess() {
     EstiConsole.println("Fetching update folder...")
     startJavaProcessPluginFetch()
     EstiConsole.println("Starting jar...")
-    val pb = ProcessBuilder("java", "-Xms$min_ram", "-Xmx$max_ram", "-XX:+UseConcMarkSweepGC", "-XX:+UseParNewGC", "-XX:+CMSIncrementalPacing", "-XX:ParallelGCThreads=2", "-XX:+AggressiveOpts", "-d64", "-server", "-jar", serverJarName, "-o true" , "-nojline")
+    val pb = ProcessBuilder("java", "-Xms$min_ram", "-Xmx$max_ram", "-XX:+UseConcMarkSweepGC", "-XX:+UseParNewGC", "-XX:+CMSIncrementalPacing", "-XX:ParallelGCThreads=2", "-XX:+AggressiveOpts", "-d64", "-server", "-jar", serverJarName, "-o true")
     pb.directory(File("./"))
     try {
         val process: Process = pb.start()
@@ -147,7 +161,8 @@ fun startJavaProcess() {
 
 fun startCommandProcess() {
     while (true) {
-        val input = System.console().readLine()
+        console.setPrompt("> ");
+        val input = console.readLine()
         val inputParsed = input.split(" ")
         if (inputParsed[0].toLowerCase() == "esticonsole" || inputParsed[0].toLowerCase() == "ec") {
             var foundValue = false
@@ -175,4 +190,28 @@ fun startCommandProcess() {
 
 fun parseJavaOutput(output: String) {
 
+}
+
+fun stashLine() {
+    stashed = console.getCursorBuffer().copy();
+    try {
+        console.getOutput().write("\u001b[1G\u001b[K");
+        console.flush();
+    } catch (e: IOException) {
+        // ignore
+    }
+}
+
+fun unstashLine() {
+    try {
+        console.resetPromptLine(console.getPrompt(), stashed.toString(), stashed!!.cursor)
+    } catch (e: IOException) {
+        // ignore
+    }
+}
+
+fun println(output: String){
+    stashLine()
+    System.out.println(output)
+    unstashLine()
 }

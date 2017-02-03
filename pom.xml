@@ -12,6 +12,12 @@
         <kotlin.version>1.0.6</kotlin.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>my-local-repo</id>
+            <url>file://${project.basedir}/src/main/resources/jansi.jar</url>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -28,8 +34,6 @@
             <groupId>org.fusesource.jansi</groupId>
             <artifactId>jansi</artifactId>
             <version>1.11</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/jansi.jar</systemPath>
         </dependency>
     </dependencies>
 

@@ -2,12 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7d02128b-1d3a-4ae0-8168-7667a05db6fb" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/resources/jansi.jar" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_fusesource_jansi_jansi_1_11.xml" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/target/EstiConsole-0.0.1-BETA-jar-with-dependencies.jar" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/EstiConsole-0.0.1-BETA.jar" afterPath="$PROJECT_DIR$/target/EstiConsole-0.0.1-BETA.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/EstiConsole.jar" afterPath="$PROJECT_DIR$/target/EstiConsole.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/EstiConsole.class" afterPath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/EstiConsole.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/EstiConsoleKt$enable$lambda$1.class" afterPath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/EstiConsoleKt$enable$lambda$1.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/EstiConsoleKt.class" afterPath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/EstiConsoleKt.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/EstiConsole.iml" afterPath="$PROJECT_DIR$/EstiConsole.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/EstiConsole.kt" afterPath="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/EstiConsole.kt" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -24,24 +28,33 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file leaf-file-name="pom.xml" pinned="false" current-in-tab="true">
+      <file leaf-file-name="pom.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="88">
-              <caret line="28" column="29" lean-forward="false" selection-start-line="28" selection-start-column="29" selection-end-line="28" selection-end-column="29" />
+            <state relative-caret-position="462">
+              <caret line="21" column="20" lean-forward="true" selection-start-line="21" selection-start-column="20" selection-end-line="21" selection-end-column="20" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="EstiConsole.kt" pinned="false" current-in-tab="false">
+      <file leaf-file-name="LogStreamReader.kt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/LogStreamReader.kt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="88">
+              <caret line="7" column="30" lean-forward="false" selection-start-line="7" selection-start-column="30" selection-end-line="7" selection-end-column="30" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="EstiConsole.kt" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/EstiConsole.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="316">
-              <caret line="101" column="41" lean-forward="false" selection-start-line="101" selection-start-column="41" selection-end-line="101" selection-end-column="41" />
+            <state relative-caret-position="220">
+              <caret line="100" column="211" lean-forward="false" selection-start-line="100" selection-start-column="211" selection-end-line="100" selection-end-column="211" />
               <folding>
-                <element signature="e#33#110#0" expanded="true" />
-                <element signature="n#!!block;n#disable#0" expanded="false" />
+                <element signature="e#33#150#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -59,34 +72,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ShutdownHook.kt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/ShutdownHook.kt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="110">
-              <caret line="5" column="70" lean-forward="false" selection-start-line="5" selection-start-column="70" selection-end-line="5" selection-end-column="70" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="LocaleType.kt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/LocaleType.kt">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="44">
               <caret line="2" column="11" lean-forward="false" selection-start-line="2" selection-start-column="11" selection-end-line="2" selection-end-column="11" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HelpCommand.kt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/commands/HelpCommand.kt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="132">
-              <caret line="6" column="6" lean-forward="false" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="6" />
-              <folding>
-                <element signature="e#42#146#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -99,16 +90,6 @@
               <folding>
                 <element signature="e#33#68#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FileOutputStream.java" pinned="false" current-in-tab="false">
-        <entry file="jar://C:/Program Files/Java/jdk1.8.0_101/src.zip!/java/io/FileOutputStream.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="160" column="11" lean-forward="false" selection-start-line="160" selection-start-column="11" selection-end-line="160" selection-end-column="11" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -147,6 +128,11 @@
       </list>
     </option>
   </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>repos</find>
+    </findStrings>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -174,9 +160,9 @@
         <option value="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/ShutdownHook.kt" />
         <option value="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/Locale.kt" />
         <option value="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/Configuration.kt" />
-        <option value="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/EstiConsole.kt" />
         <option value="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/Ansi.kt" />
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/EstiConsole.kt" />
       </list>
     </option>
   </component>
@@ -616,8 +602,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#33#110#0" expanded="true" />
-            <element signature="n#!!block;n#disable#0" expanded="false" />
+            <element signature="e#33#150#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -689,8 +674,7 @@
         <state relative-caret-position="528">
           <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
           <folding>
-            <element signature="e#33#110#0" expanded="true" />
-            <element signature="n#!!block;n#disable#0" expanded="false" />
+            <element signature="e#33#150#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -726,8 +710,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#33#110#0" expanded="true" />
-            <element signature="n#!!block;n#disable#0" expanded="false" />
+            <element signature="e#33#150#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -838,17 +821,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_101/src.zip!/java/io/Console.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="270" column="18" lean-forward="false" selection-start-line="270" selection-start-column="18" selection-end-line="270" selection-end-column="18" />
-          <folding>
-            <element signature="e#10523#10524#0" expanded="false" />
-            <element signature="e#10558#10559#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.8.0_101/src.zip!/java/io/FileOutputStream.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
@@ -864,14 +836,6 @@
           <folding>
             <element signature="e#33#68#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/LogStreamReader.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="88">
-          <caret line="7" column="30" lean-forward="false" selection-start-line="7" selection-start-column="30" selection-end-line="7" selection-end-column="30" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -921,22 +885,45 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/EstiConsole.kt">
+    <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/LogStreamReader.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="316">
-          <caret line="101" column="41" lean-forward="false" selection-start-line="101" selection-start-column="41" selection-end-line="101" selection-end-column="41" />
-          <folding>
-            <element signature="e#33#110#0" expanded="true" />
-            <element signature="n#!!block;n#disable#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="88">
+          <caret line="7" column="30" lean-forward="false" selection-start-line="7" selection-start-column="30" selection-end-line="7" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_101/src.zip!/java/io/Console.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="550">
+          <caret line="51" column="60" lean-forward="false" selection-start-line="51" selection-start-column="60" selection-end-line="51" selection-end-column="60" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_101/src.zip!/java/lang/System.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="129">
+          <caret line="211" column="22" lean-forward="true" selection-start-line="211" selection-start-column="22" selection-end-line="211" selection-end-column="22" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="88">
-          <caret line="28" column="29" lean-forward="false" selection-start-line="28" selection-start-column="29" selection-end-line="28" selection-end-column="29" />
+        <state relative-caret-position="462">
+          <caret line="21" column="20" lean-forward="true" selection-start-line="21" selection-start-column="20" selection-end-line="21" selection-end-column="20" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/EstiConsole.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="100" column="211" lean-forward="false" selection-start-line="100" selection-start-column="211" selection-end-line="100" selection-end-column="211" />
+          <folding>
+            <element signature="e#33#150#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

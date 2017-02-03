@@ -1,6 +1,7 @@
 package net.estinet.EstiConsole
 
 import net.estinet.EstiConsole.commands.*
+import org.fusesource.jansi.AnsiConsole
 import java.io.*
 import java.util.*
 
@@ -49,6 +50,7 @@ fun setupCommands() {
 fun main(args: Array<String>) {
     System.out.println("EstiConsole.")
     Runtime.getRuntime().addShutdownHook(Thread(ShutdownHook()))
+    AnsiConsole.systemInstall();
     System.out.println("Setting up Locale...")
     Locale.setupLocale()
     System.out.println(Locale.getLocale(LocaleType.ENABLING))
@@ -91,11 +93,12 @@ fun disable() {
     * Disable Processes:
     */
     println(Locale.getLocale(LocaleType.DISABLED))
+    AnsiConsole.systemUninstall();
     System.exit(0)
 }
 
 fun startJavaProcess() {
-    val pb = ProcessBuilder("java", "-Xms$min_ram", "-Xmx$max_ram", "-XX:+UseConcMarkSweepGC", "-XX:+UseParNewGC", "-XX:+CMSIncrementalPacing", "-XX:ParallelGCThreads=2", "-XX:+AggressiveOpts", "-d64", "-server", "-jar", serverJarName)
+    val pb = ProcessBuilder("java", "-Xms$min_ram", "-Xmx$max_ram", "-XX:+UseConcMarkSweepGC", "-XX:+UseParNewGC", "-XX:+CMSIncrementalPacing", "-XX:ParallelGCThreads=2", "-XX:+AggressiveOpts", "-d64", "-nojline", "-server", "-jar", serverJarName)
     pb.directory(File("./"))
     try {
         val process: Process = pb.start()

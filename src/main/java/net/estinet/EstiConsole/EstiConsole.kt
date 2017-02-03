@@ -2,10 +2,22 @@ package net.estinet.EstiConsole
 
 import net.estinet.EstiConsole.commands.*
 import java.util.*
+import java.io.IOException
+import java.io.File
 
 object EstiConsole {
     var version: String = "v0.0.1-BETA"
+    var javaProcess: Process? = null
+    fun println(output: String){
+        println("${Locale.getLocale(LocaleType.PREFIX)} $output")
+    }
+    fun sendJavaInput(input: String){
+        val copyJavaProcess = javaProcess
+        if(copyJavaProcess != null) copyJavaProcess.outputStream.bufferedWriter().write(input)
+        else println("Oh noes! Can't send output to java process!")
+    }
 }
+
 var mode: Modes = Modes.SPIGOT
 var commands = ArrayList<ConsoleCommand>()
 
@@ -14,11 +26,21 @@ var password = "pass123"
 var serverJarName = "minecraft_server.jar"
 var serverName = "Server"
 var stmode = "SPIGOT"
+var min_ram = "512M"
+var max_ram = "2G"
 
+/*
+ * Command Initializer
+ */
 fun setupCommands(){
     commands.add(HelpCommand())
     commands.add(VersionCommand())
+    commands.add(StopCommand())
 }
+
+/*
+ * Program entry point.
+ */
 
 fun main(args: Array<String>) {
     println(Locale.getLocale(LocaleType.ENABLING))
@@ -46,7 +68,7 @@ fun enable(){
         System.out.println("Welcome to EstiConsole.")
         startCommandProcess()
         println("Starting Java process...")
-
+        startJavaProcess()
     }
     else{
         println(Locale.getLocale(LocaleType.ERR_ON_START))
@@ -63,6 +85,20 @@ fun disable(){
     */
     println(Locale.getLocale(LocaleType.DISABLED))
     System.exit(0)
+}
+
+fun startJavaProcess(){
+    val pb = ProcessBuilder("java", "-Xms$min_ram", "-Xmx$max_ram", "-XX:+UseConcMarkSweepGC", "-XX:+UseParNewGC", "-XX:+CMSIncrementalPacing", "-XX:ParallelGCThreads=2", "-XX:+AggressiveOpts", "-d64", "-server", "-jar", serverJarName)
+    pb.directory(File("./"))
+    try {
+        val p = pb.start()
+        EstiConsole.javaProcess = p
+        val lsr = LogStreamReader(p.inputStream)
+        val thread = Thread(lsr, "LogStreamReader")
+        thread.start()
+    } catch (e: IOException) {
+        e.printStackTrace()
+    }
 }
 
 fun startCommandProcess(){
@@ -83,9 +119,13 @@ fun startCommandProcess(){
                     break
                 }
             }
-            if(!foundValue) println("") //TODO Must call command in java console
+            if(!foundValue) EstiConsole.sendJavaInput(input)
         }
     }
+}
+
+fun parseJavaOutput(output: String){
+
 }
 
 fun println(output: String){

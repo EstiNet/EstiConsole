@@ -9,7 +9,7 @@ object EstiConsole {
     var version: String = "v0.0.1-BETA"
     var javaProcess: Process? = null
     fun println(output: String){
-        println("${Locale.getLocale(LocaleType.PREFIX)} $output")
+        System.out.println("${Locale.getLocale(LocaleType.PREFIX)} $output")
     }
     fun sendJavaInput(input: String){
         val copyJavaProcess = javaProcess
@@ -67,7 +67,9 @@ fun enable(){
     if(isMode){
         System.out.println("Mode selected: $mode")
         System.out.println("Welcome to EstiConsole.")
-        startCommandProcess()
+        val lambda = { startCommandProcess() }
+        val thr: Thread = Thread(lambda)
+        thr.start()
         println("Starting Java process...")
         startJavaProcess()
     }
@@ -120,7 +122,10 @@ fun startCommandProcess(){
                     break
                 }
             }
-            if(!foundValue) EstiConsole.sendJavaInput(input)
+            if(!foundValue) println("Do /ec help for help!")
+        }
+        else{
+            EstiConsole.sendJavaInput(input)
         }
     }
 }
@@ -130,5 +135,5 @@ fun parseJavaOutput(output: String){
 }
 
 fun println(output: String){
-    println("${Locale.getLocale(LocaleType.PREFIX)} $output")
+    System.out.println("${Locale.getLocale(LocaleType.PREFIX)} $output")
 }

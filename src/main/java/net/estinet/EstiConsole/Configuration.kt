@@ -71,7 +71,7 @@ fun loadConfiguration() {
     val prop = Properties()
     var input: InputStream? = null
     try {
-        input = FileInputStream("config.properties")
+        input = FileInputStream("esticonsole.properties")
         prop.load(input)
         port = prop.getProperty("port").toInt()
         serverJarName = prop.getProperty("server_jar_name")

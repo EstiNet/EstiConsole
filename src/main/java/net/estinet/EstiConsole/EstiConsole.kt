@@ -4,12 +4,12 @@ import com.sun.xml.internal.fastinfoset.util.StringArray
 import java.util.*
 
 
-var version: String = "0.0.1-BETA"
+var version: String = "v0.0.1-BETA"
 var mode: Modes = Modes.SPIGOT
 var commands = ArrayList<ConsoleCommand>()
 
 fun main(args: Array<String>) {
-    println("EstiConsole $version starting up...")
+    println(Locale.getLocale(LocaleType.ENABLING))
     enable(args)
 }
 
@@ -26,9 +26,11 @@ fun enable(args: Array<String>){
     }
     if(isMode){
         println("Mode selected: $mode")
+        Locale.setupLocale()
         startCommandProcess()
     }
     else{
+        println(Locale.getLocale(LocaleType.ERR_ON_START))
         println("[Error] Incorrect mode specified!")
         println("Exiting program...")
         System.exit(0)
@@ -36,10 +38,12 @@ fun enable(args: Array<String>){
 }
 
 fun disable(){
-    println("EstiConsole $version disabling...")
+    println(Locale.getLocale(LocaleType.DISABLING))
     /*
     * Disable Processes:
     */
+    println(Locale.getLocale(LocaleType.DISABLED))
+    System.exit(0)
 }
 
 fun startCommandProcess(){
@@ -63,4 +67,8 @@ fun startCommandProcess(){
             if(!foundValue) println("")
         }
     }
+}
+
+fun println(output: String){
+    println(Locale.getLocale("${Locale.getLocale(LocaleType.PREFIX)} $output"))
 }

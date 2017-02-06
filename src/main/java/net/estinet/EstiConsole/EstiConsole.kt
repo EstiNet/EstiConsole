@@ -94,6 +94,8 @@ fun enable() {
         val lambda = { startCommandProcess() }
         val thr: Thread = Thread(lambda)
         thr.start()
+        println("Starting network process...")
+        Thread({ startNetworkServer()}).start()
         EstiConsole.println("Starting Java process...")
         startJavaProcess()
         val th1 = Thread(ServerTimer())
@@ -187,6 +189,10 @@ fun startCommandProcess() {
             EstiConsole.sendJavaInput(input)
         }
     }
+}
+
+fun startNetworkServer(){
+
 }
 
 fun parseJavaOutput(output: String) {

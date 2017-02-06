@@ -2,6 +2,7 @@ package net.estinet.EstiConsole
 
 class ShutdownHook : Runnable{
     override fun run() {
+        EstiConsole.autoStartOnStop = false
         if(mode == Modes.BUNGEE) EstiConsole.sendJavaInput("end")
         else if (mode == Modes.SPIGOT) EstiConsole.sendJavaInput("stop")
         var thr: Thread = Thread({

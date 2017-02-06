@@ -1,14 +1,20 @@
 package net.estinet.EstiConsole
 
-import jline.Terminal
 import jline.console.ConsoleReader
+import jline.console.CursorBuffer
 import net.estinet.EstiConsole.commands.*
 import org.fusesource.jansi.AnsiConsole
-import java.io.*
+import java.io.File
+import java.io.IOException
+import java.io.OutputStreamWriter
+import java.io.PrintWriter
+import java.net.InetSocketAddress
+import java.nio.channels.SelectionKey
+import java.nio.channels.Selector
+import java.nio.channels.ServerSocketChannel
+import java.nio.channels.SocketChannel
 import java.nio.file.Files
 import java.util.*
-import jline.console.CursorBuffer
-
 
 
 object EstiConsole {
@@ -35,6 +41,8 @@ object EstiConsole {
 
 var mode: Modes = Modes.SPIGOT
 var commands = ArrayList<ConsoleCommand>()
+
+var channel: ServerSocketChannel? = null
 
 var port = 6921
 var password = "pass123"
@@ -191,6 +199,47 @@ fun startCommandProcess() {
 
 fun parseJavaOutput(output: String) {
 
+}
+
+fun startNetworkProcess() {
+    val selector = Selector.open()
+
+    channel = ServerSocketChannel.open()
+    val address = InetSocketAddress("localhost", port)
+    channel.apply {
+        channel!!.bind(address)
+        channel!!.configureBlocking(false)
+        channel!!.register(selector, channel!!.validOps())
+    }
+
+    while (true) {
+        selector.select()
+
+        val keys = selector.selectedKeys()
+        val iterator = keys.iterator()
+        while (iterator.hasNext()) {
+            val key = iterator.next()
+            if (key.isAcceptable) {
+                channel!!.accept().apply {
+                    configureBlocking(false)
+                    register(selector, SelectionKey.OP_READ)
+                    log("Connection accepted: $localAddress")
+                }
+            } else if (key.isReadable) {
+                val client = key.channel() as SocketChannel
+                val buffer = ByteBuffer.allocate(256)
+                client.read(buffer)
+                val result = buffer.data()
+                log("Message received: $result")
+
+                if (result == "Close") {
+                    client.close()
+                    log("Connection closed")
+                }
+            }
+            iterator.remove()
+        }
+    }
 }
 
 fun stashLine() {

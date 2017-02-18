@@ -4,10 +4,10 @@ class ShutdownHook : Runnable{
     override fun run() {
         EstiConsole.autoStartOnStop = false
         if(mode == Modes.BUNGEE) EstiConsole.sendJavaInput("end")
-        else if (mode == Modes.SPIGOT) EstiConsole.sendJavaInput("stop")
-        var thr: Thread = Thread({
+        else if (mode == Modes.SPIGOT || mode == Modes.PAPERSPIGOT) EstiConsole.sendJavaInput("stop")
+        val thr: Thread = Thread({
             Thread.sleep(30000)
-            if(EstiConsole.javaProcess!!.isAlive()) EstiConsole.javaProcess!!.destroyForcibly()
+            if(EstiConsole.javaProcess.isAlive()) EstiConsole.javaProcess.destroyForcibly()
         })
         thr.start()
     }

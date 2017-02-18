@@ -8,19 +8,15 @@ import java.io.File
 import java.io.IOException
 import java.io.OutputStreamWriter
 import java.io.PrintWriter
-import java.net.InetSocketAddress
-import java.nio.channels.SelectionKey
-import java.nio.channels.Selector
 import java.nio.channels.ServerSocketChannel
-import java.nio.channels.SocketChannel
 import java.nio.file.Files
 import java.util.*
 
 
 object EstiConsole {
     var version: String = "v1.0.0"
-    var javaProcess: Process? = null
-    var writer: PrintWriter? = null
+    lateinit var javaProcess: Process
+    lateinit var writer: PrintWriter
     var autoStartOnStop = false
 
     fun println(output: String) {
@@ -152,8 +148,12 @@ private fun startJavaProcessPluginFetch(){
 }
 
 fun startJavaProcess() {
+    //EstiConsole.println("Injecting color code...")
+    //ASMInject.injectCode()
+
     EstiConsole.println("Fetching update folder...")
     startJavaProcessPluginFetch()
+
     EstiConsole.println("Starting jar...")
     val pb = ProcessBuilder("java", "-Xms$min_ram", "-Xmx$max_ram", "-XX:+UseConcMarkSweepGC", "-XX:+UseParNewGC", "-XX:+CMSIncrementalPacing", "-XX:ParallelGCThreads=2", "-XX:+AggressiveOpts", "-d64", "-server", "-jar", serverJarName, "-o true")
     pb.directory(File("./"))

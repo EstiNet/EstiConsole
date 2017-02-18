@@ -11,7 +11,7 @@ class StopCommand : ConsoleCommand() {
     override fun run(args: ArrayList<String>){
         EstiConsole.autoStartOnStop = false
         if(mode == Modes.BUNGEE) EstiConsole.sendJavaInput("end")
-        else if (mode == Modes.SPIGOT) EstiConsole.sendJavaInput("stop")
+        else if (mode == Modes.SPIGOT || mode == Modes.PAPERSPIGOT) EstiConsole.sendJavaInput("stop")
     }
 }
 

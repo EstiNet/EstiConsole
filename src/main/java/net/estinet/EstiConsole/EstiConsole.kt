@@ -3,18 +3,17 @@ package net.estinet.EstiConsole
 import jline.console.ConsoleReader
 import jline.console.CursorBuffer
 import net.estinet.EstiConsole.commands.*
+import net.estinet.EstiConsole.network.CurlogsMessage
 import net.estinet.EstiConsole.network.HelloMessage
+import net.estinet.EstiConsole.network.Message
 import net.estinet.EstiConsole.network.SocketIO
 import org.fusesource.jansi.AnsiConsole
-import net.estinet.EstiConsole.network.Message
 import java.io.File
 import java.io.IOException
 import java.io.OutputStreamWriter
 import java.io.PrintWriter
-import java.nio.channels.ServerSocketChannel
 import java.nio.file.Files
 import java.util.*
-
 
 object EstiConsole {
     var version: String = "v1.1.0"
@@ -28,6 +27,7 @@ object EstiConsole {
 
     fun println(output: String) {
         stashLine()
+        logByteArray += "\n${Locale.getLocale(LocaleType.PREFIX)} $output"
         System.out.println("${Locale.getLocale(LocaleType.PREFIX)} $output")
         unstashLine()
     }
@@ -45,8 +45,6 @@ object EstiConsole {
 var mode: Modes = Modes.SPIGOT
 val commands = ArrayList<ConsoleCommand>()
 val messages = ArrayList<Message>()
-
-var channel: ServerSocketChannel? = null
 
 val sessions = HashMap<String, Boolean>();
 
@@ -80,6 +78,7 @@ fun setupCommands() {
  */
 fun setupMessages(){
     messages.add(HelloMessage())
+    messages.add(CurlogsMessage())
 }
 
 /*
@@ -245,6 +244,7 @@ fun unstashLine() {
 
 fun println(output: String){
     stashLine()
+    EstiConsole.logByteArray += "\n$output"
     System.out.println(output)
     unstashLine()
 }

@@ -16,18 +16,17 @@ import javax.net.ssl.TrustManagerFactory
 import io.scalecube.socketio.ServerConfiguration
 import net.estinet.EstiConsole.*
 
-object SocketIO{
+object SocketIO {
     lateinit var sslServer: SocketIOServer
-    fun doSocket(){
-        EstiConsole.println("Starting server...")
+    fun doSocket() {
+        net.estinet.EstiConsole.println("Starting server...")
 
-        EstiConsole.println("Initializing SSL context...")
-        val sslContext = initSslContext()
+        //EstiConsole.println("Initializing SSL context...")
+        //val sslContext = initSslContext()
 
         val config = ServerConfiguration.builder()
                 .port(port)
                 .eventExecutorEnabled(false)
-                .sslContext(sslContext)
                 .build()
         sslServer = SocketIOServer.newInstance(config)
         networkOn = true
@@ -36,16 +35,18 @@ object SocketIO{
                 EstiConsole.println("Client has connected: " + session)
                 sessions.put(session.sessionId, false);
             }
+
             override fun onMessage(session: Session, message: ByteBuf) {
                 val str = message.toString(CharsetUtil.UTF_8)
                 EstiConsole.println("Received: " + str)
-                for(messaged in messages){
-                    if(messaged.name == str.split(" ")[0]){
+                for (messaged in messages) {
+                    if (messaged.name == str.split(" ")[0]) {
                         messaged.run(str.split(" ").subList(1, str.split(" ").size), session)
                     }
                 }
                 message.release()
             }
+
             override fun onDisconnect(session: Session) {
                 EstiConsole.println("Client has disconnected: " + session)
                 sessions.remove(session.sessionId)
@@ -53,10 +54,11 @@ object SocketIO{
             }
         }
         sslServer.start()
+        net.estinet.EstiConsole.println("Started server on port $port!")
     }
 
-    fun sendToAll(output: String){
-        for (s in sessionStorage.values){
+    fun sendToAll(output: String) {
+        for (s in sessionStorage.values) {
             s.send(Unpooled.copiedBuffer(output.toByteArray()))
         }
     }

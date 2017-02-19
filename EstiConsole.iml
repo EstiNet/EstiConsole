@@ -109,5 +109,6 @@
     <orderEntry type="library" name="Maven: io.netty:netty-resolver:4.1.6.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-transport-native-epoll:linux-x86_64:4.1.6.Final" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.22" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-simple:1.7.23" level="project" />
   </component>
 </module>

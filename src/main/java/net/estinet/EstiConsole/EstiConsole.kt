@@ -4,10 +4,7 @@ import io.scalecube.socketio.Session
 import jline.console.ConsoleReader
 import jline.console.CursorBuffer
 import net.estinet.EstiConsole.commands.*
-import net.estinet.EstiConsole.network.CurlogsMessage
-import net.estinet.EstiConsole.network.HelloMessage
-import net.estinet.EstiConsole.network.Message
-import net.estinet.EstiConsole.network.SocketIO
+import net.estinet.EstiConsole.network.*
 import org.fusesource.jansi.AnsiConsole
 import java.io.File
 import java.io.IOException
@@ -85,6 +82,7 @@ fun setupCommands() {
 fun setupMessages(){
     messages.add(HelloMessage())
     messages.add(CurlogsMessage())
+    messages.add(CommandMessage())
 }
 
 /*

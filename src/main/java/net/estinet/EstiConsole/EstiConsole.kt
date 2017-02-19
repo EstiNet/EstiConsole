@@ -1,5 +1,6 @@
 package net.estinet.EstiConsole
 
+import io.scalecube.socketio.Session
 import jline.console.ConsoleReader
 import jline.console.CursorBuffer
 import net.estinet.EstiConsole.commands.*
@@ -25,9 +26,13 @@ object EstiConsole {
 
     var logByteArray = ""
 
+    /*
+    * One of two println functions that must be used to print to console.
+    */
     fun println(output: String) {
         stashLine()
         logByteArray += "\n${Locale.getLocale(LocaleType.PREFIX)} $output"
+        SocketIO.sendToAll("log ${Locale.getLocale(LocaleType.PREFIX)} $output")
         System.out.println("${Locale.getLocale(LocaleType.PREFIX)} $output")
         unstashLine()
     }
@@ -47,6 +52,7 @@ val commands = ArrayList<ConsoleCommand>()
 val messages = ArrayList<Message>()
 
 val sessions = HashMap<String, Boolean>();
+val sessionStorage = HashMap<String, Session>();
 
 var networkOn = false;
 
@@ -191,28 +197,32 @@ fun startCommandProcess() {
     while (true) {
         console.setPrompt(">");
         val input = console.readLine()
-        val inputParsed = input.split(" ")
-        if (inputParsed[0].toLowerCase() == "esticonsole" || inputParsed[0].toLowerCase() == "ec") {
-            var foundValue = false
-            if (inputParsed.size >= 2) {
-                for (cc in commands) {
-                    if (cc.cName.toLowerCase() == inputParsed[1]) {
-                        val args = ArrayList<String>()
-                        var i = 0
-                        while (i < inputParsed.size) {
-                            if (i != 0 && i != 1) args.add(inputParsed[i])
-                            i++
-                        }
-                        cc.run(args)
-                        foundValue = true
-                        break
+        processCommand(input)
+    }
+}
+
+fun processCommand(input: String){
+    val inputParsed: List<String> = input.split(" ")
+    if (inputParsed[0].toLowerCase() == "esticonsole" || inputParsed[0].toLowerCase() == "ec") {
+        var foundValue = false
+        if (inputParsed.size >= 2) {
+            for (cc in commands) {
+                if (cc.cName.toLowerCase() == inputParsed[1]) {
+                    val args = ArrayList<String>()
+                    var i = 0
+                    while (i < inputParsed.size) {
+                        if (i != 0 && i != 1) args.add(inputParsed[i])
+                        i++
                     }
+                    cc.run(args)
+                    foundValue = true
+                    break
                 }
             }
-            if (!foundValue) println("Do /ec help for help!")
-        } else {
-            EstiConsole.sendJavaInput(input)
         }
+        if (!foundValue) println("Do /ec help for help!")
+    } else {
+        EstiConsole.sendJavaInput(input)
     }
 }
 
@@ -241,10 +251,13 @@ fun unstashLine() {
         // ignore
     }
 }
-
+/*
+ * One of two println functions that must be used to print to console.
+ */
 fun println(output: String){
     stashLine()
     EstiConsole.logByteArray += "\n$output"
+    SocketIO.sendToAll("log $output")
     System.out.println(output)
     unstashLine()
 }

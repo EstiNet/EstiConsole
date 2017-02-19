@@ -1,6 +1,7 @@
 package net.estinet.EstiConsole.network
 
 import io.netty.buffer.ByteBuf
+import io.netty.buffer.Unpooled
 import io.netty.util.CharsetUtil
 import io.scalecube.socketio.Session
 import io.scalecube.socketio.SocketIOListener
@@ -16,6 +17,7 @@ import io.scalecube.socketio.ServerConfiguration
 import net.estinet.EstiConsole.*
 
 object SocketIO{
+    lateinit var sslServer: SocketIOServer
     fun doSocket(){
         EstiConsole.println("Starting server...")
 
@@ -27,7 +29,7 @@ object SocketIO{
                 .eventExecutorEnabled(false)
                 .sslContext(sslContext)
                 .build()
-        val sslServer = SocketIOServer.newInstance(config)
+        sslServer = SocketIOServer.newInstance(config)
         networkOn = true
         sslServer.listener = object : SocketIOListener {
             override fun onConnect(session: Session) {
@@ -46,10 +48,17 @@ object SocketIO{
             }
             override fun onDisconnect(session: Session) {
                 EstiConsole.println("Client has disconnected: " + session)
-                sessions.remove(session.sessionId);
+                sessions.remove(session.sessionId)
+                sessionStorage.remove(session.sessionId)
             }
         }
         sslServer.start()
+    }
+
+    fun sendToAll(output: String){
+        for (s in sessionStorage.values){
+            s.send(Unpooled.copiedBuffer(output.toByteArray()))
+        }
     }
 
     @Throws(Exception::class)

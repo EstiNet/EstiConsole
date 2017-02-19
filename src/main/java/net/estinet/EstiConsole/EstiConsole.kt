@@ -3,7 +3,10 @@ package net.estinet.EstiConsole
 import jline.console.ConsoleReader
 import jline.console.CursorBuffer
 import net.estinet.EstiConsole.commands.*
+import net.estinet.EstiConsole.network.HelloMessage
+import net.estinet.EstiConsole.network.SocketIO
 import org.fusesource.jansi.AnsiConsole
+import net.estinet.EstiConsole.network.Message
 import java.io.File
 import java.io.IOException
 import java.io.OutputStreamWriter
@@ -14,10 +17,14 @@ import java.util.*
 
 
 object EstiConsole {
-    var version: String = "v1.0.0"
+    var version: String = "v1.1.0"
     lateinit var javaProcess: Process
     lateinit var writer: PrintWriter
     var autoStartOnStop = false
+
+    var debug = false;
+
+    var logByteArray = ""
 
     fun println(output: String) {
         stashLine()
@@ -36,9 +43,14 @@ object EstiConsole {
 }
 
 var mode: Modes = Modes.SPIGOT
-var commands = ArrayList<ConsoleCommand>()
+val commands = ArrayList<ConsoleCommand>()
+val messages = ArrayList<Message>()
 
 var channel: ServerSocketChannel? = null
+
+val sessions = HashMap<String, Boolean>();
+
+var networkOn = false;
 
 var port = 6921
 var password = "pass123"
@@ -62,6 +74,12 @@ fun setupCommands() {
     commands.add(KillCommand())
     commands.add(ConsoleStopCommand())
     commands.add(RestartCommand())
+}
+/*
+ * Socket listener initializer
+ */
+fun setupMessages(){
+    messages.add(HelloMessage())
 }
 
 /*
@@ -200,7 +218,7 @@ fun startCommandProcess() {
 }
 
 fun startNetworkServer(){
-
+    SocketIO.doSocket()
 }
 
 fun parseJavaOutput(output: String) {

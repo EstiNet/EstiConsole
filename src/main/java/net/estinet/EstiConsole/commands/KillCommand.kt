@@ -10,7 +10,7 @@ class KillCommand : ConsoleCommand() {
         super.desc = "Kills the java process (if online). Turns off auto-start."
     }
     override fun run(args: ArrayList<String>){
-        println("Are you sure you want to kill the java process? (y/n)")
+        EstiConsole.println("Are you sure you want to kill the java process? (y/n)")
         val input = System.console().readLine()
         if(input.toLowerCase() == "y"){
             EstiConsole.javaProcess.destroy()

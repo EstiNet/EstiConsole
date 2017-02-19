@@ -5,25 +5,65 @@ import io.netty.util.CharsetUtil
 import io.scalecube.socketio.Session
 import io.scalecube.socketio.SocketIOListener
 import io.scalecube.socketio.SocketIOServer
-
+import java.io.FileInputStream
+import java.security.KeyStore
+import java.io.File
+import java.security.SecureRandom
+import javax.net.ssl.KeyManagerFactory
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManagerFactory
+import io.scalecube.socketio.ServerConfiguration
+import net.estinet.EstiConsole.*
 
 object SocketIO{
     fun doSocket(){
-        val logServer = SocketIOServer.newInstance(5000 /*port*/)
-        logServer.listener = object : SocketIOListener {
-            override fun onConnect(session: Session) {
-                println("Connected: " + session)
-            }
+        EstiConsole.println("Starting server...")
 
+        EstiConsole.println("Initializing SSL context...")
+        val sslContext = initSslContext()
+
+        val config = ServerConfiguration.builder()
+                .port(port)
+                .eventExecutorEnabled(false)
+                .sslContext(sslContext)
+                .build()
+        val sslServer = SocketIOServer.newInstance(config)
+        networkOn = true
+        sslServer.listener = object : SocketIOListener {
+            override fun onConnect(session: Session) {
+                EstiConsole.println("Client has connected: " + session)
+                sessions.put(session.sessionId, false);
+            }
             override fun onMessage(session: Session, message: ByteBuf) {
-                System.out.println("Received: " + message.toString(CharsetUtil.UTF_8))
+                val str = message.toString(CharsetUtil.UTF_8)
+                EstiConsole.println("Received: " + str)
+                for(messaged in messages){
+                    if(messaged.name == str.split(" ")[0]){
+                        messaged.run(str.split(" ").subList(1, str.split(" ").size), session)
+                    }
+                }
                 message.release()
             }
-
             override fun onDisconnect(session: Session) {
-                println("Disconnected: " + session)
+                EstiConsole.println("Client has disconnected: " + session)
+                sessions.remove(session.sessionId);
             }
         }
-        logServer.start()
+        sslServer.start()
+    }
+
+    @Throws(Exception::class)
+    private fun initSslContext(): SSLContext {
+        val keystorePassword = "password".toCharArray()
+        val keystoreFile = File(SocketIO::class.java.getResource("/keystore.jks").getFile())
+        val ks = KeyStore.getInstance("JKS")
+        ks.load(FileInputStream(keystoreFile), keystorePassword)
+        val kmf = KeyManagerFactory.getInstance("SunX509")
+        kmf.init(ks, keystorePassword)
+        val tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+        tmf.init(ks)
+        val sslContext = SSLContext.getInstance("TLS")
+        sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), SecureRandom())
+        return sslContext
     }
 }

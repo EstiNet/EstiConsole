@@ -17,6 +17,9 @@ EstiConsole will execute the command onto the server.
 
 ##What EstiConsole sends:
 
+###authed
+Acknowledges that your client has been authenticated after a hello query.
+
 ###curlogs [bytes]
 Sent after the client requests the logs with curlogs. Returns bytes containing all the logs.
 

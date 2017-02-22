@@ -1,5 +1,6 @@
 package net.estinet.EstiConsole.network
 
+import io.netty.buffer.Unpooled
 import io.scalecube.socketio.Session
 import net.estinet.EstiConsole.password
 import net.estinet.EstiConsole.sessionStorage
@@ -11,6 +12,9 @@ class HelloMessage : Message{
         if(args[0] == password){
             sessionStorage.put(session.sessionId, session)
             sessions.set(session.sessionId, true)
+        }
+        else{
+            session.send(Unpooled.copiedBuffer("error 401".toByteArray()))
         }
     }
 }

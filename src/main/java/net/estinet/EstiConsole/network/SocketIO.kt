@@ -39,12 +39,17 @@ object SocketIO {
             override fun onMessage(session: Session, message: ByteBuf) {
                 val str = message.toString(CharsetUtil.UTF_8)
                 EstiConsole.println("Received: " + str)
-                for (messaged in messages) {
-                    if (messaged.name == str.split(" ")[0]) {
-                        messaged.run(str.split(" ").subList(1, str.split(" ").size), session)
+                if (str.split(" ")[0] == "hello" || sessions.get(session.sessionId)!!) {
+                    for (messaged in messages) {
+                        if (messaged.name == str.split(" ")[0]) {
+                            messaged.run(str.split(" ").subList(1, str.split(" ").size), session)
+                        }
                     }
+                    message.release()
                 }
-                message.release()
+                else{
+                    session.send(Unpooled.copiedBuffer("error 900".toByteArray()))
+                }
             }
 
             override fun onDisconnect(session: Session) {

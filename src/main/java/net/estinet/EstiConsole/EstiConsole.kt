@@ -237,7 +237,7 @@ fun stashLine() {
     try {
         console.getOutput().write("\u001b[1G\u001b[K");
         console.flush();
-    } catch (e: IOException) {
+    } catch (e: Exception) {
         // ignore
     }
 }
@@ -245,7 +245,7 @@ fun stashLine() {
 fun unstashLine() {
     try {
         console.resetPromptLine(console.getPrompt(), stashed.toString(), stashed!!.cursor)
-    } catch (e: IOException) {
+    } catch (e: Exception) {
         // ignore
     }
 }

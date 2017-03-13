@@ -1,20 +1,17 @@
 package net.estinet.EstiConsole.network
 
-import io.netty.buffer.ByteBuf
-import io.netty.buffer.Unpooled
-import io.netty.util.CharsetUtil
-import io.scalecube.socketio.Session
-import io.scalecube.socketio.SocketIOListener
-import io.scalecube.socketio.SocketIOServer
+import com.corundumstudio.socketio.Configuration
+import com.corundumstudio.socketio.SocketIOClient
+import com.corundumstudio.socketio.SocketIOServer
+import com.corundumstudio.socketio.listener.DataListener
+import net.estinet.EstiConsole.*
+import java.io.File
 import java.io.FileInputStream
 import java.security.KeyStore
-import java.io.File
 import java.security.SecureRandom
 import javax.net.ssl.KeyManagerFactory
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
-import io.scalecube.socketio.ServerConfiguration
-import net.estinet.EstiConsole.*
 
 object SocketIO {
     lateinit var sslServer: SocketIOServer
@@ -24,38 +21,38 @@ object SocketIO {
         //EstiConsole.println("Initializing SSL context...")
         //val sslContext = initSslContext()
 
-        val config = ServerConfiguration.builder()
-                .port(port)
-                .eventExecutorEnabled(false)
-                .build()
-        sslServer = SocketIOServer.newInstance(config)
-        networkOn = true
-        sslServer.listener = object : SocketIOListener {
-            override fun onConnect(session: Session) {
-                EstiConsole.println("Client has connected: " + session)
-                sessions.put(session.sessionId, false);
-            }
+        val config: Configuration = Configuration();
+        config.setPort(port)
 
-            override fun onMessage(session: Session, message: ByteBuf) {
-                val str = message.toString(CharsetUtil.UTF_8)
+        sslServer = SocketIOServer(config)
+        networkOn = true
+        sslServer.addConnectListener({client: SocketIOClient ->
+            run {
+                EstiConsole.println("Client has connected: " + client)
+                sessions.put(client.sessionId.toString(), false);
+            }
+        })
+        sslServer.addEventListener("message", String.javaClass, DataListener(){client: SocketIOClient, data, ack ->
+            run{
+                val str = data.toString()
                 EstiConsole.println("Received: " + str)
-                if (str.split(" ")[0] == "hello" || sessions.get(session.sessionId)!!) {
+                if (str.split(" ")[0] == "hello" || sessions.get(client.sessionId.toString())!!) {
                     for (messaged in messages) {
                         if (messaged.name == str.split(" ")[0]) {
-                            messaged.run(str.split(" ").subList(1, str.split(" ").size), session)
+                            messaged.run(str.split(" ").subList(1, str.split(" ").size), client)
                         }
                     }
-                    message.release()
                 }
                 else{
-                    session.send(Unpooled.copiedBuffer("error 900".toByteArray()))
+                    client.sendEvent("error", "900")
                 }
             }
-
-            override fun onDisconnect(session: Session) {
-                EstiConsole.println("Client has disconnected: " + session)
-                sessions.remove(session.sessionId)
-                sessionStorage.remove(session.sessionId)
+        });
+        sslServer.addDisconnectListener { client: SocketIOClient ->
+            run{
+                EstiConsole.println("Client has disconnected: " + client)
+                sessions.remove(client.sessionId.toString())
+                sessionStorage.remove(client.sessionId.toString())
             }
         }
         sslServer.start()
@@ -64,7 +61,7 @@ object SocketIO {
 
     fun sendToAll(output: String) {
         for (s in sessionStorage.values) {
-            s.send(Unpooled.copiedBuffer(output.toByteArray()))
+            s.sendEvent("log", output.toByteArray())
         }
     }
 

@@ -1,6 +1,6 @@
 package net.estinet.EstiConsole
 
-import io.scalecube.socketio.Session
+import com.corundumstudio.socketio.SocketIOClient
 import jline.console.ConsoleReader
 import jline.console.CursorBuffer
 import net.estinet.EstiConsole.commands.*
@@ -49,7 +49,7 @@ val commands = ArrayList<ConsoleCommand>()
 val messages = ArrayList<Message>()
 
 val sessions = HashMap<String, Boolean>();
-val sessionStorage = HashMap<String, Session>();
+val sessionStorage = HashMap<String, SocketIOClient>();
 
 var networkOn = false;
 

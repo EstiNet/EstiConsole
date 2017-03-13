@@ -92,6 +92,7 @@ fun setupMessages(){
 
 fun main(args: Array<String>) {
     println("EstiConsole.")
+    setupMessages()
     Runtime.getRuntime().addShutdownHook(Thread(ShutdownHook()))
     AnsiConsole.systemInstall()
     println("Setting up Locale...")

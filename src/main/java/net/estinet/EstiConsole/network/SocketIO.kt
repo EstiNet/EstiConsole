@@ -36,14 +36,16 @@ object SocketIO {
         for(message in messages){
             sslServer.addEventListener(message.name, String::class.java, {client: SocketIOClient, data, ack ->
                 run{
-                    val str = data.toString()
-                    EstiConsole.println("Received: " + str)
-                    if (message.name == "hello" || sessions.get(client.sessionId.toString())!!) {
-                        message.run(data.toString().split(" "), client)
+                    try {
+                        val str = data.toString()
+                        EstiConsole.println("Received: " + str)
+                        if (message.name == "hello" || sessions.get(client.sessionId.toString())!!) {
+                            message.run(data.toString().split(" "), client)
+                        } else {
+                            client.sendEvent("error", "900")
+                        }
                     }
-                    else{
-                        client.sendEvent("error", "900")
-                    }
+                    catch(e: NullPointerException) {}
                 }
             })
         }

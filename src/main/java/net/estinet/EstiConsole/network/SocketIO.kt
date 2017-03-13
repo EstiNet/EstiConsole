@@ -32,25 +32,23 @@ object SocketIO {
                 sessions.put(client.sessionId.toString(), false);
             }
         })
-        sslServer.addEventListener("message", String.javaClass, { client: SocketIOClient, data, ack ->
-            run{
-                val str = data.toString()
-                EstiConsole.println("Received: " + str)
-                if (str.split(" ")[0] == "hello" || sessions.get(client.sessionId.toString())!!) {
-                    for (messaged in messages) {
-                        if (messaged.name == str.split(" ")[0]) {
-                            messaged.run(str.split(" ").subList(1, str.split(" ").size), client)
-                        }
+        for(message in messages){
+            sslServer.addEventListener(message.name, String.javaClass, {client: SocketIOClient, data, ack ->
+                run{
+                    val str = data.toString()
+                    EstiConsole.println("Received: " + str)
+                    if (message.name == "hello" || sessions.get(client.sessionId.toString())!!) {
+                        message.run(data.toString().split(" "), client)
+                    }
+                    else{
+                        client.sendEvent("error", "900")
                     }
                 }
-                else{
-                    client.sendEvent("error", "900")
-                }
-            }
-        });
+            })
+        }
         sslServer.addDisconnectListener { client: SocketIOClient ->
             run{
-                EstiConsole.println("Client has disconnected: " + client)
+                EstiConsole.println("Client has disconnected: " + client.remoteAddress)
                 sessions.remove(client.sessionId.toString())
                 sessionStorage.remove(client.sessionId.toString())
             }
@@ -60,6 +58,7 @@ object SocketIO {
     }
 
     fun sendToAll(output: String) {
+        System.out.println("${sessionStorage.values.size}")
         for (s in sessionStorage.values) {
             EstiConsole.println("sending to " + s.remoteAddress);
             s.sendEvent("log", output.toByteArray())

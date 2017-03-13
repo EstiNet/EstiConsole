@@ -12,6 +12,7 @@ class HelloMessage : Message{
         if(args[0] == password){
             sessionStorage.put(session.sessionId.toString(), session)
             sessions.set(session.sessionId.toString(), true)
+            session.sendEvent("authed")
         }
         else{
             session.sendEvent("error", "401")

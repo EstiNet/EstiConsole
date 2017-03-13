@@ -75,6 +75,7 @@ fun setupCommands() {
     commands.add(KillCommand())
     commands.add(ConsoleStopCommand())
     commands.add(RestartCommand())
+    commands.add(SocketSendCommand())
 }
 /*
  * Socket listener initializer
@@ -141,6 +142,7 @@ fun disable() {
     EstiConsole.autoStartOnStop = false
     AnsiConsole.systemUninstall()
     println(Locale.getLocale(LocaleType.DISABLED))
+    SocketIO.sslServer.stop();
     System.exit(0)
 }
 

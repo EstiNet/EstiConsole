@@ -28,11 +28,11 @@ object SocketIO {
         networkOn = true
         sslServer.addConnectListener({client: SocketIOClient ->
             run {
-                EstiConsole.println("Client has connected: " + client)
+                EstiConsole.println("Client has connected: " + client.remoteAddress)
                 sessions.put(client.sessionId.toString(), false);
             }
         })
-        sslServer.addEventListener("message", String.javaClass, DataListener(){client: SocketIOClient, data, ack ->
+        sslServer.addEventListener("message", String.javaClass, { client: SocketIOClient, data, ack ->
             run{
                 val str = data.toString()
                 EstiConsole.println("Received: " + str)
@@ -61,6 +61,7 @@ object SocketIO {
 
     fun sendToAll(output: String) {
         for (s in sessionStorage.values) {
+            EstiConsole.println("sending to " + s.remoteAddress);
             s.sendEvent("log", output.toByteArray())
         }
     }

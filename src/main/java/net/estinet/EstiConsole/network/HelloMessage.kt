@@ -21,7 +21,7 @@ class HelloMessage : Message{
             if(EstiConsole.debug){
                 EstiConsole.println("${session.remoteAddress} has failed auth.")
             }
-            session.sendEvent("error", "401")
+            session.sendEvent("ecerror", "401")
         }
     }
 }

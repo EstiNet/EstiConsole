@@ -44,7 +44,7 @@ object SocketIO {
                         if (message.name == "hello" || sessions.get(client.sessionId.toString())!!) {
                             message.run(data.toString().split(" "), client)
                         } else {
-                            client.sendEvent("error", "900")
+                            client.sendEvent("ecerror", "900")
                         }
                     }
                     catch(e: NullPointerException) {}

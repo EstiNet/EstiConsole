@@ -15,6 +15,21 @@ EstiConsole will return all the logs up to that point in bytes.
 ###command [command]
 EstiConsole will execute the command onto the server.
 
+###curdir [directory]
+Request the file list of the directory. "./" requests the root directory.
+
+###upload [directory] [bytestream]
+Uploads a file to the directory.
+
+###mkdir [directory]
+Creates a folder at the directory.
+
+###delete [directory]
+Deletes a file at the directory.
+
+###download [directory]
+Downloads a file at the directory.
+
 ##What EstiConsole sends:
 
 ###authed
@@ -26,8 +41,14 @@ Sent after the client requests the logs with curlogs. Returns bytes containing a
 ###log [bytes]
 Sent when there there is console output.
 
-###error [error code]
+###ecerror [error code]
 Sent back if something went wrong with input. Check below for what the error code means.
+
+###curdir ["filename":sizekb "filename2":size2kb etc.]
+This is a callback, only sent when curdir is sent to the server. Format: 
+
+###download [bytestream]
+This is a callback, only sent when download is sent the server.
 
 #Error Codes
 
@@ -45,15 +66,15 @@ Sent back to client if there are too many, or not enough arguments.
 
 ##2xx
 
-Errors that are associated with variables sent to ClioteSky.
+Errors associated with files and file transfers.
 
 ###200
 
-Sent back to client if the category is not recognized.
+Sent back to client if the directory cannot be found.
 
 ###201
 
-Sent back to client if the Cliote Name is not recognized.
+Sent back to client if the file cannot be found.
 
 ###202
 

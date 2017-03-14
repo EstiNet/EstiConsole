@@ -84,6 +84,11 @@ fun setupMessages(){
     messages.add(HelloMessage())
     messages.add(CurlogsMessage())
     messages.add(CommandMessage())
+    messages.add(CurdirMessage())
+    messages.add(DeleteMessage())
+    messages.add(DownloadMessage())
+    messages.add(MkdirMessage())
+    messages.add(UploadMessage())
 }
 
 /*

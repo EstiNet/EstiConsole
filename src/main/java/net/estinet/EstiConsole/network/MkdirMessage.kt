@@ -8,8 +8,6 @@ import java.io.File
 class MkdirMessage : Message{
     override val name: String = "mkdir"
     override fun run(args: List<String>, session: SocketIOClient, ack: AckRequest) {
-        var str = ""
-
         try {
             if (File(args[0]).exists()) {
                 if (EstiConsole.debug) {
@@ -21,6 +19,7 @@ class MkdirMessage : Message{
                     EstiConsole.println("[Debug] mkdir request: Created " + args[0])
                 }
                 File(args[0]).mkdir()
+                ack.sendAckData("good")
             }
         }
         catch(e: Throwable){

@@ -50,6 +50,9 @@ This is a callback, only sent when curdir is sent to the server. Format:
 ###download [bytestream]
 This is a callback, only sent when download is sent the server.
 
+###good
+This is a callback, only sent when a task has successfully completed.
+
 #Error Codes
 
 ##1xx

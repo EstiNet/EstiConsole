@@ -42,7 +42,7 @@ object SocketIO {
                             EstiConsole.println("Received: " + str)
                         }
                         if (message.name == "hello" || sessions.get(client.sessionId.toString())!!) {
-                            message.run(data.toString().split(" "), client)
+                            message.run(data.toString().split(" "), client, ack)
                         } else {
                             client.sendEvent("ecerror", "900")
                         }

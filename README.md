@@ -78,7 +78,7 @@ Sent back to client if the file cannot be found.
 
 ###202
 
-Sent back to client if both the category and the Cliote Name isn't recognized.
+Sent back to client if the directory requested is a file.
 
 ##3xx
 

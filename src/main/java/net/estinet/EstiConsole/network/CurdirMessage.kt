@@ -2,7 +2,6 @@ package net.estinet.EstiConsole.network
 
 import com.corundumstudio.socketio.AckRequest
 import com.corundumstudio.socketio.SocketIOClient
-import net.estinet.EstiConsole.EstiConsole
 import java.io.File
 
 class CurdirMessage : Message{
@@ -11,16 +10,21 @@ class CurdirMessage : Message{
         var str = ""
 
         if(!File(args[0]).exists()){
-            ack.sendAckData("error", "200")
+            ack.sendAckData("ecerror", "200")
         }
         else if(!File(args[0]).isDirectory){
-            ack.sendAckData("error", "202")
+            ack.sendAckData("ecerror", "202")
         }
         else {
             for(file in File(args[0]).listFiles()){
-                str += file
+                if(file.isDirectory){
+                    str += file.name + ":" + file.length()/1024/1024 + ":true"
+                }
+                else{
+                    str += file.name + ":" + file.length()/1024/1024 + ":false"
+                }
             }
-            session.sendEvent("curdir", EstiConsole.logByteArray)
+            ack.sendAckData("curdir", str)
         }
     }
 }

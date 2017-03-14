@@ -2,8 +2,6 @@ package net.estinet.EstiConsole.network
 
 import com.corundumstudio.socketio.AckRequest
 import com.corundumstudio.socketio.SocketIOClient
-import io.netty.buffer.Unpooled
-import io.scalecube.socketio.Session
 import net.estinet.EstiConsole.EstiConsole
 
 class CurlogsMessage : Message{

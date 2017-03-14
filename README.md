@@ -44,7 +44,7 @@ Sent when there there is console output.
 ###ecerror [error code]
 Sent back if something went wrong with input. Check below for what the error code means.
 
-###curdir ["filename":sizekb "filename2":size2kb etc.]
+###curdir [filename:sizekb:ifdir filename2:size2kb:ifdir etc.]
 This is a callback, only sent when curdir is sent to the server. Format: 
 
 ###download [bytestream]
@@ -80,6 +80,10 @@ Sent back to client if the file cannot be found.
 
 Sent back to client if the directory requested is a file.
 
+###203
+
+Sent back to client if the directory already exists.
+
 ##3xx
 
 Errors that are associated with Cliote creation.
@@ -111,3 +115,7 @@ Other errors.
 ###900
 
 Sent back to client when the client tries to execute a query before authenticating.
+
+###901
+
+Sent back to client if a general error has occured.

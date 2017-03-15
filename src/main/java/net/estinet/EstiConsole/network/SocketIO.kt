@@ -39,7 +39,7 @@ object SocketIO {
                     try {
                         val str = data.toString()
                         if(EstiConsole.debug){
-                            EstiConsole.println("Received: " + str)
+                            EstiConsole.println("Received: " + message.name + " " + str)
                         }
                         if (message.name == "hello" || sessions.get(client.sessionId.toString())!!) {
                             message.run(data.toString().split(" "), client, ack)

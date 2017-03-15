@@ -11,5 +11,6 @@ class DebugCommand : ConsoleCommand() {
     }
     override fun run(args: ArrayList<String>){
         EstiConsole.debug = !EstiConsole.debug
+        EstiConsole.println("Toggled debug: " + EstiConsole.debug)
     }
 }

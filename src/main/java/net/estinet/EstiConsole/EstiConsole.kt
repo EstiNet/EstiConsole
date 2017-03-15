@@ -14,7 +14,7 @@ import java.nio.file.Files
 import java.util.*
 
 object EstiConsole {
-    var version: String = "v1.1.2"
+    var version: String = "v1.1.3"
     lateinit var javaProcess: Process
     lateinit var writer: PrintWriter
     var autoStartOnStop = false
@@ -76,6 +76,7 @@ fun setupCommands() {
     commands.add(ConsoleStopCommand())
     commands.add(RestartCommand())
     commands.add(SocketSendCommand())
+    commands.add(DebugCommand())
 }
 /*
  * Socket listener initializer

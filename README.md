@@ -19,7 +19,7 @@ EstiConsole will execute the command onto the server.
 Request the file list of the directory. "./" requests the root directory.
 
 ###upload [directory] [bytestream]
-Uploads a file to the directory.
+Uploads a file to the directory, and continues a stream until the 'uploadgood' key phrase is sent.
 
 ###mkdir [directory]
 Creates a folder at the directory.
@@ -29,6 +29,9 @@ Deletes a file at the directory.
 
 ###download [directory]
 Downloads a file at the directory.
+
+###uploadgood
+Sent as a callback for confirmation of finishing an upload.
 
 ##What EstiConsole sends:
 
@@ -43,6 +46,9 @@ Sent when there there is console output.
 
 ###ecerror [error code]
 Sent back if something went wrong with input. Check below for what the error code means.
+
+###uploadcontinue
+Sent back as a callback to continue streaming input.
 
 ###curdir [filename:sizekb:ifdir filename2:size2kb:ifdir etc.]
 This is a callback, only sent when curdir is sent to the server. Format: 

@@ -35,9 +35,9 @@ object EstiConsole {
     }
     fun sendJavaInput(input: String) {
         try {
-            writer?.write("$input\n")
-            writer?.flush()
-            writer = PrintWriter(OutputStreamWriter(javaProcess?.outputStream))
+            writer.write("$input\n")
+            writer.flush()
+            writer = PrintWriter(OutputStreamWriter(javaProcess.outputStream))
         } catch(e: NullPointerException){
             println("Oh noes! Can't send output to java process! Is it offline?")
         }
@@ -90,6 +90,7 @@ fun setupMessages(){
     messages.add(DownloadMessage())
     messages.add(MkdirMessage())
     messages.add(UploadMessage())
+    messages.add(UploadGoodMessage())
 }
 
 /*

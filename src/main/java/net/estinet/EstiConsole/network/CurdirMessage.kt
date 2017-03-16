@@ -12,16 +12,16 @@ class CurdirMessage : Message{
         if(!File(args[0]).exists()){
             ack.sendAckData("ecerror", "200")
         }
-        else if(!File(args[0]).isDirectory){
+        else if(!File(args[0]).isDirectory()){
             ack.sendAckData("ecerror", "202")
         }
         else {
             for(file in File(args[0]).listFiles()){
-                if(file.isDirectory){
-                    str += file.name + ":" + file.length()/1024/1024 + ":true "
+                if(file.isDirectory()){
+                    str += file.name + ":" + file.length()/1024 + ":true "
                 }
                 else{
-                    str += file.name + ":" + file.length()/1024/1024 + ":false "
+                    str += file.name + ":" + file.length()/1024 + ":false "
                 }
             }
             ack.sendAckData(str)

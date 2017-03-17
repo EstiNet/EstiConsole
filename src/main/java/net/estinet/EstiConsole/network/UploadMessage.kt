@@ -3,9 +3,12 @@ package net.estinet.EstiConsole.network
 import com.corundumstudio.socketio.AckRequest
 import com.corundumstudio.socketio.SocketIOClient
 import net.estinet.EstiConsole.EstiConsole
-import java.io.File
-import java.io.FileOutputStream
+import java.io.*
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.*
+import javax.xml.bind.DatatypeConverter
+
 
 var uploadInProgress = ArrayList<String>()
 
@@ -21,7 +24,12 @@ class UploadMessage : Message{
                     str += args[i] + " "
                     i++
                 }
-                FileOutputStream(f).write(str.toByteArray())
+                var ind = DatatypeConverter.parseBase64Binary(str)
+                val bw = BufferedOutputStream(FileOutputStream(f, true))
+                bw.write(ind)
+                bw.flush()
+                bw.close()
+
                 ack.sendAckData("uploadcontinue")
             }
             catch(e: Throwable){
@@ -49,12 +57,14 @@ class UploadMessage : Message{
                         str += args[i] + " "
                         i++
                     }
-                    FileOutputStream(f).write(str.toByteArray())
+                    var ind = DatatypeConverter.parseBase64Binary(str)
+                    Files.write(Paths.get(f.toURI()), ind)
+
                     if(EstiConsole.debug) {
                         EstiConsole.println("[Debug] upload request: Write complete.")
                     }
                     uploadInProgress.add(session.remoteAddress.toString())
-                    ack.sendAckData("continue")
+                    ack.sendAckData("uploadcontinue", "uploadcontinue")
                 }
             }
             catch(e: Throwable){

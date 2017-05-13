@@ -55,7 +55,7 @@ val sessions = HashMap<String, Boolean>();
 val sessionStorage = HashMap<String, SocketIOClient>();
 
 var lineCount = 0
-var parsePoint = 0;
+var parsePoint = 0
 
 var networkOn = false;
 
@@ -252,8 +252,8 @@ fun parseJavaOutput(output: String) {
 
 fun checkLength(){
     if(lineCount > 10000){
-        EstiConsole.logByteArray = EstiConsole.logByteArray.substring(10000-100-parsePoint)
-        lineCount = 8900
+        EstiConsole.logByteArray = EstiConsole.logByteArray.substring(10000-parsePoint)
+        lineCount = 8999
     }
 }
 
@@ -261,7 +261,7 @@ fun stashLine() {
     stashed = console.getCursorBuffer().copy();
     try {
         console.getOutput().write("\u001b[1G\u001b[K");
-        console.flush();
+        console.flush()
     } catch (e: Exception) {
         // ignore
     }

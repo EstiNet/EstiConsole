@@ -27,11 +27,14 @@ object EstiConsole {
     * One of two println functions that must be used to print to console.
     */
     fun println(output: String) {
+        lineCount++
         stashLine()
         logByteArray += "\n${Locale.getLocale(LocaleType.PREFIX)} $output"
+        if(lineCount == 9000) parsePoint = EstiConsole.logByteArray.length
         SocketIO.sendToAll("log ${Locale.getLocale(LocaleType.PREFIX)} $output")
         System.out.println("${Locale.getLocale(LocaleType.PREFIX)} $output")
         unstashLine()
+        checkLength()
     }
     fun sendJavaInput(input: String) {
         try {
@@ -50,6 +53,9 @@ val messages = ArrayList<Message>()
 
 val sessions = HashMap<String, Boolean>();
 val sessionStorage = HashMap<String, SocketIOClient>();
+
+var lineCount = 0
+var parsePoint = 0;
 
 var networkOn = false;
 
@@ -244,6 +250,13 @@ fun parseJavaOutput(output: String) {
 
 }
 
+fun checkLength(){
+    if(lineCount > 10000){
+        EstiConsole.logByteArray = EstiConsole.logByteArray.substring(10000-100-parsePoint)
+        lineCount = 8900
+    }
+}
+
 fun stashLine() {
     stashed = console.getCursorBuffer().copy();
     try {
@@ -265,9 +278,12 @@ fun unstashLine() {
  * One of two println functions that must be used to print to console.
  */
 fun println(output: String){
+    lineCount++
     stashLine()
     EstiConsole.logByteArray += "\n$output"
+    if(lineCount == 9000) parsePoint = EstiConsole.logByteArray.length
     SocketIO.sendToAll("log $output")
     System.out.println(output)
     unstashLine()
+    checkLength()
 }

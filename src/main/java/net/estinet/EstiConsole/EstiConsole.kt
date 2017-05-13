@@ -14,7 +14,7 @@ import java.nio.file.Files
 import java.util.*
 
 object EstiConsole {
-    var version: String = "v1.1.3"
+    var version: String = "v1.2.0"
     lateinit var javaProcess: Process
     lateinit var writer: PrintWriter
     var autoStartOnStop = false
@@ -60,6 +60,8 @@ var serverName = "Server"
 var stmode = "SPIGOT"
 var min_ram = "512M"
 var max_ram = "2G"
+var autoRestart = "no"
+var timeAutoRestart = "24"
 
 var console: ConsoleReader = ConsoleReader()
 private var stashed: CursorBuffer? = null

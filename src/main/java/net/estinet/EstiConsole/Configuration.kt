@@ -67,6 +67,18 @@ fun setupConfiguration() {
             if (input == "") input = "2G"
             prop.setProperty("max_ram", input)
         }
+        if (prop.getProperty("autoRestart") == null) {
+            println("Input whether or not you want auto restart (Default: no):")
+            var input = console.readLine()
+            if (input == "") input = "no"
+            prop.setProperty("autoRestart", input)
+        }
+        if (prop.getProperty("timeAutoRestart") == null) {
+            println("Input time in hours for auto restart (Default: 24):")
+            var input = console.readLine()
+            if (input == "") input = "24"
+            prop.setProperty("timeAutoRestart", input)
+        }
     } catch (io: IOException) {
         io.printStackTrace()
     } finally {
@@ -94,6 +106,8 @@ fun loadConfiguration() {
         serverName = prop.getProperty("server_name")
         min_ram = prop.getProperty("min_ram")
         max_ram = prop.getProperty("max_ram")
+        autoRestart = prop.getProperty("autoRestart")
+        timeAutoRestart = prop.getProperty("timeAutoRestart")
     } catch (ex: IOException) {
         ex.printStackTrace()
     } finally {

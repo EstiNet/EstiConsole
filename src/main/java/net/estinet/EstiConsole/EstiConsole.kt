@@ -14,7 +14,7 @@ import java.nio.file.Files
 import java.util.*
 
 object EstiConsole {
-    var version: String = "v1.1.3"
+    var version: String = "v1.2.0"
     lateinit var javaProcess: Process
     lateinit var writer: PrintWriter
     var autoStartOnStop = false
@@ -27,11 +27,14 @@ object EstiConsole {
     * One of two println functions that must be used to print to console.
     */
     fun println(output: String) {
+        lineCount++
         stashLine()
         logByteArray += "\n${Locale.getLocale(LocaleType.PREFIX)} $output"
+        if(lineCount == 9000) parsePoint = EstiConsole.logByteArray.length
         SocketIO.sendToAll("log ${Locale.getLocale(LocaleType.PREFIX)} $output")
         System.out.println("${Locale.getLocale(LocaleType.PREFIX)} $output")
         unstashLine()
+        checkLength()
     }
     fun sendJavaInput(input: String) {
         try {
@@ -51,6 +54,9 @@ val messages = ArrayList<Message>()
 val sessions = HashMap<String, Boolean>();
 val sessionStorage = HashMap<String, SocketIOClient>();
 
+var lineCount = 0
+var parsePoint = 0
+
 var networkOn = false;
 
 var port = 6921
@@ -60,6 +66,8 @@ var serverName = "Server"
 var stmode = "SPIGOT"
 var min_ram = "512M"
 var max_ram = "2G"
+var autoRestart = "no"
+var timeAutoRestart = "24"
 
 var console: ConsoleReader = ConsoleReader()
 private var stashed: CursorBuffer? = null
@@ -242,11 +250,18 @@ fun parseJavaOutput(output: String) {
 
 }
 
+fun checkLength(){
+    if(lineCount > 10000){
+        EstiConsole.logByteArray = EstiConsole.logByteArray.substring(10000-parsePoint)
+        lineCount = 8999
+    }
+}
+
 fun stashLine() {
     stashed = console.getCursorBuffer().copy();
     try {
         console.getOutput().write("\u001b[1G\u001b[K");
-        console.flush();
+        console.flush()
     } catch (e: Exception) {
         // ignore
     }
@@ -263,9 +278,12 @@ fun unstashLine() {
  * One of two println functions that must be used to print to console.
  */
 fun println(output: String){
+    lineCount++
     stashLine()
     EstiConsole.logByteArray += "\n$output"
+    if(lineCount == 9000) parsePoint = EstiConsole.logByteArray.length
     SocketIO.sendToAll("log $output")
     System.out.println(output)
     unstashLine()
+    checkLength()
 }

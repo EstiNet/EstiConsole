@@ -11,6 +11,6 @@ class VersionCommand : ConsoleCommand(){
         super.desc = "Displays the version number for this instance of EstiConsole."
     }
     override fun run(args: ArrayList<String>){
-        println("EstiConsole ${EstiConsole.version}")
+        EstiConsole.println("EstiConsole ${EstiConsole.version}")
     }
 }

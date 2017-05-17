@@ -25,7 +25,7 @@ class UploadMessage : Message{
                 }
                 var ind = DatatypeConverter.parseBase64Binary(str)
                 val bw = BufferedOutputStream(FileOutputStream(f, true))
-                bw.write(ind)
+                bw.write(ind) //CHANGE THIS
                 bw.flush()
                 bw.close()
 
@@ -57,7 +57,7 @@ class UploadMessage : Message{
                         i++
                     }
                     var ind = DatatypeConverter.parseBase64Binary(str)
-                    Files.write(Paths.get(f.toURI()), ind)
+                    Files.write(Paths.get(f.toURI()), ind) //CHANGE
 
                     if(EstiConsole.debug) {
                         EstiConsole.println("[Debug] upload request: Write complete.")

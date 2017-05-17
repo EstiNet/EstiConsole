@@ -3,7 +3,6 @@ package net.estinet.EstiConsole.network
 import com.corundumstudio.socketio.Configuration
 import com.corundumstudio.socketio.SocketIOClient
 import com.corundumstudio.socketio.SocketIOServer
-import com.corundumstudio.socketio.listener.DataListener
 import net.estinet.EstiConsole.*
 import java.io.File
 import java.io.FileInputStream

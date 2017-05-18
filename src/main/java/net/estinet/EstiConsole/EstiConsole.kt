@@ -14,7 +14,7 @@ import java.nio.file.Files
 import java.util.*
 
 object EstiConsole {
-    var version: String = "v1.2.0"
+    var version: String = "v1.2.1"
     lateinit var javaProcess: Process
     lateinit var writer: PrintWriter
     var autoStartOnStop = false
@@ -30,7 +30,7 @@ object EstiConsole {
         lineCount++
         stashLine()
         logByteArray += "\n${Locale.getLocale(LocaleType.PREFIX)} $output"
-        if(lineCount == 9000) parsePoint = EstiConsole.logByteArray.length
+        if(lineCount == Integer.parseInt(lineMax) - Integer.parseInt(linesToCutOnMax)) parsePoint = EstiConsole.logByteArray.length
         SocketIO.sendToAll("log ${Locale.getLocale(LocaleType.PREFIX)} $output")
         System.out.println("${Locale.getLocale(LocaleType.PREFIX)} $output")
         unstashLine()
@@ -68,6 +68,8 @@ var min_ram = "512M"
 var max_ram = "2G"
 var autoRestart = "no"
 var timeAutoRestart = "24"
+var lineMax = "2000"
+var linesToCutOnMax = "100"
 
 var console: ConsoleReader = ConsoleReader()
 private var stashed: CursorBuffer? = null
@@ -251,9 +253,9 @@ fun parseJavaOutput(output: String) {
 }
 
 fun checkLength(){
-    if(lineCount > 10000){
-        EstiConsole.logByteArray = EstiConsole.logByteArray.substring(10000-parsePoint)
-        lineCount = 8999
+    if(lineCount > Integer.parseInt(lineMax)){
+        EstiConsole.logByteArray = EstiConsole.logByteArray.substring(EstiConsole.logByteArray.length-parsePoint)
+        lineCount = Integer.parseInt(lineMax) - Integer.parseInt(linesToCutOnMax) - 1
     }
 }
 
@@ -281,7 +283,7 @@ fun println(output: String){
     lineCount++
     stashLine()
     EstiConsole.logByteArray += "\n$output"
-    if(lineCount == 9000) parsePoint = EstiConsole.logByteArray.length
+    if(lineCount == Integer.parseInt(lineMax) - Integer.parseInt(linesToCutOnMax)) parsePoint = EstiConsole.logByteArray.length
     SocketIO.sendToAll("log $output")
     System.out.println(output)
     unstashLine()

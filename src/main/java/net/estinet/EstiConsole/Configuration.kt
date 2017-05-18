@@ -79,6 +79,52 @@ fun setupConfiguration() {
             if (input == "") input = "24"
             prop.setProperty("timeAutoRestart", input)
         }
+        if (prop.getProperty("max_lines") == null) {
+            fun verify(){
+                println("Input max number of output lines to store in RAM (Default: 2000):")
+                var input = console.readLine()
+                try{
+                    if(Integer.parseInt(input) < 1){
+                        println("Please give a valid number.")
+                        verify()
+                    }
+                    else{
+                        if (input == "") input = "2000"
+                        prop.setProperty("timeAutoRestart", input)
+                    }
+                }
+                catch(e: Throwable){
+                    net.estinet.EstiConsole.println("Please give a valid number.")
+                    verify()
+                }
+            }
+            verify()
+        }
+        if(prop.getProperty("amount_of_lines_to_cut_on_max") == null){
+            fun verify(){
+                println("Input number of lines to cut when line limit is reached (Default: 100):")
+                var input = console.readLine()
+                try{
+                    if(Integer.parseInt(input) < 1){
+                        println("Please give a valid number.")
+                        verify()
+                    }
+                    else if(Integer.parseInt(input) <= Integer.parseInt("max_lines")){
+                        println("The number must be smaller than the maximum amount of lines.")
+                        verify()
+                    }
+                    else{
+                        if (input == "") input = "100"
+                        prop.setProperty("amount_of_lines_to_cut_on_max", input)
+                    }
+                }
+                catch(e: Throwable){
+                    net.estinet.EstiConsole.println("Please give a valid number.")
+                    verify()
+                }
+            }
+            verify()
+        }
     } catch (io: IOException) {
         io.printStackTrace()
     } finally {
@@ -108,6 +154,8 @@ fun loadConfiguration() {
         max_ram = prop.getProperty("max_ram")
         autoRestart = prop.getProperty("autoRestart")
         timeAutoRestart = prop.getProperty("timeAutoRestart")
+        lineMax = prop.getProperty("max_lines")
+        linesToCutOnMax = prop.getProperty("amount_of_lines_to_cut_on_max");
     } catch (ex: IOException) {
         ex.printStackTrace()
     } finally {

@@ -1,130 +1,130 @@
-#EstiConsole
+# EstiConsole
 EstiNet's Minecraft server console wrapper with remote access support.
 
-#Protocol
+# Protocol
 Communicating with EstiConsole is rather easy. Use the Socket.io library to initialize a connection.
 
-##What EstiConsole recieves:
+## What EstiConsole recieves:
 
-###hello [password]
+### hello [password]
 Must be sent before any other messages are sent. Will return error 401 if the password is incorrect.
 
-###curlogs
+### curlogs
 EstiConsole will return all the logs up to that point in bytes.
 
-###command [command]
+### command [command]
 EstiConsole will execute the command onto the server.
 
-###curdir [directory]
+### curdir [directory]
 Request the file list of the directory. "./" requests the root directory.
 
-###upload [directory] [bytestream]
+### upload [directory] [bytestream]
 Uploads a file to the directory, and continues a stream until the 'uploadgood' key phrase is sent.
 
-###mkdir [directory]
+### mkdir [directory]
 Creates a folder at the directory.
 
-###delete [directory]
+### delete [directory]
 Deletes a file at the directory.
 
-###download [directory]
+### download [directory]
 Downloads a file at the directory.
 
-###uploadgood
+### uploadgood
 Sent as a callback for confirmation of finishing an upload.
 
-##What EstiConsole sends:
+## What EstiConsole sends:
 
-###authed
+### authed
 Acknowledges that your client has been authenticated after a hello query.
 
-###curlogs [bytes]
+### curlogs [bytes]
 Sent after the client requests the logs with curlogs. Returns bytes containing all the logs.
 
-###log [bytes]
+### log [bytes]
 Sent when there there is console output.
 
-###ecerror [error code]
+### ecerror [error code]
 Sent back if something went wrong with input. Check below for what the error code means.
 
-###uploadcontinue
+### uploadcontinue
 Sent back as a callback to continue streaming input.
 
-###curdir [filename:sizekb:ifdir filename2:size2kb:ifdir etc.]
+### curdir [filename:sizekb:ifdir filename2:size2kb:ifdir etc.]
 This is a callback, only sent when curdir is sent to the server. Format: 
 
-###download [bytestream]
+### download [bytestream]
 This is a callback, only sent when download is sent the server.
 
-###good
+### good
 This is a callback, only sent when a task has successfully completed.
 
-#Error Codes
+# Error Codes
 
-##1xx
+## 1xx
 
 Errors that are associated with improper syntax.
 
-###100
+### 100
 
 Sent back to client when the function is not recognized.
 
-###101
+### 101
 
 Sent back to client if there are too many, or not enough arguments.
 
-##2xx
+## 2xx
 
 Errors associated with files and file transfers.
 
-###200
+### 200
 
 Sent back to client if the directory cannot be found.
 
-###201
+### 201
 
 Sent back to client if the file cannot be found.
 
-###202
+### 202
 
 Sent back to client if the directory requested is a file.
 
-###203
+### 203
 
 Sent back to client if the directory already exists.
 
-##3xx
+## 3xx
 
 Errors that are associated with Cliote creation.
 
-###300
+### 300
 
 Sent back to client if the category is not recognized.
 
-###301
+### 301
 
 Sent back to client if the Cliote name is already used.
 
-##4xx
+## 4xx
 
 Errors associated with the login process.
 
-###400
+### 400
 
 Sent back to client if the Cliote is already logged in.
 
-###401
+### 401
 
 Sent back to client when the "password" is incorrect.
 
-##9xx
+## 9xx
 
 Other errors.
 
-###900
+### 900
 
 Sent back to client when the client tries to execute a query before authenticating.
 
-###901
+### 901
 
 Sent back to client if a general error has occured.

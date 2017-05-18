@@ -14,7 +14,7 @@ import java.nio.file.Files
 import java.util.*
 
 object EstiConsole {
-    var version: String = "v1.2.1"
+    var version: String = "v1.2.2"
     lateinit var javaProcess: Process
     lateinit var writer: PrintWriter
     var autoStartOnStop = false
@@ -192,7 +192,7 @@ fun startJavaProcess() {
     //EstiConsole.println("Injecting color code...")
     //ASMInject.injectCode()
 
-    EstiConsole.println("Fetching update folder...")
+    println("Fetching update folder...")
     startJavaProcessPluginFetch()
 
     EstiConsole.println("Starting jar...")
@@ -201,7 +201,7 @@ fun startJavaProcess() {
     try {
         val process: Process = pb.start()
         EstiConsole.javaProcess = process
-        EstiConsole.writer = PrintWriter(OutputStreamWriter(EstiConsole.javaProcess?.outputStream))
+        EstiConsole.writer = PrintWriter(OutputStreamWriter(EstiConsole.javaProcess.outputStream))
         val lsr = LogStreamReader(process.inputStream, process.errorStream)
         val thread = Thread(lsr, "LogStreamReader")
         thread.start()

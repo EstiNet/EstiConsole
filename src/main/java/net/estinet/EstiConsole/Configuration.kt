@@ -85,12 +85,12 @@ fun setupConfiguration() {
                 var input = console.readLine()
                 try{
                     if(Integer.parseInt(input) < 1){
-                        println("Please give a valid number.")
+                        println("Please give a positive number.")
                         verify()
                     }
                     else{
                         if (input == "") input = "2000"
-                        prop.setProperty("timeAutoRestart", input)
+                        prop.setProperty("max_lines", input)
                     }
                 }
                 catch(e: Throwable){
@@ -106,10 +106,10 @@ fun setupConfiguration() {
                 var input = console.readLine()
                 try{
                     if(Integer.parseInt(input) < 1){
-                        println("Please give a valid number.")
+                        println("Please give a positive number.")
                         verify()
                     }
-                    else if(Integer.parseInt(input) <= Integer.parseInt("max_lines")){
+                    else if(Integer.parseInt(input) >= Integer.parseInt(prop.getProperty("max_lines"))){
                         println("The number must be smaller than the maximum amount of lines.")
                         verify()
                     }

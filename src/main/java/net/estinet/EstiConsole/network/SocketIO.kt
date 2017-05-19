@@ -8,6 +8,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.security.KeyStore
 import java.security.SecureRandom
+import java.util.*
 import javax.net.ssl.KeyManagerFactory
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
@@ -41,7 +42,22 @@ object SocketIO {
                             EstiConsole.println("Received: " + message.name + " " + str)
                         }
                         if (message.name == "hello" || sessions.get(client.sessionId.toString())!!) {
-                            message.run(data.toString().split(" "), client, ack)
+                            var inputParsed = ArrayList<String>()
+                            var cache = ""
+                            var hasA = false
+                            for(char in data.toString().toCharArray()){
+                                if(char == '"') hasA = !hasA
+                                else{
+                                    if(char == ' ' && !hasA){
+                                        inputParsed.add(cache)
+                                        cache = ""
+                                    }
+                                    else{
+                                        cache += char
+                                    }
+                                }
+                            }
+                            message.run(inputParsed, client, ack)
                         } else {
                             client.sendEvent("ecerror", "900")
                         }

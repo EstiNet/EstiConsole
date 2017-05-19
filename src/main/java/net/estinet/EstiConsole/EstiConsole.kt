@@ -222,7 +222,7 @@ fun startCommandProcess() {
 }
 
 fun processCommand(input: String){
-    val inputParsed: List<String> = input.split(" ")
+    val inputParsed = ArrayList<String>()
     if (inputParsed[0].toLowerCase() == "esticonsole" || inputParsed[0].toLowerCase() == "ec") {
         var foundValue = false
         if (inputParsed.size >= 2) {

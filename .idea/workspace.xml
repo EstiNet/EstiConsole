@@ -2,25 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="631c45f1-9390-46b2-a432-b45922ca0bf6" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/target/EstiConsole-1.2.0.jar" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/EstiConsole.jar" afterPath="$PROJECT_DIR$/target/EstiConsole.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/ConfigurationKt.class" afterPath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/ConfigurationKt.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/EstiConsole.class" afterPath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/EstiConsole.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/EstiConsoleKt$enable$1.class" afterPath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/EstiConsoleKt$enable$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/EstiConsoleKt$enable$lambda$1.class" afterPath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/EstiConsoleKt$enable$lambda$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/EstiConsoleKt.class" afterPath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/EstiConsoleKt.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/network/SocketIO$doSocket$1.class" afterPath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/network/SocketIO$doSocket$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/network/SocketIO$doSocket$2.class" afterPath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/network/SocketIO$doSocket$2.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/network/SocketIO$doSocket$3.class" afterPath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/network/SocketIO$doSocket$3.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/network/SocketIO.class" afterPath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/network/SocketIO.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/network/UploadMessage.class" afterPath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/network/UploadMessage.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/network/UploadMessageKt.class" afterPath="$PROJECT_DIR$/target/classes/net/estinet/EstiConsole/network/UploadMessageKt.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/Configuration.kt" afterPath="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/Configuration.kt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/EstiConsole.kt" afterPath="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/EstiConsole.kt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/LogStreamReader.kt" afterPath="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/LogStreamReader.kt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -50,8 +33,8 @@
       <file leaf-file-name="EstiConsole.kt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/EstiConsole.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="361">
-              <caret line="30" column="19" lean-forward="true" selection-start-line="30" selection-start-column="19" selection-end-line="30" selection-end-column="19" />
+            <state relative-caret-position="269">
+              <caret line="284" column="32" lean-forward="false" selection-start-line="284" selection-start-column="32" selection-end-line="284" selection-end-column="32" />
               <folding />
             </state>
           </provider>
@@ -94,7 +77,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/network/UploadMessage.kt">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-260">
-              <caret line="19" column="28" lean-forward="true" selection-start-line="19" selection-start-column="28" selection-end-line="19" selection-end-column="28" />
+              <caret line="19" column="28" lean-forward="false" selection-start-line="19" selection-start-column="28" selection-end-line="19" selection-end-column="28" />
               <folding>
                 <element signature="e#41#309#0" expanded="true" />
               </folding>
@@ -115,8 +98,18 @@
       <file leaf-file-name="LogStreamReader.kt" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/LogStreamReader.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="437">
-              <caret line="26" column="26" lean-forward="true" selection-start-line="26" selection-start-column="26" selection-end-line="26" selection-end-column="26" />
+            <state relative-caret-position="323">
+              <caret line="20" column="30" lean-forward="false" selection-start-line="20" selection-start-column="30" selection-end-line="20" selection-end-column="30" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="LocaleType.kt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/LocaleType.kt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="95">
+              <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -137,16 +130,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="171">
               <caret line="12" column="1" lean-forward="false" selection-start-line="12" selection-start-column="1" selection-end-line="12" selection-end-column="1" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RestartCommand.kt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/commands/RestartCommand.kt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="209">
-              <caret line="12" column="30" lean-forward="false" selection-start-line="12" selection-start-column="30" selection-end-line="12" selection-end-column="30" />
               <folding />
             </state>
           </provider>
@@ -198,8 +181,8 @@
         <option value="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/network/UploadMessage.kt" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/Configuration.kt" />
-        <option value="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/EstiConsole.kt" />
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/EstiConsole.kt" />
         <option value="$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/LogStreamReader.kt" />
       </list>
     </option>
@@ -830,12 +813,12 @@
       <workItem from="1491656579494" duration="67000" />
       <workItem from="1494705100593" duration="14682000" />
       <workItem from="1494983397094" duration="186000" />
-      <workItem from="1495140681206" duration="4677000" />
+      <workItem from="1495140681206" duration="9603000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="70465000" />
+    <option name="totallyTimeSpent" value="75391000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -856,9 +839,9 @@
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32820514" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32870865" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32870865" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32704404" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32704404" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32914045" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -887,7 +870,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="2" />
+      <option name="time" value="3" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -993,7 +976,7 @@
         <state relative-caret-position="38">
           <caret line="2" column="6" lean-forward="false" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
           <folding>
-            <element signature="e#33#106#0" expanded="true" />
+            <element signature="e#33#106#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1092,7 +1075,7 @@
         <state relative-caret-position="456">
           <caret line="24" column="0" lean-forward="true" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
           <folding>
-            <element signature="e#33#106#0" expanded="true" />
+            <element signature="e#33#106#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1117,14 +1100,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="627">
           <caret line="34" column="33" lean-forward="false" selection-start-line="34" selection-start-column="33" selection-end-line="34" selection-end-column="33" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/LocaleType.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="38">
-          <caret line="2" column="11" lean-forward="false" selection-start-line="2" selection-start-column="11" selection-end-line="2" selection-end-column="11" />
           <folding />
         </state>
       </provider>
@@ -1265,14 +1240,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/EstiConsole.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="361">
-          <caret line="30" column="19" lean-forward="true" selection-start-line="30" selection-start-column="19" selection-end-line="30" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/network/UploadGoodMessage.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="171">
@@ -1284,17 +1251,33 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/network/UploadMessage.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-260">
-          <caret line="19" column="28" lean-forward="true" selection-start-line="19" selection-start-column="28" selection-end-line="19" selection-end-column="28" />
+          <caret line="19" column="28" lean-forward="false" selection-start-line="19" selection-start-column="28" selection-end-line="19" selection-end-column="28" />
           <folding>
             <element signature="e#41#309#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/EstiConsole.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="269">
+          <caret line="284" column="32" lean-forward="false" selection-start-line="284" selection-start-column="32" selection-end-line="284" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/LocaleType.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="95">
+          <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/net/estinet/EstiConsole/LogStreamReader.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="437">
-          <caret line="26" column="26" lean-forward="true" selection-start-line="26" selection-start-column="26" selection-end-line="26" selection-end-column="26" />
+        <state relative-caret-position="323">
+          <caret line="20" column="30" lean-forward="false" selection-start-line="20" selection-start-column="30" selection-end-line="20" selection-end-column="30" />
           <folding />
         </state>
       </provider>

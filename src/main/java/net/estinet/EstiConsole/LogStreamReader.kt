@@ -18,10 +18,10 @@ internal class LogStreamReader(`is`: InputStream, `stream`: InputStream) : Runna
         try {
             var line: String? = reader.readLine()
             while (line != null) {
-                if(mode == Modes.BUNGEE)
-                    line.replace("\n", "")
-                println(line)
-                parseJavaOutput(line)
+                if(line != "" || mode != Modes.BUNGEE){
+                    println(line)
+                    parseJavaOutput(line)
+                }
                 line = reader.readLine()
             }
             reader.close()

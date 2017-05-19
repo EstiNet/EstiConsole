@@ -27,14 +27,16 @@ object EstiConsole {
     * One of two println functions that must be used to print to console.
     */
     fun println(output: String) {
-        lineCount++
-        stashLine()
-        logByteArray += "\n${Locale.getLocale(LocaleType.PREFIX)} $output"
-        if(lineCount == Integer.parseInt(lineMax) - Integer.parseInt(linesToCutOnMax)) parsePoint = EstiConsole.logByteArray.length
-        SocketIO.sendToAll("log ${Locale.getLocale(LocaleType.PREFIX)} $output")
-        System.out.println("${Locale.getLocale(LocaleType.PREFIX)} $output")
-        unstashLine()
-        checkLength()
+        if(!(output == ">" && mode == Modes.BUNGEE)){
+            lineCount++
+            stashLine()
+            logByteArray += "\n${Locale.getLocale(LocaleType.PREFIX)} $output"
+            if(lineCount == Integer.parseInt(lineMax) - Integer.parseInt(linesToCutOnMax)) parsePoint = EstiConsole.logByteArray.length
+            SocketIO.sendToAll("log ${Locale.getLocale(LocaleType.PREFIX)} $output")
+            System.out.println("${Locale.getLocale(LocaleType.PREFIX)} $output")
+            unstashLine()
+            checkLength()
+        }
     }
     fun sendJavaInput(input: String) {
         try {
@@ -280,12 +282,14 @@ fun unstashLine() {
  * One of two println functions that must be used to print to console.
  */
 fun println(output: String){
-    lineCount++
-    stashLine()
-    EstiConsole.logByteArray += "\n$output"
-    if(lineCount == Integer.parseInt(lineMax) - Integer.parseInt(linesToCutOnMax)) parsePoint = EstiConsole.logByteArray.length
-    SocketIO.sendToAll("log $output")
-    System.out.println(output)
-    unstashLine()
-    checkLength()
+    if(!(output == ">" && mode == Modes.BUNGEE)){
+        lineCount++
+        stashLine()
+        EstiConsole.logByteArray += "\n$output"
+        if(lineCount == Integer.parseInt(lineMax) - Integer.parseInt(linesToCutOnMax)) parsePoint = EstiConsole.logByteArray.length
+        SocketIO.sendToAll("log $output")
+        System.out.println(output)
+        unstashLine()
+        checkLength()
+    }
 }

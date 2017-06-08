@@ -20,6 +20,7 @@ class DownloadMessage : Message{
                 }
                 val f: File = File(args[0])
                 val bytes = f.readBytes()
+
                 ack.sendAckData("download", bytes)
             }
         }

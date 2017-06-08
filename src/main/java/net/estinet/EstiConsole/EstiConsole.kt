@@ -288,6 +288,15 @@ fun println(output: String){
         EstiConsole.logByteArray += "\n$output"
         if(lineCount == Integer.parseInt(lineMax) - Integer.parseInt(linesToCutOnMax)) parsePoint = EstiConsole.logByteArray.length
         SocketIO.sendToAll("log $output")
+        var colour = ""
+        for(ch in output.toCharArray()){
+            if(ch != '§'){
+                colour += ch;
+            }
+            else{
+
+            }
+        }
         System.out.println(output)
         unstashLine()
         checkLength()

@@ -1,5 +1,5 @@
 # EstiConsole
-EstiNet's Minecraft server console wrapper with remote access support.
+EstiNet's Minecraft server console wrapper with remote access support. It can also wrap other JVM console programs with the same amount of functionality.
 
 # Protocol
 Communicating with EstiConsole is rather easy. Use the Socket.io library to initialize a connection.

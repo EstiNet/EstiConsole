@@ -14,7 +14,7 @@ import java.nio.file.Files
 import java.util.*
 
 object EstiConsole {
-    var version: String = "v1.2.2"
+    var version: String = "v1.2.3"
     lateinit var javaProcess: Process
     lateinit var writer: PrintWriter
     var autoStartOnStop = false
@@ -214,15 +214,24 @@ fun startJavaProcess() {
 }
 
 fun startCommandProcess() {
+    var prompt = true
     while (true) {
-        console.setPrompt(">");
+        if(prompt){
+            console.setPrompt(">");
+        }
         val input = console.readLine()
-        processCommand(input)
+        if(input != null){
+            processCommand(input)
+            prompt = true
+        }
+        else{
+            prompt = false
+        }
     }
 }
 
 fun processCommand(input: String){
-    val inputParsed = ArrayList<String>()
+    val inputParsed = input.split(" ")
     if (inputParsed[0].toLowerCase() == "esticonsole" || inputParsed[0].toLowerCase() == "ec") {
         var foundValue = false
         if (inputParsed.size >= 2) {

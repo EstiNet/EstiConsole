@@ -20,8 +20,13 @@ class DownloadMessage : Message{
                 }
                 val f: File = File(args[0])
                 val bytes = f.readBytes()
-
-                ack.sendAckData("download", bytes)
+                if(bytes.size > 10000){
+                    ack.sendAckData("download", bytes)
+                }
+                else {
+                    ack.sendAckData("download", bytes)
+                    ack.sendAckData("downloadgood")
+                }
             }
         }
         catch(e: Throwable){

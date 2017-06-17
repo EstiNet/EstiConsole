@@ -18,10 +18,10 @@ class CurdirMessage : Message{
         else {
             for(file in File(args[0]).listFiles()){
                 if(file.isDirectory()){
-                    str += file.name + ":" + file.length()/1024 + ":true "
+                    str += file.name + ":" + file.length()/1024 + ":true`"
                 }
                 else{
-                    str += file.name + ":" + file.length()/1024 + ":false "
+                    str += file.name + ":" + file.length()/1024 + ":false`"
                 }
             }
             ack.sendAckData(str)

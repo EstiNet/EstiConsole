@@ -57,6 +57,7 @@ object SocketIO {
                                     }
                                 }
                             }
+                            inputParsed.add(cache);
                             message.run(inputParsed, client, ack)
                         } else {
                             client.sendEvent("ecerror", "900")

@@ -79,6 +79,7 @@ private var stashed: CursorBuffer? = null
 /*
  * Command Initializer
  */
+
 fun setupCommands() {
     commands.add(HelpCommand())
     commands.add(VersionCommand())
@@ -90,9 +91,11 @@ fun setupCommands() {
     commands.add(SocketSendCommand())
     commands.add(DebugCommand())
 }
+
 /*
  * Socket listener initializer
  */
+
 fun setupMessages(){
     messages.add(HelloMessage())
     messages.add(CurlogsMessage())

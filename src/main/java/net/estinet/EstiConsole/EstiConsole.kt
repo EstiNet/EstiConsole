@@ -14,7 +14,7 @@ import java.nio.file.Files
 import java.util.*
 
 object EstiConsole {
-    var version: String = "v1.2.4"
+    var version: String = "v1.2.5"
     lateinit var javaProcess: Process
     lateinit var writer: PrintWriter
     var autoStartOnStop = false
@@ -223,7 +223,7 @@ fun startCommandProcess() {
             console.setPrompt(">");
         }
         val input = console.readLine()
-        if(input != null){
+        if(input != null && !input.trim().equals("")){
             processCommand(input)
             prompt = true
         }

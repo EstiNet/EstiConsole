@@ -140,8 +140,7 @@ fun enable() {
     if (isMode) {
         println("Mode selected: $mode")
         println("Welcome to EstiConsole.")
-        val lambda = { startCommandProcess() }
-        val thr: Thread = Thread(lambda)
+        val thr: Thread = Thread({ startCommandProcess() })
         thr.start()
         println("Starting network process...")
         Thread({ startNetworkServer()}).start()
@@ -230,6 +229,7 @@ fun startCommandProcess() {
         else{
             prompt = false
         }
+        Thread.sleep(500)
     }
 }
 

@@ -13,7 +13,6 @@ class ShutdownHook : Runnable{
         thr.start()
         var i = 0
         while(i < 30){
-            println("Please don't end me...")
             Thread.sleep(1000)
             if(!EstiConsole.javaProcess.isAlive()) return
             i++

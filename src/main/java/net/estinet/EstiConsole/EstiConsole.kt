@@ -223,6 +223,9 @@ fun startCommandProcess() {
         }
         val input = console.readLine()
         if(input != null && !input.trim().equals("")){
+            if(EstiConsole.debug){
+                println("Inputted command: $input")
+            }
             processCommand(input)
             prompt = true
         }

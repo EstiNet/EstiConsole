@@ -65,6 +65,7 @@ var port = 6921
 var password = "pass123"
 var serverJarName = "minecraft_server.jar"
 var serverName = "Server"
+var startArgs = "-XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -d64 -server"
 var stmode = "SPIGOT"
 var min_ram = "512M"
 var max_ram = "2G"
@@ -193,14 +194,23 @@ private fun startJavaProcessPluginFetch(){
 }
 
 fun startJavaProcess() {
-    //EstiConsole.println("Injecting color code...")
-    //ASMInject.injectCode()
-
     println("Fetching update folder...")
     startJavaProcessPluginFetch()
 
     EstiConsole.println("Starting jar...")
-    val pb = ProcessBuilder("java", "-Xms$min_ram", "-Xmx$max_ram", "-XX:+UseConcMarkSweepGC", "-XX:+UseParNewGC", "-XX:+CMSIncrementalPacing", "-XX:ParallelGCThreads=2", "-XX:+AggressiveOpts", "-d64", "-server", "-jar", serverJarName, "-o true")
+
+    val commands = ArrayList<String>()
+    commands.add("java")
+    commands.add("-Xms$min_ram")
+    commands.add("-Xmx$max_ram")
+    for(str in startArgs.split(" ")) {
+        commands.add(str)
+    }
+    commands.add("-jar")
+    commands.add(serverJarName)
+    commands.add("-o true")
+
+    val pb = ProcessBuilder(commands)
     pb.directory(File("./"))
     try {
         val process: Process = pb.start()

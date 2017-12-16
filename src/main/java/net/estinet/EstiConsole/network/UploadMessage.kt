@@ -8,7 +8,6 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
 import javax.xml.bind.DatatypeConverter
-
 var uploadInProgress = ArrayList<String>()
 
 class UploadMessage : Message{

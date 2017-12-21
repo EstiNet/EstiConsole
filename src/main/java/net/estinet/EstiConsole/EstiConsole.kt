@@ -14,7 +14,7 @@ import java.nio.file.Files
 import java.util.*
 
 object EstiConsole {
-    var version: String = "v1.2.6"
+    var version: String = "v1.2.7"
     lateinit var javaProcess: Process
     lateinit var writer: PrintWriter
     var autoStartOnStop = false

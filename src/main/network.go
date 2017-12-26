@@ -1,5 +1,7 @@
 package main
 
-func NetworkStart() {
 
+func NetworkStart() {
+	server := tcp_server.New("localhost:9999")
+	
 }

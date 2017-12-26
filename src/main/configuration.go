@@ -35,6 +35,7 @@ type InstanceConfig struct {
 type ServerConfig struct {
 	InstanceName                      string `json:"instance_name"`
 	HomeDirectory                     string `json:"home_directory"`
+	ExecutableName                    string `json:"executable_name"`
 	MinRam                            string `json:"min_ram"`
 	MaxRam                            string `json:"max_ram"`
 	JavaArgs                          string `json:"java_args"`
@@ -59,6 +60,7 @@ func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 	wi.HomeDirectory = "./"
 	wi.MinRam = "512M"
 	wi.MaxRam = "2G"
+	wi.ExecutableName = "minecraft_server.jar"
 	wi.JavaArgs = "-XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -d64 -server"
 	wi.MaxLines = 2000
 	wi.AmountOfLinesToCutOnMax = 100
@@ -157,6 +159,7 @@ func verifySettings(config *InstanceConfig) {
 	namesUsed := make([]string, 1)
 
 	for i, server := range config.Servers {
+
 		_, err := os.Stat(server.HomeDirectory)
 		if os.IsNotExist(err) {
 			println(server.InstanceName + "'s home directory does not exist! Please fix this error in the config.")
@@ -165,6 +168,12 @@ func verifySettings(config *InstanceConfig) {
 		if server.HomeDirectory[len(server.HomeDirectory)-1] == '/' {
 			config.Servers[i].HomeDirectory = substring(server.HomeDirectory, 0, len(server.HomeDirectory)-1)
 		}
+
+		_, err2 := os.Stat(server.ExecutableName)
+		if os.IsNotExist(err2) {
+			println(server.InstanceName + "")
+		}
+
 		for _, k := range namesUsed {
 			if k == server.InstanceName {
 				log.Fatal("The name " + server.InstanceName + " is already taken, check for duplicates!")

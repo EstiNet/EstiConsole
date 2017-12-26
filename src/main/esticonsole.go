@@ -40,6 +40,7 @@ func init() {
 	commands["switch"] = CommandSwitch
 	commands["instancestop"] = CommandInstanceStop
 	commands["start"] = CommandStart
+	commands["kill"] = CommandKill
 
 	clear = make(map[string]func())
 	clear["linux"] = func() {

@@ -25,7 +25,7 @@ func CommandList(input string) {
 		} else {
 			state = "Offline"
 		}
-		println(k + "(" + state + ")")
+		println(k + " (" + state + ")")
 	}
 }
 func CommandSwitch(input string) {

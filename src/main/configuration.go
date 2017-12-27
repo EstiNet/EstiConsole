@@ -6,6 +6,8 @@ import (
 	"io"
 	"encoding/json"
 	"bytes"
+	"reflect"
+	"fmt"
 )
 
 /*
@@ -24,6 +26,7 @@ type Users struct {
 type InstanceConfig struct {
 	InstanceName string         `json:"instance_name"`
 	InstancePort uint           `json:"instance_port"`
+	Test string `json:test` //TODO
 	Servers      []ServerConfig `json:"servers"`
 	Users        []Users        `json:"users"`
 }
@@ -54,6 +57,7 @@ func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 	con := InstanceConfig{}
 	con.InstanceName = "Server"
 	con.InstancePort = 6921
+	con.Test = "hi" //TODO
 
 	wi := ServerConfig{}
 	wi.InstanceName = "Server1"
@@ -146,10 +150,43 @@ func LoadConfig() {
 		println("Once you are done updating, please start the server again.")
 		os.Exit(0)
 	}
+
+	/*//Verify that all of the settings are there (possible config update)
+	//TODO
+	instance, server, users := ConfigDefault()
+	inst := reflect.ValueOf(instance)
+	conf := reflect.ValueOf(config)
+	for i := 0; i < conf.NumField(); i++ {
+		fmt.Println(conf.Field(i).Interface())
+		if conf.Field(i).Interface() == "" {
+			println("Please check your config, a setting has been updated. (" + inst.Field(i).String() + ")")
+			conf.Field(i).Set(inst.Field(i))
+		}
+	}
+	for i := 0; i < len(config.Servers); i++ {
+		sever := reflect.ValueOf(config.Servers[i])
+		for j := 0; j < sever.NumField(); j++ {
+			if sever.Field(j).Interface() == nil {
+				println("Please check your config, a setting has been updated. (" + sever.Field(j).String() + ")")
+				sever.Field(j).Set(reflect.ValueOf(server).Field(j))
+			}
+		}
+	}
+	for i := 0; i < len(config.Users); i++ {
+		sever := reflect.ValueOf(config.Users[i])
+		for j := 0; j < sever.NumField(); j++ {
+			if sever.Field(j).Interface() == nil {
+				println("Please check your config, a setting has been updated. (" + sever.Field(j).String() + ")")
+				sever.Field(j).Set(reflect.ValueOf(users).Field(j))
+			}
+		}
+	}*/
+
 	//Verify settings before starting the program (if the settings are incorrect, the program stops)
 	verifySettings(&config)
 	instanceSettings = config
 }
+
 
 /*
  * Settings verification (crashes with error)

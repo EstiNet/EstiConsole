@@ -120,6 +120,7 @@ func ClientsStart() {
 func ClientsStop() {
 	println("Stopping all clients...")
 	end := func(server *Server) {
+		server.AutoStart = false
 		server.stop()
 		time.Sleep(time.Second * time.Duration(server.Settings.ServerUnresponsiveKillTimeSeconds))
 		if server.IsOnline {

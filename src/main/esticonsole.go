@@ -10,13 +10,13 @@ import (
 	"os/exec"
 	"runtime"
 	"time"
+	"io"
 )
 
 var version = "v2.0.0"
 var instanceSettings InstanceConfig
 
 var commands = make(map[string]interface{})
-var reader = bufio.NewReader(os.Stdin)
 
 var curServerView *Server = nil
 
@@ -115,8 +115,16 @@ func Shutdown() {
  */
 
 func ConsoleStart() {
+	var reader = bufio.NewReader(os.Stdin)
 	for {
-		input, _ := reader.ReadString('\n')
+		input, err := reader.ReadString('\n')
+		if err == io.EOF {
+			time.Sleep(100 * time.Millisecond)
+			continue
+		}
+		if err != nil {
+			println(err.Error())
+		}
 		input = strings.TrimRight(input, "\n")
 		cFound := false
 		if strings.Split(input, " ")[0] == "ec" {

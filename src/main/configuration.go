@@ -151,7 +151,7 @@ func LoadConfig() {
 		os.Exit(0)
 	}
 
-	/*//Verify that all of the settings are there (possible config update)
+	//Verify that all of the settings are there (possible config update)
 	//TODO
 	instance, server, users := ConfigDefault()
 	inst := reflect.ValueOf(instance)
@@ -167,7 +167,7 @@ func LoadConfig() {
 		sever := reflect.ValueOf(config.Servers[i])
 		for j := 0; j < sever.NumField(); j++ {
 			if sever.Field(j).Interface() == nil {
-				println("Please check your config, a setting has been updated. (" + sever.Field(j).String() + ")")
+				println("Please check your config, a setting has been updated. (" + sever.Field(j).Name + sever.Field(j).String() + ")")
 				sever.Field(j).Set(reflect.ValueOf(server).Field(j))
 			}
 		}
@@ -180,7 +180,7 @@ func LoadConfig() {
 				sever.Field(j).Set(reflect.ValueOf(users).Field(j))
 			}
 		}
-	}*/
+	}
 
 	//Verify settings before starting the program (if the settings are incorrect, the program stops)
 	verifySettings(&config)

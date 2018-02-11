@@ -152,35 +152,40 @@ func LoadConfig() {
 	}
 
 	//Verify that all of the settings are there (possible config update)
-	//TODO
 	instance, server, users := ConfigDefault()
-	inst := reflect.ValueOf(instance)
-	conf := reflect.ValueOf(config)
+	inst := reflect.Indirect(reflect.ValueOf(instance))
+	conf := reflect.Indirect(reflect.ValueOf(config))
+	confSet := reflect.ValueOf(&config).Elem()
 	for i := 0; i < conf.NumField(); i++ {
 		fmt.Println(conf.Field(i).Interface())
 		if conf.Field(i).Interface() == "" {
 			println("Please check your config, a setting has been updated. (" + inst.Field(i).String() + ")")
-			conf.Field(i).Set(inst.Field(i))
+			confSet.Field(i).SetString(inst.Field(i).String())
 		}
 	}
 	for i := 0; i < len(config.Servers); i++ {
 		sever := reflect.ValueOf(config.Servers[i])
 		for j := 0; j < sever.NumField(); j++ {
 			if sever.Field(j).Interface() == nil {
-				println("Please check your config, a setting has been updated. (" + sever.Field(j).Name + sever.Field(j).String() + ")")
-				sever.Field(j).Set(reflect.ValueOf(server).Field(j))
+				println("Please check your config, a setting has been updated. (" + sever.Field(j).String() + ")")
+				severSet := reflect.ValueOf(&config.Servers[i]).Elem()
+				severSet.Field(j).Set(reflect.ValueOf(server).Field(j))
 			}
 		}
 	}
 	for i := 0; i < len(config.Users); i++ {
 		sever := reflect.ValueOf(config.Users[i])
+		severSet := reflect.ValueOf(&config.Users[i]).Elem();
 		for j := 0; j < sever.NumField(); j++ {
 			if sever.Field(j).Interface() == nil {
 				println("Please check your config, a setting has been updated. (" + sever.Field(j).String() + ")")
-				sever.Field(j).Set(reflect.ValueOf(users).Field(j))
+				severSet.Field(j).Set(reflect.ValueOf(users).Field(j))
 			}
 		}
 	}
+	js, err := json.MarshalIndent(instance, "", "    ") //pretty JSON
+	file.Write(js)
+	file.Close()
 
 	//Verify settings before starting the program (if the settings are incorrect, the program stops)
 	verifySettings(&config)

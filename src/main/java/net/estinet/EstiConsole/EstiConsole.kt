@@ -65,7 +65,7 @@ var port = 6921
 var password = "pass123"
 var serverJarName = "minecraft_server.jar"
 var serverName = "Server"
-var startArgs = "-XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -d64 -server"
+var startArgs = "-XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+UnlockExperimentalVMOptions -XX:MaxGCPauseMillis=50 -XX:+DisableExplicitGC -XX:TargetSurvivorRatio=90 -XX:G1NewSizePercent=50 -XX:G1MaxNewSizePercent=80 -XX:InitiatingHeapOccupancyPercent=10 -XX:+AggressiveOpts -d64 -server"
 var stmode = "SPIGOT"
 var min_ram = "512M"
 var max_ram = "2G"
@@ -208,7 +208,7 @@ fun startJavaProcess() {
     }
     commands.add("-jar")
     commands.add(serverJarName)
-    commands.add("-o true")
+    commands.add("--noconsole")
 
     val pb = ProcessBuilder(commands)
     pb.directory(File("./"))

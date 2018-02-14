@@ -208,7 +208,6 @@ fun startJavaProcess() {
     }
     commands.add("-jar")
     commands.add(serverJarName)
-    commands.add("--noconsole")
 
     val pb = ProcessBuilder(commands)
     pb.directory(File("./"))

@@ -46,6 +46,7 @@ type ServerConfig struct {
 	StopProcessCommand                string `json:"stop_process_command"`
 	ServerUnresponsiveKillTimeSeconds uint   `json:"server_unresponsive_kill_time_seconds"`
 	MinecraftMode                     bool   `json:"minecraft_mode"`
+	Test                              string `json:"test"`
 }
 
 /*
@@ -69,6 +70,8 @@ func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 	wi.StopProcessCommand = "stop"
 	wi.ServerUnresponsiveKillTimeSeconds = 20
 	wi.MinecraftMode = true
+
+	wi.Test = "hi"
 
 	users := Users{}
 	users.Name = "default"
@@ -155,8 +158,7 @@ func LoadConfig() {
 	conf := reflect.Indirect(reflect.ValueOf(config))
 	confSet := reflect.ValueOf(&config).Elem()
 	for i := 0; i < conf.NumField(); i++ {
-		fmt.Println(conf.Field(i).Interface())
-		if conf.Field(i).Interface() == "" {
+		if conf.Field(i).Interface() == "" || conf.Field(i).Interface() == 0 {
 			println("Please check your config, a setting has been updated. (" + inst.Field(i).String() + ")")
 			confSet.Field(i).SetString(inst.Field(i).String())
 		}
@@ -164,14 +166,12 @@ func LoadConfig() {
 	for i := 0; i < len(config.Servers); i++ {
 		sever := reflect.ValueOf(config.Servers[i])
 		for j := 0; j < sever.NumField(); j++ {
+			//fmt.Println(sever.Field(j).Interface()) //TODO
+			//debug(" " + sever.Field(j).String())
 			if sever.Field(j).Interface() == nil {
 				println("Please check your config, a setting has been updated. (" + sever.Field(j).String() + ")")
-<<<<<<< Updated upstream
 				severSet := reflect.ValueOf(&config.Servers[i]).Elem()
 				severSet.Field(j).Set(reflect.ValueOf(server).Field(j))
-=======
-				sever.Field(j).Set(reflect.ValueOf(server).Field(j))
->>>>>>> Stashed changes
 			}
 		}
 	}
@@ -185,9 +185,19 @@ func LoadConfig() {
 			}
 		}
 	}
-	js, err := json.MarshalIndent(instance, "", "    ") //pretty JSON
-	file.Write(js)
-	file.Close()
+
+	debug(config.Test)
+
+	js, err := json.MarshalIndent(config, "", "    ") //pretty JSON
+	if err != nil {
+		log.Fatal(err)
+	}
+	var file2, err4 = os.OpenFile(configPath, os.O_RDWR, 0755) //Check if file is openable (and get file object)
+	if err4 != nil {
+		log.Fatal(err4)
+	}
+	file2.Write(js) //write JSON to file
+	file2.Close()
 
 	//Verify settings before starting the program (if the settings are incorrect, the program stops)
 	verifySettings(&config)

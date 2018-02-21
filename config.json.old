@@ -1,6 +1,5 @@
 {
     "instance_name": "Server",
-    "instance_port": 0,
     "servers": [
         {
             "instance_name": "Server1",
@@ -14,7 +13,6 @@
             "stop_process_command": "stop",
             "server_unresponsive_kill_time_seconds": 20,
             "minecraft_mode": true,
-            "test": "hi"
         }
     ],
     "users": [

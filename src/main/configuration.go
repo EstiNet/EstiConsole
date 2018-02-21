@@ -26,7 +26,6 @@ type Users struct {
 type InstanceConfig struct {
 	InstanceName string         `json:"instance_name"`
 	InstancePort uint           `json:"instance_port"`
-	Test string `json:test` //TODO
 	Servers      []ServerConfig `json:"servers"`
 	Users        []Users        `json:"users"`
 }
@@ -57,7 +56,6 @@ func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 	con := InstanceConfig{}
 	con.InstanceName = "Server"
 	con.InstancePort = 6921
-	con.Test = "hi" //TODO
 
 	wi := ServerConfig{}
 	wi.InstanceName = "Server1"
@@ -168,8 +166,12 @@ func LoadConfig() {
 		for j := 0; j < sever.NumField(); j++ {
 			if sever.Field(j).Interface() == nil {
 				println("Please check your config, a setting has been updated. (" + sever.Field(j).String() + ")")
+<<<<<<< Updated upstream
 				severSet := reflect.ValueOf(&config.Servers[i]).Elem()
 				severSet.Field(j).Set(reflect.ValueOf(server).Field(j))
+=======
+				sever.Field(j).Set(reflect.ValueOf(server).Field(j))
+>>>>>>> Stashed changes
 			}
 		}
 	}

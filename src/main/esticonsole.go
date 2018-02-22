@@ -31,6 +31,9 @@ func println(str string) {
 func print(str string) {
 	fmt.Print(str)
 }
+func debug(str string) {
+	fmt.Println(str)
+}
 
 func init() {
 	commands["version"] = CommandVersion

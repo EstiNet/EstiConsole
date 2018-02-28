@@ -4,7 +4,7 @@
     "servers": [
         {
             "instance_name": "Server1",
-            "home_directory": "./",
+            "home_directory": "/home/devin/Flow/ECExp",
             "executable_name": "minecraft_server.jar",
             "min_ram": "512M",
             "max_ram": "2G",

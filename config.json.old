@@ -1,5 +1,6 @@
 {
     "instance_name": "Server",
+    "instance_port": 0,
     "servers": [
         {
             "instance_name": "Server1",
@@ -12,7 +13,7 @@
             "amount_of_lines_to_cut_on_max": 100,
             "stop_process_command": "stop",
             "server_unresponsive_kill_time_seconds": 20,
-            "minecraft_mode": true,
+            "minecraft_mode": true
         }
     ],
     "users": [
@@ -20,6 +21,8 @@
             "name": "default",
             "password": "password"
         }
-    ],
-    "test": "hi"
+    ]
+}assword"
+        }
+    ]
 }

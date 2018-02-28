@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"bytes"
 	"reflect"
-	"fmt"
 )
 
 /*
@@ -46,7 +45,6 @@ type ServerConfig struct {
 	StopProcessCommand                string `json:"stop_process_command"`
 	ServerUnresponsiveKillTimeSeconds uint   `json:"server_unresponsive_kill_time_seconds"`
 	MinecraftMode                     bool   `json:"minecraft_mode"`
-	Test                              string `json:"test"`
 }
 
 /*
@@ -70,8 +68,6 @@ func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 	wi.StopProcessCommand = "stop"
 	wi.ServerUnresponsiveKillTimeSeconds = 20
 	wi.MinecraftMode = true
-
-	wi.Test = "hi"
 
 	users := Users{}
 	users.Name = "default"
@@ -185,8 +181,6 @@ func LoadConfig() {
 			}
 		}
 	}
-
-	debug(config.Test)
 
 	js, err := json.MarshalIndent(config, "", "    ") //pretty JSON
 	if err != nil {

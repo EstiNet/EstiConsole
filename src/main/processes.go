@@ -92,7 +92,7 @@ func (server *Server) stop() {
 }
 
 func (server *Server) input(input string) {
-	io.WriteString(server.InputPipe, input + "\n")
+	io.WriteString(server.InputPipe, input+"\n")
 }
 
 /*
@@ -137,11 +137,27 @@ func ClientsStop() {
 }
 
 func StartClient(name string) string {
-
+	if _, ok := Servers[name]; ok {
+		if Servers[name].IsOnline {
+			return "Process already online."
+		} else {
+			Servers[name].AutoStart = true
+			Servers[name].start()
+			return "Started " + Servers[name].Settings.InstanceName
+		}
+	} else {
+		return "Server not found."
+	}
 }
 
 func StopClient(name string) string {
-
+	if _, ok := Servers[name]; ok {
+		Servers[name].AutoStart = false
+		Servers[name].stop()
+		return "Stopped " + Servers[name].Settings.InstanceName
+	} else {
+		return "Server not found."
+	}
 }
 
 func KillClient(name string) string {

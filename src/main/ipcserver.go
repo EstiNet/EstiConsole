@@ -5,6 +5,7 @@ import (
 	"net"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type Args struct {
@@ -35,37 +36,28 @@ func (ipcserver *Ipcserver) List(arg *Args, reply *string) error {
 }
 
 func (ipcserver *Ipcserver) Stop(arg *Args, reply *string) error {
-	if _, ok := Servers[arg.Slice[0]]; ok {
-		Servers[arg.Slice[0]].AutoStart = false
-		Servers[arg.Slice[0]].stop()
-		output := "Stopped " + Servers[arg.Slice[0]].Settings.InstanceName
+	output := StopClient(arg.Slice[0])
+	if strings.Split(output, " ")[0] == "Stopped" {
 		println(output)
-		*reply = output
-	} else {
-		*reply = "Server not found."
 	}
+	*reply = output
 	return nil
 }
 
 func (ipcserver *Ipcserver) Start(arg *Args, reply *string) error {
-	if _, ok := Servers[arg.Slice[0]]; ok {
-		if Servers[arg.Slice[0]].IsOnline {
-			*reply = "Process already online."
-		} else {
-			Servers[arg.Slice[0]].AutoStart = true
-			Servers[arg.Slice[0]].start()
-			output := "Started " + Servers[arg.Slice[0]].Settings.InstanceName
-			println(output)
-			*reply = output
-		}
-	} else {
-		*reply = "Server not found."
+	output := StartClient(arg.Slice[0])
+	if strings.Split(output, " ")[0] == "Started" {
+		println(output)
 	}
+	*reply = output
 	return nil
 }
 
 func (ipcserver *Ipcserver) Kill(arg *Args, reply *string) error {
 	output := KillClient(arg.Slice[0])
+	if strings.Split(output, " ")[0] == "Killed" {
+		println(output)
+	}
 	*reply = output
 	return nil
 }

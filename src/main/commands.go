@@ -39,26 +39,10 @@ func CommandSwitch(input string) {
 	}
 }
 func CommandStop(input string) {
-	if _, ok := Servers[input]; ok {
-		Servers[input].AutoStart = false
-		Servers[input].stop()
-		println("Stopped " + Servers[input].Settings.InstanceName)
-	} else {
-		println("Server not found.")
-	}
+	println(StopClient(input))
 }
 func CommandStart(input string) {
-	if _, ok := Servers[input]; ok {
-		if Servers[input].IsOnline {
-			println("Process already online.")
-		} else {
-			Servers[input].AutoStart = true
-			Servers[input].start()
-			println("Started " + Servers[input].Settings.InstanceName)
-		}
-	} else {
-		println("Server not found.")
-	}
+	println(StartClient(input))
 }
 func CommandKill(input string) {
 	println(KillClient(input))

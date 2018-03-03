@@ -27,7 +27,7 @@ type Server struct {
 
 func (server *Server) start() {
 	println("Starting " + server.Settings.InstanceName)
-	server.Process = exec.Command("java", "-jar", "minecraft_server.jar")
+	server.Process = exec.Command("java", "-jar", server.Settings.ExecutableName)
 	server.Process.Dir = server.Settings.HomeDirectory //set working directory
 
 	//Handle minecraft related tasks

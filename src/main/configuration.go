@@ -7,6 +7,10 @@ import (
 	"encoding/json"
 	"bytes"
 	"reflect"
+<<<<<<< Updated upstream
+=======
+//	"fmt"
+>>>>>>> Stashed changes
 )
 
 /*
@@ -44,7 +48,11 @@ type ServerConfig struct {
 	AmountOfLinesToCutOnMax           uint   `json:"amount_of_lines_to_cut_on_max"`
 	StopProcessCommand                string `json:"stop_process_command"`
 	ServerUnresponsiveKillTimeSeconds uint   `json:"server_unresponsive_kill_time_seconds"`
+<<<<<<< Updated upstream
 	MinecraftMode                     bool   `json:"minecraft_mode"`
+=======
+	MinecraftMode                     bool   `json:"minecraft_mode"` //TODO not implemented
+>>>>>>> Stashed changes
 }
 
 /*
@@ -119,6 +127,7 @@ func LoadConfig() {
 	var config InstanceConfig
 	err3 := json.Unmarshal(text, &config)
 	if err3 != nil {
+		println(err3.Error())
 		if string(text) != "" && !createdFile {
 			os.Rename(configPath, configPath+".old")
 			println("Moved the old config to config.json.old.")
@@ -183,9 +192,19 @@ func LoadConfig() {
 	}
 
 	js, err := json.MarshalIndent(config, "", "    ") //pretty JSON
+
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	os.Remove(configPath)
+
+	var file3, err5 = os.Create(configPath)
+	if err5 != nil { //Crash if the program can't load config file.
+		log.Fatal(err5)
+	}
+	file3.Close()
+
 	var file2, err4 = os.OpenFile(configPath, os.O_RDWR, 0755) //Check if file is openable (and get file object)
 	if err4 != nil {
 		log.Fatal(err4)
@@ -217,9 +236,9 @@ func verifySettings(config *InstanceConfig) {
 			config.Servers[i].HomeDirectory = substring(server.HomeDirectory, 0, len(server.HomeDirectory)-1)
 		}
 
-		_, err2 := os.Stat(server.ExecutableName)
+		_, err2 := os.Stat(server.HomeDirectory + "/" + server.ExecutableName)
 		if os.IsNotExist(err2) {
-			println(server.InstanceName + "")
+			log.Fatal(server.InstanceName + "'s path for executable " + server.HomeDirectory + "/" + server.ExecutableName + " does not exist! Check your path in the config.")
 		}
 
 		for _, k := range namesUsed {

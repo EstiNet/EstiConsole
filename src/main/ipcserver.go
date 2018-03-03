@@ -34,6 +34,25 @@ func (ipcserver *Ipcserver) List(arg *Args, reply *string) error {
 	return nil
 }
 
+func (ipcserver *Ipcserver) Stop(arg *Args, reply *string) error {
+	if _, ok := Servers[arg.Slice[0]]; ok {
+		Servers[arg.Slice[0]].AutoStart = false
+		Servers[arg.Slice[0]].stop()
+		output := "Stopped " + Servers[arg.Slice[0]].Settings.InstanceName
+		println(output)
+		*reply = output
+	} else {
+		*reply = "Server not found."
+	}
+	return nil
+}
+
+func (ipcserver *Ipcserver) InstanceStop(arg *Args, reply *string) error {
+	go Shutdown()
+	*reply = "Host service shutting down."
+	return nil
+}
+
 func ipcserverStart() {
 	ipcserver := new(Ipcserver)
 	rpc.Register(ipcserver)

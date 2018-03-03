@@ -11,65 +11,77 @@ type Args struct {
 	Slice []string;
 }
 
-var instanceName string
+var version = "v1.0.0"
+
+var commands = make(map[string]interface{})
+
 var args []string
+var address* string
+var port* string
 
 var client *rpc.Client
 
-func startCon() *rpc.Client {
-	println("Attempting connection to host server...")
-	client, err := rpc.DialHTTP("tcp", "127.0.0.1:19005")
-	if err != nil {
-		log.Fatal("Error connecting to host process, is it running?:", err)
-	}
-	return client
+/*
+ * Initialize command functions
+ */
+
+func init() {
+	commands["help"] = CommandHelp
+	commands["version"] = CommandVersion
+	commands["list"] = CommandList
+	commands["status"] = CommandStatus
+	commands["instancestop"] = CommandInstanceStop
+	commands["stop"] = CommandStop
 }
 
 /*
  * Client entry point
  */
-func main() {
+
+ func main() {
 	args = os.Args[1:]
-	clientPtr := flag.String("instance", "s", "specify the instance to attach to")
 
-	flag.Parse()
+	//Initialize flags first
+	getVer := flag.Bool("v", false, "get the version of the client")
 
-	instanceName = *clientPtr
+	address = flag.String("a", "127.0.0.1", "specify the address of the host")
+	port = flag.String("p", "19005", "specify the port of the host")
 
-	switch args[0] {
-	case "help":
-		println("-----Help-----")
-		println("version          | Get the version of this instance.")
-		println("status           | some sort of status thing")
-		println("instancestop     | Stop this instance of EstiConsole.")
-		println("list             | List all of the client servers.")
-		println("switch [process] | Switch view to another process.")
-		println("stop [process]   | Stop the process using the default stop command.")
-		println("start [process]  | Start the process.")
-		println("kill [process]   | Forcibly kill the process.")
-		break
-	case "version":
-		client = startCon()
-		argss := Args{[]string{}}
-		var reply string
-		err := client.Call("Ipcserver.Version", argss, &reply)
-		if err != nil {
-			log.Fatal("ipcserver error:", err)
-		}
-		println("Version: ", reply)
-		break
-	case "list":
-		client = startCon()
-		argss := Args{[]string{}}
-		var reply string
-		err := client.Call("Ipcserver.List", argss, &reply)
-		if err != nil {
-			log.Fatal("ipcserver error:", err)
-			println(reply)
-		}
-		break
-	case "status":
-		break
+	flag.Parse() //Get the flag for user
+
+	if(*getVer) {
+		println("EstiCli " + version)
 	}
 
+	//Check for command
+	found := false
+	 for k, v := range commands {
+		 if k == args[0] {
+			 in := ""
+			 for i, str := range args {
+				 if i != 0 {
+					 in += str
+				 }
+			 }
+			 v.(func(string))(in)
+			 found = true
+			 break
+		 }
+	 }
+	 if !found {
+		 println("Unknown command, do /ec help.")
+	 }
+}
+
+/*
+ * Initialize connection with server
+ */
+
+func startCon() {
+	println("Attempting connection to host server...")
+	clienti, err := rpc.DialHTTP("tcp", *address + ":" + *port)
+	if err != nil {
+		log.Fatal("Error connecting to host process " + *address + ":" + *port + ", is the address and port correct?:", err)
+	}
+	client = clienti
 }

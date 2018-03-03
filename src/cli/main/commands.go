@@ -1,6 +1,6 @@
 package main
 
-import "log"
+import _ "log"
 
 func CommandHelp(input string) {
 	println("-----Help-----")
@@ -19,9 +19,7 @@ func CommandVersion(input string) {
 	argss := Args{[]string{}}
 	var reply string
 	err := client.Call("Ipcserver.Version", argss, &reply)
-	if err != nil {
-		log.Fatal("ipcserver error:", err)
-	}
+	checkError(err)
 	println("Version: ", reply)
 }
 
@@ -30,9 +28,7 @@ func CommandList(input string) {
 	argss := Args{[]string{}}
 	var reply string
 	err := client.Call("Ipcserver.List", argss, &reply)
-	if err != nil {
-		log.Fatal("ipcserver error:", err)
-	}
+	checkError(err)
 	println(reply)
 }
 
@@ -41,9 +37,7 @@ func CommandStop(input string) {
 	argss := Args{[]string{input}}
 	var reply string
 	err := client.Call("Ipcserver.Stop", argss, &reply)
-	if err != nil {
-		log.Fatal("ipcserver error:", err)
-	}
+	checkError(err)
 	println(reply)
 }
 
@@ -52,9 +46,16 @@ func CommandInstanceStop(input string) {
 	argss := Args{[]string{}}
 	var reply string
 	err := client.Call("Ipcserver.InstanceStop", argss, &reply)
-	if err != nil {
-		log.Fatal("ipcserver error:", err)
-	}
+	checkError(err)
+	println(reply)
+}
+
+func CommandStart(input string) {
+	startCon()
+	argss := Args{[]string{input}}
+	var reply string
+	err := client.Call("Ipcserver.Start", argss, &reply)
+	checkError(err)
 	println(reply)
 }
 

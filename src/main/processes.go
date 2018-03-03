@@ -135,3 +135,25 @@ func ClientsStop() {
 		}
 	}
 }
+
+func StartClient(name string) string {
+
+}
+
+func StopClient(name string) string {
+
+}
+
+func KillClient(name string) string {
+	if _, ok := Servers[name]; ok {
+		if !Servers[name].IsOnline {
+			return "Process is not online."
+		} else {
+			Servers[name].AutoStart = false
+			Servers[name].kill()
+			return "Killed process " + name + "."
+		}
+	} else {
+		return "Server not found."
+	}
+}

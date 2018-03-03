@@ -61,14 +61,5 @@ func CommandStart(input string) {
 	}
 }
 func CommandKill(input string) {
-	if _, ok := Servers[input]; ok {
-		if !Servers[input].IsOnline {
-			println("Process is not online.")
-		} else {
-			Servers[input].AutoStart = false
-			Servers[input].kill()
-		}
-	} else {
-		println("Server not found.")
-	}
+	println(KillClient(input))
 }

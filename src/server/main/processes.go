@@ -25,6 +25,7 @@ type Server struct {
 	IsOnline   bool
 }
 
+//warning: this is a synchronous call.
 func (server *Server) start() {
 	println("Starting " + server.Settings.InstanceName)
 	server.Process = exec.Command("java", "-jar", server.Settings.ExecutableName)
@@ -142,7 +143,7 @@ func StartClient(name string) string {
 			return "Process already online."
 		} else {
 			Servers[name].AutoStart = true
-			Servers[name].start()
+			go Servers[name].start()
 			return "Started " + Servers[name].Settings.InstanceName
 		}
 	} else {
@@ -152,9 +153,13 @@ func StartClient(name string) string {
 
 func StopClient(name string) string {
 	if _, ok := Servers[name]; ok {
-		Servers[name].AutoStart = false
-		Servers[name].stop()
-		return "Stopped " + Servers[name].Settings.InstanceName
+		if !Servers[name].IsOnline {
+			return "Process already offline."
+		} else {
+			Servers[name].AutoStart = false
+			Servers[name].stop()
+			return "Stopped " + Servers[name].Settings.InstanceName
+		}
 	} else {
 		return "Server not found."
 	}

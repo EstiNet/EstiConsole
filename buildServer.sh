@@ -1,4 +1,4 @@
 #!/bin/bash
-cd src/main
+cd src/server/main
 go build .
-mv main ../../server
+mv main ../../../server

@@ -46,6 +46,7 @@ func (ipcserver *Ipcserver) Stop(arg *Args, reply *string) error {
 
 func (ipcserver *Ipcserver) Start(arg *Args, reply *string) error {
 	output := StartClient(arg.Slice[0])
+	println(strings.Split(output, " ")[0])
 	if strings.Split(output, " ")[0] == "Started" {
 		println(output)
 	}

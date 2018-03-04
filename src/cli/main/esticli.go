@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"os"
+	_ "os"
 	"log"
 	"net/rpc"
 	"strings"
@@ -42,7 +42,6 @@ func init() {
  */
 
 func main() {
-	args = os.Args[1:]
 
 	//Initialize flags first
 	getVer := flag.Bool("v", false, "get the version of the client")
@@ -51,15 +50,18 @@ func main() {
 	port = flag.String("p", "19005", "specify the port of the host")
 
 	flag.Parse() //Get the flag for user
+	args = flag.Args()//os.Args[1:]
 
 	if (*getVer) {
 		println("EstiCli " + version)
 	}
 
-	args[0] = strings.ToLower(args[0])
 
 	//Check for command
-	if args[0] != "" {
+	if len(args) == 0 {
+		println("Unknown command, do /ec help.")
+	} else if args[0] != "" {
+		args[0] = strings.ToLower(args[0])
 		found := false
 		for k, v := range commands {
 			if k == args[0] {

@@ -34,6 +34,7 @@ func init() {
 	commands["instancestop"] = CommandInstanceStop
 	commands["stop"] = CommandStop
 	commands["start"] = CommandStart
+	commands["kill"] = CommandKill
 }
 
 /*
@@ -58,22 +59,24 @@ func main() {
 	args[0] = strings.ToLower(args[0])
 
 	//Check for command
-	found := false
-	for k, v := range commands {
-		if k == args[0] {
-			in := ""
-			for i, str := range args {
-				if i != 0 {
-					in += str
+	if args[0] != "" {
+		found := false
+		for k, v := range commands {
+			if k == args[0] {
+				in := ""
+				for i, str := range args {
+					if i != 0 {
+						in += str
+					}
 				}
+				v.(func(string))(in)
+				found = true
+				break
 			}
-			v.(func(string))(in)
-			found = true
-			break
 		}
-	}
-	if !found {
-		println("Unknown command, do /ec help.")
+		if !found {
+			println("Unknown command, do /ec help.")
+		}
 	}
 }
 

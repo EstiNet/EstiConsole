@@ -59,6 +59,15 @@ func CommandStart(input string) {
 	println(reply)
 }
 
+func CommandKill(input string)  {
+	startCon()
+	argss := Args{[]string{input}}
+	var reply string
+	err := client.Call("Ipcserver.Kill", argss, &reply)
+	checkError(err)
+	println(reply)
+}
+
 func CommandStatus(input string) {
 	startCon()
 	println("Connection successful!")

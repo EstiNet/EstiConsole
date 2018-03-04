@@ -67,7 +67,7 @@ func main() {
 	//Start logging
 	initLog()
 
-	println("ESC[1;31m EstiConsole " + version)
+	println("EstiConsole " + version)
 
 	//System signal hooks
 	println("Registering hooks...")

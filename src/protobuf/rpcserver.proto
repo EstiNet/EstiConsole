@@ -1,0 +1,14 @@
+service RPCServer {
+    rpc Version(string) returns (string) {}
+    rpc List(string) returns (string) {}
+    rpc Stop(string) returns (string) {}
+    rpc Start(string) returns (string) {}
+    rpc Kill(string) returns (string) {}
+    rpc InstanceStop(string) returns (string) {}
+    rpc Attach(string) returns (stream ServerQuery) {}
+}
+
+message ServerQuery {
+    string message = 1;
+
+}

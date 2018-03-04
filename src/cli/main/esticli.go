@@ -35,6 +35,7 @@ func init() {
 	commands["stop"] = CommandStop
 	commands["start"] = CommandStart
 	commands["kill"] = CommandKill
+	commands["attach"] = CommandAttach
 }
 
 /*
@@ -88,7 +89,7 @@ func main() {
 
 func checkError(err error) {
 	if err != nil {
-		log.Fatal("IPC Error", err)
+		log.Fatal("RPC Error", err)
 	}
 }
 

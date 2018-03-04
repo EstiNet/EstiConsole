@@ -8,7 +8,7 @@ func CommandHelp(input string) {
 	println("status           | Get the status of the instance")
 	println("instancestop     | Stop this instance of EstiConsole.")
 	println("list             | List all of the client servers.")
-	println("switch [process] | Switch view to another process.")
+	println("attach [process] | Switch view to another process.")
 	println("stop [process]   | Stop the process using the default stop command.")
 	println("start [process]  | Start the process.")
 	println("kill [process]   | Forcibly kill the process.")
@@ -59,13 +59,17 @@ func CommandStart(input string) {
 	println(reply)
 }
 
-func CommandKill(input string)  {
+func CommandKill(input string) {
 	startCon()
 	argss := Args{[]string{input}}
 	var reply string
 	err := client.Call("Ipcserver.Kill", argss, &reply)
 	checkError(err)
 	println(reply)
+}
+
+func CommandAttach(input string) {
+
 }
 
 func CommandStatus(input string) {

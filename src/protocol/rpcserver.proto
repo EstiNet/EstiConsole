@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+service RPCServer {
+    rpc Version(String) returns (String);
+    rpc List(String) returns (String);
+    rpc Stop(String) returns (String);
+    rpc Start(String) returns (String);
+    rpc Kill(String) returns (String);
+    rpc InstanceStop(String) returns (String);
+    rpc Attach(stream ServerQuery) returns (stream ServerReply);
+}
+
+message String {
+    string str = 1;
+}
+
+message ServerQuery {
+    uint64 message_id = 1; //fetches 100 messages from before this id, -1 for latest
+    bool get_ram = 2; //get ram usage
+    bool get_cpu = 3; //get cpu usage
+    string command = 4; //input command
+}
+
+message ServerReply {
+    repeated string messages = 1; //returns related messages
+    uint64 message_id = 2; //returns message id from which it starts from
+    string ram_usage = 3;
+    string cpu_usage = 4;
+}

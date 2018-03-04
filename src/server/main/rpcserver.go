@@ -1,25 +1,29 @@
 package main
 
 import (
-	"net/rpc"
 	"net"
 	"log"
-	"net/http"
 	"strings"
+
+	pb "../../protocol"
+	"context"
+	"fmt"
+	"google.golang.org/grpc"
 )
 
 type Args struct {
 	Slice []string;
 }
 
-type Ipcserver string
+type RPCServer struct {
 
-func (ipcserver *Ipcserver) Version(arg *Args, reply *string) error {
-	*reply = version
-	return nil
 }
 
-func (ipcserver *Ipcserver) List(arg *Args, reply *string) error {
+func (rpcserver *pb.RPCServerServer) Version(ctx context.Context, str *pb.String) (*pb.String, error) {
+	return &pb.String{Str: version}, nil
+}
+
+func (rpcserver *RPCServer) List(ctx context.Context, str *pb.String) (*pb.String, error) {
 	ret := ""
 	ret += "Clients:\n"
 	for k, v := range Servers {
@@ -31,51 +35,45 @@ func (ipcserver *Ipcserver) List(arg *Args, reply *string) error {
 		}
 		ret += k + " (" + state + ")\n"
 	}
-	*reply = ret
-	return nil
+	return &pb.String{Str: ret}, nil
 }
 
-func (ipcserver *Ipcserver) Stop(arg *Args, reply *string) error {
-	output := StopClient(arg.Slice[0])
+func (rpcserver *RPCServer) Stop(ctx context.Context, str *pb.String) (*pb.String, error) {
+	output := StopClient(str.Str)
 	if strings.Split(output, " ")[0] == "Stopped" {
 		println(output)
 	}
-	*reply = output
-	return nil
+	return &pb.String{Str: output}, nil
 }
 
-func (ipcserver *Ipcserver) Start(arg *Args, reply *string) error {
-	output := StartClient(arg.Slice[0])
+func (rpcserver *RPCServer) Start(ctx context.Context, str *pb.String) (*pb.String, error) {
+	output := StartClient(str.Str)
 	println(strings.Split(output, " ")[0])
 	if strings.Split(output, " ")[0] == "Started" {
 		println(output)
 	}
-	*reply = output
-	return nil
+	return &pb.String{Str: output}, nil
 }
 
-func (ipcserver *Ipcserver) Kill(arg *Args, reply *string) error {
-	output := KillClient(arg.Slice[0])
+func (rpcserver *RPCServer) Kill(ctx context.Context, str *pb.String) (*pb.String, error) {
+	output := KillClient(str.Str)
 	if strings.Split(output, " ")[0] == "Killed" {
 		println(output)
 	}
-	*reply = output
-	return nil
+	return &pb.String{Str: output}, nil
 }
 
-func (ipcserver *Ipcserver) InstanceStop(arg *Args, reply *string) error {
+func (rpcserver *RPCServer) InstanceStop(ctx context.Context, str *pb.String) (*pb.String, error) {
 	go Shutdown()
-	*reply = "Host service shutting down."
-	return nil
+	return &pb.String{Str: "Host service shutting down."}, nil
 }
 
-func ipcserverStart() {
-	ipcserver := new(Ipcserver)
-	rpc.Register(ipcserver)
-	rpc.HandleHTTP()
-	l, e := net.Listen("tcp", ":19005")
-	if e != nil {
-		log.Fatal("Oh no! IPC listen error (check if the port has been taken):", e)
+func rpcserverStart() {
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", "19005"))
+	if err != nil {
+		log.Fatal("Oh no! IPC listen error (check if the port has been taken):", err)
 	}
-	go http.Serve(l, nil)
+	grpcServer := grpc.NewServer()
+	pb.RegisterRPCServerServer(grpcServer, &RPCServer{})
+	grpcServer.Serve(lis)
 }

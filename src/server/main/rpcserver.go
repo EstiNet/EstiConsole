@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"google.golang.org/grpc"
+	"io"
 )
 
 var grpcServer *grpc.Server
@@ -68,8 +69,21 @@ func (rpcserver *RPCServer) InstanceStop(ctx context.Context, str *pb.String) (*
 }
 
 func (rpcserver *RPCServer) Attach(stream pb.RPCServer_AttachServer) error {
-
-	return nil
+	for {
+		in, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		key := serialize(in.Location)
+		for _, note := range s.routeNotes[key] {
+			if err := stream.Send(note); err != nil {
+				return err
+			}
+		}
+	}
 }
 
 func rpcserverStart() {

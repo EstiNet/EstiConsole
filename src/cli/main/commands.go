@@ -9,6 +9,7 @@ import (
 
 func CommandHelp(input string) {
 	println("-----Help-----")
+	println("-h               | Get the help interface for flags.")
 	println("version          | Get the version of this instance.")
 	println("status           | Get the status of the instance")
 	println("instancestop     | Stop this instance of EstiConsole.")

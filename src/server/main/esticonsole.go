@@ -31,6 +31,9 @@ func println(str string) {
 func print(str string) {
 	fmt.Print(str)
 }
+func info(str string) {
+	println(time.Now().Format("2006-01-02 15:04:05") + " [INFO] " + str)
+}
 func debug(str string) {
 	fmt.Println(str)
 }
@@ -70,27 +73,27 @@ func main() {
 	println("EstiConsole " + version)
 
 	//System signal hooks
-	println("Registering hooks...")
+	info("Registering hooks...")
 	sigs := make(chan os.Signal, 1)
 	done := make(chan bool, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		sig := <-sigs
-		println("Received host " + sig.String())
+		info("Received host " + sig.String())
 		done <- true
 	}()
-	println("Completed!")
+	info("Completed!")
 
 	//Continue with startup
-	println("Setting up and loading configuration...")
+	info("Setting up and loading configuration...")
 	LoadConfig()
-	println("Completed!")
+	info("Completed!")
 
-	println("Starting network processes...")
+	info("Starting network processes...")
 	go NetworkStart()
-	println("Starting client processes...")
+	info("Starting client processes...")
 	go ClientsStart()
-	println("Starting command system...")
+	info("Starting command system...")
 	go ConsoleStart()
 
 	//Receive interrupt
@@ -102,7 +105,7 @@ func main() {
  * Shutdown task
  */
 func Shutdown() {
-	println("Commencing instance shutdown.")
+	info("Commencing instance shutdown.")
 	ClientsStop()
 
 	//TODO REPLACE WITH THREAD BLOCKING
@@ -111,7 +114,7 @@ func Shutdown() {
 
 	grpcServer.Stop()
 
-	println("Exited EstiConsole " + version)
+	info("Exited EstiConsole " + version)
 	os.Exit(0)
 }
 

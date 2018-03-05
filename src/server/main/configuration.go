@@ -93,7 +93,7 @@ func LoadConfig() {
 			log.Fatal(err)
 		}
 		file.Close()
-		println("Created config.json!")
+		info("Created config.json!")
 		createdFile = true
 	}
 	//Open file with R&W permissions and read it
@@ -114,21 +114,21 @@ func LoadConfig() {
 	}
 	file.Close()
 	text = bytes.Trim(text, "\x00") //Trim null characters
-	println("Extracted config contents!")
+	info("Extracted config contents!")
 	//Parse json
 	var config InstanceConfig
 	err3 := json.Unmarshal(text, &config)
 	if err3 != nil {
-		println(err3.Error())
+		info(err3.Error())
 		if string(text) != "" && !createdFile {
 			os.Rename(configPath, configPath+".old")
-			println("Moved the old config to config.json.old.")
+			info("Moved the old config to config.json.old.")
 			var file, err = os.Create(configPath)
 			if err != nil { //Crash if the program can't load config file.
 				log.Fatal(err)
 			}
 			file.Close()
-			println("Created config.json!")
+			info("Created config.json!")
 		}
 		//Create default values
 		instance, server, users := ConfigDefault()
@@ -136,7 +136,7 @@ func LoadConfig() {
 		instance.Users = []Users{users}
 		js, err := json.MarshalIndent(instance, "", "    ") //pretty JSON
 		if err != nil { //JSON incorrect catch (if there is a programmer error) .-.
-			println("This error shouldn't happen. Please contact an administrator. (Default JSON Incorrect)")
+			info("This error shouldn't happen. Please contact an administrator. (Default JSON Incorrect)")
 			log.Fatal(err)
 		}
 		var file, err2 = os.OpenFile(configPath, os.O_RDWR, 0755) //Check if file is openable (and get file object)
@@ -144,8 +144,8 @@ func LoadConfig() {
 			log.Fatal(err2)
 		}
 		file.Write(js) //write JSON to file
-		println("Updated the config. Please check the config.json file and adjust the appropriate settings.")
-		println("Once you are done updating, please start the server again.")
+		info("Updated the config. Please check the config.json file and adjust the appropriate settings.")
+		info("Once you are done updating, please start the server again.")
 		os.Exit(0)
 	}
 
@@ -156,7 +156,7 @@ func LoadConfig() {
 	confSet := reflect.ValueOf(&config).Elem()
 	for i := 0; i < conf.NumField(); i++ {
 		if conf.Field(i).Interface() == "" || conf.Field(i).Interface() == 0 {
-			println("Please check your config, a setting has been updated. (" + inst.Field(i).String() + ")")
+			info("Please check your config, a setting has been updated. (" + inst.Field(i).String() + ")")
 			confSet.Field(i).SetString(inst.Field(i).String())
 		}
 	}
@@ -166,7 +166,7 @@ func LoadConfig() {
 			//fmt.Println(sever.Field(j).Interface()) //TODO
 			//debug(" " + sever.Field(j).String())
 			if sever.Field(j).Interface() == nil {
-				println("Please check your config, a setting has been updated. (" + sever.Field(j).String() + ")")
+				info("Please check your config, a setting has been updated. (" + sever.Field(j).String() + ")")
 				severSet := reflect.ValueOf(&config.Servers[i]).Elem()
 				severSet.Field(j).Set(reflect.ValueOf(server).Field(j))
 			}
@@ -177,7 +177,7 @@ func LoadConfig() {
 		severSet := reflect.ValueOf(&config.Users[i]).Elem();
 		for j := 0; j < sever.NumField(); j++ {
 			if sever.Field(j).Interface() == nil {
-				println("Please check your config, a setting has been updated. (" + sever.Field(j).String() + ")")
+				info("Please check your config, a setting has been updated. (" + sever.Field(j).String() + ")")
 				severSet.Field(j).Set(reflect.ValueOf(users).Field(j))
 			}
 		}
@@ -221,7 +221,7 @@ func verifySettings(config *InstanceConfig) {
 
 		_, err := os.Stat(server.HomeDirectory)
 		if os.IsNotExist(err) {
-			println(server.InstanceName + "'s home directory does not exist! Please fix this error in the config.")
+			info(server.InstanceName + "'s home directory does not exist! Please fix this error in the config.")
 			log.Fatal(err)
 		}
 		if server.HomeDirectory[len(server.HomeDirectory)-1] == '/' {
@@ -249,11 +249,11 @@ func verifySettings(config *InstanceConfig) {
 func initLog() {
 	if _, err := os.Stat(logDirPath); os.IsNotExist(err) {
 		os.Mkdir(logDirPath, 0755)
-		println("Created the logging directory!")
+		info("Created the logging directory!")
 	}
 	if _, err := os.Stat(logPath); os.IsNotExist(err) {
 		os.Create(logPath)
-		println("Created the main log file!")
+		info("Created the main log file!")
 	}
 
 }

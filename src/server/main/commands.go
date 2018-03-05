@@ -32,7 +32,9 @@ func CommandSwitch(input string) {
 	if _, ok := Servers[input]; ok {
 		curServerView = Servers[input]
 		ClearTerminal()
-		print(Servers[input].Log)
+		for _, e := range Servers[input].Log {
+			println(e)
+		}
 		println("Successfully switched server view to " + input)
 	} else {
 		println("Server not found.")

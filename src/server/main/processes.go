@@ -16,7 +16,7 @@ var Servers = make(map[string]*Server)
 
 type Server struct {
 	Settings   ServerConfig
-	Log        string
+	Log        []string
 	Channel    chan string
 	Process    *exec.Cmd
 	OutputPipe io.ReadCloser
@@ -27,7 +27,7 @@ type Server struct {
 
 //warning: this is a synchronous call.
 func (server *Server) start() {
-	println("Starting " + server.Settings.InstanceName)
+	info("Starting " + server.Settings.InstanceName)
 	server.Process = exec.Command("java", "-jar", server.Settings.ExecutableName)
 	server.Process.Dir = server.Settings.HomeDirectory //set working directory
 
@@ -35,7 +35,7 @@ func (server *Server) start() {
 	if (server.Settings.MinecraftMode) {
 		if _, err := os.Stat(server.Settings.HomeDirectory + "/update"); os.IsNotExist(err) {
 			os.Mkdir(server.Settings.HomeDirectory+"/update", 0755)
-			println("Created the update directory!")
+			info("Created the update directory!")
 		}
 	}
 
@@ -43,14 +43,14 @@ func (server *Server) start() {
 	server.OutputPipe, _ = server.Process.StdoutPipe()
 	pipe, err := server.Process.StdinPipe()
 	if err != nil {
-		println("Process error for " + server.Settings.InstanceName + ": " + err.Error())
+		info("Process error for " + server.Settings.InstanceName + ": " + err.Error())
 	}
 	server.InputPipe = pipe
 
 	//Start process
 	err2 := server.Process.Start()
 	if err2 != nil {
-		println("Error starting process " + server.Settings.InstanceName + ": " + err2.Error())
+		info("Error starting process " + server.Settings.InstanceName + ": " + err2.Error())
 		return
 	}
 	server.IsOnline = true
@@ -61,7 +61,7 @@ func (server *Server) start() {
 		server.IsOnline = false
 		server.InputPipe.Close()
 		server.OutputPipe.Close()
-		println(server.Settings.InstanceName + " has stopped.")
+		info(server.Settings.InstanceName + " has stopped.")
 		if (server.AutoStart) {
 			time.Sleep(time.Second * 2) //Let's not die right TODO
 			go server.start()
@@ -73,7 +73,7 @@ func (server *Server) start() {
 	//Print output
 	buff := bufio.NewScanner(server.OutputPipe)
 	for buff.Scan() {
-		server.Log += buff.Text() + "\n"
+		server.Log = append(server.Log, buff.Text())
 		if curServerView != nil && server.Settings.InstanceName == curServerView.Settings.InstanceName {
 			println(buff.Text())
 		}
@@ -82,9 +82,9 @@ func (server *Server) start() {
 
 func (server *Server) kill() {
 	if err := server.Process.Process.Kill(); err != nil {
-		println("Failed to kill process" + server.Settings.InstanceName + ": " + err.Error())
+		info("Failed to kill process" + server.Settings.InstanceName + ": " + err.Error())
 	} else {
-		println("Killed " + server.Settings.InstanceName)
+		info("Killed " + server.Settings.InstanceName)
 	}
 }
 
@@ -95,6 +95,18 @@ func (server *Server) stop() {
 func (server *Server) input(input string) {
 	io.WriteString(server.InputPipe, input+"\n")
 }
+
+func (server *Server) getLog(beginIndex int, endIndex int) {
+
+}
+
+func (server *Server) getLatestLogID() int {
+	return len(server.Log)-1
+}
+
+//END OF SERVER METHODS
+
+//*************************************************************//
 
 /*
  * Init and start all clients
@@ -107,11 +119,11 @@ func ClientsStart() {
 		Servers[server.Settings.InstanceName] = server
 		server.AutoStart = true
 
-		println("Initialized server " + server.Settings.InstanceName + ".")
+		info("Initialized server " + server.Settings.InstanceName + ".")
 
 		go server.start()
 	}
-	println("Completed process initialization!")
+	info("Completed process initialization!")
 }
 
 /*
@@ -119,7 +131,7 @@ func ClientsStart() {
  */
 
 func ClientsStop() {
-	println("Stopping all clients...")
+	info("Stopping all clients...")
 	end := func(server *Server) {
 		server.AutoStart = false
 		server.stop()
@@ -131,11 +143,15 @@ func ClientsStop() {
 	}
 	for key, _ := range Servers {
 		if Servers[key].IsOnline {
-			println("Stopping " + key + "...")
+			info("Stopping " + key + "...")
 			go end(Servers[key])
 		}
 	}
 }
+
+/*
+ * Global helper functions for statically doing client manipulation
+ */
 
 func StartClient(name string) string {
 	if _, ok := Servers[name]; ok {

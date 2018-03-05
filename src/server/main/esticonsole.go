@@ -109,6 +109,8 @@ func Shutdown() {
 	//TODO TEMP SOLUTION SHOULD NOT BE WORKING IN PRODUCTION!!!!!!
 	time.Sleep(time.Second * 8)
 
+	grpcServer.Stop()
+
 	println("Exited EstiConsole " + version)
 	os.Exit(0)
 }

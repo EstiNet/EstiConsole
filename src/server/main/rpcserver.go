@@ -11,15 +11,15 @@ import (
 	"google.golang.org/grpc"
 )
 
+var grpcServer *grpc.Server
+
 type Args struct {
 	Slice []string;
 }
 
-type RPCServer struct {
+type RPCServer struct {}
 
-}
-
-func (rpcserver *pb.RPCServerServer) Version(ctx context.Context, str *pb.String) (*pb.String, error) {
+func (rpcserver *RPCServer) Version(ctx context.Context, str *pb.String) (*pb.String, error) {
 	return &pb.String{Str: version}, nil
 }
 
@@ -68,12 +68,17 @@ func (rpcserver *RPCServer) InstanceStop(ctx context.Context, str *pb.String) (*
 	return &pb.String{Str: "Host service shutting down."}, nil
 }
 
+func (rpcserver *RPCServer) Attach(stream pb.RPCServer_AttachServer) error {
+
+	return nil
+}
+
 func rpcserverStart() {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", "19005"))
 	if err != nil {
 		log.Fatal("Oh no! IPC listen error (check if the port has been taken):", err)
 	}
-	grpcServer := grpc.NewServer()
+	grpcServer = grpc.NewServer()
 	pb.RegisterRPCServerServer(grpcServer, &RPCServer{})
 	grpcServer.Serve(lis)
 }

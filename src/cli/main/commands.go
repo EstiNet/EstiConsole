@@ -1,6 +1,11 @@
 package main
 
-import _ "log"
+import (
+	_ "log"
+	"context"
+	pb "../../protocol"
+	"google.golang.org/grpc/connectivity"
+)
 
 func CommandHelp(input string) {
 	println("-----Help-----")
@@ -16,56 +21,44 @@ func CommandHelp(input string) {
 
 func CommandVersion(input string) {
 	startCon()
-	argss := Args{[]string{}}
-	var reply string
-	err := client.Call("Ipcserver.Version", argss, &reply)
+	reply, err := client.Version(context.Background(), &pb.String{Str: "test reply"})
 	checkError(err)
-	println("Version: ", reply)
+	println("Version: ", reply.Str)
 }
 
 func CommandList(input string) {
 	startCon()
-	argss := Args{[]string{}}
-	var reply string
-	err := client.Call("Ipcserver.List", argss, &reply)
+	reply, err := client.List(context.Background(), &pb.String{Str: ""})
 	checkError(err)
-	println(reply)
+	println(reply.Str)
 }
 
 func CommandStop(input string) {
 	startCon()
-	argss := Args{[]string{input}}
-	var reply string
-	err := client.Call("Ipcserver.Stop", argss, &reply)
+	reply, err := client.Stop(context.Background(), &pb.String{Str: input})
 	checkError(err)
-	println(reply)
+	println(reply.Str)
 }
 
 func CommandInstanceStop(input string) {
 	startCon()
-	argss := Args{[]string{}}
-	var reply string
-	err := client.Call("Ipcserver.InstanceStop", argss, &reply)
+	reply, err := client.InstanceStop(context.Background(), &pb.String{Str: ""})
 	checkError(err)
-	println(reply)
+	println(reply.Str)
 }
 
 func CommandStart(input string) {
 	startCon()
-	argss := Args{[]string{input}}
-	var reply string
-	err := client.Call("Ipcserver.Start", argss, &reply)
+	reply, err := client.Start(context.Background(), &pb.String{Str: input})
 	checkError(err)
-	println(reply)
+	println(reply.Str)
 }
 
 func CommandKill(input string) {
 	startCon()
-	argss := Args{[]string{input}}
-	var reply string
-	err := client.Call("Ipcserver.Kill", argss, &reply)
+	reply, err := client.Kill(context.Background(), &pb.String{Str: input})
 	checkError(err)
-	println(reply)
+	println(reply.Str)
 }
 
 func CommandAttach(input string) {
@@ -74,5 +67,7 @@ func CommandAttach(input string) {
 
 func CommandStatus(input string) {
 	startCon()
-	println("Connection successful!")
+	if conn.GetState() == connectivity.Ready {
+		println("Connection successful!")
+	}
 }

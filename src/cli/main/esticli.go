@@ -4,13 +4,11 @@ import (
 	"flag"
 	_ "os"
 	"log"
-	"net/rpc"
 	"strings"
-)
+	"google.golang.org/grpc"
 
-type Args struct {
-	Slice []string;
-}
+	pb "../../protocol"
+)
 
 var version = "v1.0.0"
 
@@ -20,7 +18,9 @@ var args []string
 var address *string
 var port *string
 
-var client *rpc.Client
+var conn *grpc.ClientConn
+
+var client pb.RPCServerClient
 
 /*
  * Initialize command functions
@@ -50,13 +50,12 @@ func main() {
 	address = flag.String("a", "127.0.0.1", "specify the address of the host")
 	port = flag.String("p", "19005", "specify the port of the host")
 
-	flag.Parse() //Get the flag for user
-	args = flag.Args()//os.Args[1:]
+	flag.Parse()       //Get the flag for user
+	args = flag.Args() //os.Args[1:]
 
 	if (*getVer) {
 		println("EstiCli " + version)
 	}
-
 
 	//Check for command
 	if len(args) == 0 {
@@ -84,12 +83,12 @@ func main() {
 }
 
 /*
- * Handle IPC connection error
+ * Handle RPC connection error
  */
 
 func checkError(err error) {
 	if err != nil {
-		log.Fatal("RPC Error", err)
+		log.Fatal("RPC Error: ", err)
 	}
 }
 
@@ -98,10 +97,15 @@ func checkError(err error) {
  */
 
 func startCon() {
+	var opts []grpc.DialOption
+
+	opts = append(opts, grpc.WithInsecure())
+
 	println("Attempting connection to host server...")
-	clienti, err := rpc.DialHTTP("tcp", *address + ":" + *port)
+	var err error
+	conn, err = grpc.Dial(*address + ":" + *port, opts...)
 	if err != nil {
 		log.Fatal("Error connecting to host process " + *address + ":" + *port+", is the address and port correct?:", err)
 	}
-	client = clienti
+	client = pb.NewRPCServerClient(conn)
 }

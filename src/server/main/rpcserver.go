@@ -13,9 +13,9 @@ import (
 
 var grpcServer *grpc.Server
 
-type Args struct {
-	Slice []string;
-}
+/*
+ * Define grpc struct for esticli method calls
+ */
 
 type RPCServer struct {}
 
@@ -48,7 +48,6 @@ func (rpcserver *RPCServer) Stop(ctx context.Context, str *pb.String) (*pb.Strin
 
 func (rpcserver *RPCServer) Start(ctx context.Context, str *pb.String) (*pb.String, error) {
 	output := StartClient(str.Str)
-	println(strings.Split(output, " ")[0])
 	if strings.Split(output, " ")[0] == "Started" {
 		println(output)
 	}
@@ -74,7 +73,7 @@ func (rpcserver *RPCServer) Attach(stream pb.RPCServer_AttachServer) error {
 }
 
 func rpcserverStart() {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", "19005"))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 19005))
 	if err != nil {
 		log.Fatal("Oh no! IPC listen error (check if the port has been taken):", err)
 	}

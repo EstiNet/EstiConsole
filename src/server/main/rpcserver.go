@@ -41,7 +41,7 @@ func (rpcserver *RPCServer) List(ctx context.Context, str *pb.String) (*pb.Strin
 func (rpcserver *RPCServer) Stop(ctx context.Context, str *pb.String) (*pb.String, error) {
 	output := StopClient(str.Str)
 	if strings.Split(output, " ")[0] == "Stopped" {
-		println(output)
+		info(output)
 	}
 	return &pb.String{Str: output}, nil
 }
@@ -49,7 +49,7 @@ func (rpcserver *RPCServer) Stop(ctx context.Context, str *pb.String) (*pb.Strin
 func (rpcserver *RPCServer) Start(ctx context.Context, str *pb.String) (*pb.String, error) {
 	output := StartClient(str.Str)
 	if strings.Split(output, " ")[0] == "Started" {
-		println(output)
+		info(output)
 	}
 	return &pb.String{Str: output}, nil
 }
@@ -57,7 +57,7 @@ func (rpcserver *RPCServer) Start(ctx context.Context, str *pb.String) (*pb.Stri
 func (rpcserver *RPCServer) Kill(ctx context.Context, str *pb.String) (*pb.String, error) {
 	output := KillClient(str.Str)
 	if strings.Split(output, " ")[0] == "Killed" {
-		println(output)
+		info(output)
 	}
 	return &pb.String{Str: output}, nil
 }

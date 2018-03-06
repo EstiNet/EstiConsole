@@ -15,7 +15,7 @@ message String {
 }
 
 message ServerQuery {
-    uint64 message_id = 1; //fetches 100 messages from before this id, -1 for latest
+    int64 message_id = 1; //fetches 100 messages from before this id, -1 for latest, -2 for no messages
     bool get_ram = 2; //get ram usage
     bool get_cpu = 3; //get cpu usage
     string command = 4; //input command

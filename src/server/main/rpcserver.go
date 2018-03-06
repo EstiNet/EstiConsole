@@ -77,11 +77,14 @@ func (rpcserver *RPCServer) Attach(stream pb.RPCServer_AttachServer) error {
 		if err != nil {
 			return err
 		}
-		key := serialize(in.Location)
-		for _, note := range s.routeNotes[key] {
-			if err := stream.Send(note); err != nil {
-				return err
-			}
+		//Parse ServerQuery object
+
+		if in.MessageId == -2 {
+
+		}
+
+		if err := stream.Send(note); err != nil {
+			return err
 		}
 	}
 }

@@ -18,7 +18,7 @@ var grpcServer *grpc.Server
  * Define grpc struct for esticli method calls
  */
 
-type RPCServer struct {}
+type RPCServer struct{}
 
 func (rpcserver *RPCServer) Version(ctx context.Context, str *pb.String) (*pb.String, error) {
 	return &pb.String{Str: version}, nil
@@ -70,21 +70,31 @@ func (rpcserver *RPCServer) InstanceStop(ctx context.Context, str *pb.String) (*
 
 func (rpcserver *RPCServer) Attach(stream pb.RPCServer_AttachServer) error {
 	for {
-		in, err := stream.Recv()
+		query, err := stream.Recv()
 		if err == io.EOF {
 			return nil
 		}
 		if err != nil {
 			return err
 		}
+
+		reply := &pb.ServerReply{} //begin construction of reply
+		server := Servers[query.ProcessName]
+
 		//Parse ServerQuery object
 
-		if in.MessageId == -2 {
-
+		if query.MessageId == -1 {
+			reply.Messages = server.getLog(server.getLatestLogID()-100, server.getLatestLogID())
+		} else if query.MessageId > -1 {
+			reply.Messages = server.getLog(int(query.MessageId-100), int(query.MessageId))
+		} else {
+			reply.Messages = []string{}
 		}
 
-		if err := stream.Send(note); err != nil {
-			return err
+		//TODO get cpu and ram usage and process command
+
+		if err := stream.Send(reply); err != nil {
+			return err //TODO do something with error and parse
 		}
 	}
 }

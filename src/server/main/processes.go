@@ -96,8 +96,8 @@ func (server *Server) input(input string) {
 	io.WriteString(server.InputPipe, input+"\n")
 }
 
-func (server *Server) getLog(beginIndex int, endIndex int) {
-
+func (server *Server) getLog(beginIndex int, endIndex int) []string {
+	//TODO
 }
 
 func (server *Server) getLatestLogID() int {

@@ -19,6 +19,7 @@ message ServerQuery {
     bool get_ram = 2; //get ram usage
     bool get_cpu = 3; //get cpu usage
     string command = 4; //input command
+    string process_name = 5;//input process name
 }
 
 message ServerReply {

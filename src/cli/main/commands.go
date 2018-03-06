@@ -63,7 +63,7 @@ func CommandKill(input string) {
 }
 
 func CommandAttach(input string) {
-
+	attachCUI()
 }
 
 func CommandStatus(input string) {

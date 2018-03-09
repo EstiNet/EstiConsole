@@ -7,6 +7,9 @@ import (
 	"encoding/json"
 	"bytes"
 	"reflect"
+	"io/ioutil"
+	"fmt"
+	"archive/zip"
 )
 
 /*
@@ -251,9 +254,33 @@ func initLog() {
 		os.Mkdir(logDirPath, 0755)
 		info("Created the logging directory!")
 	}
-	if _, err := os.Stat(logPath); os.IsNotExist(err) {
-		os.Create(logPath)
-		info("Created the main log file!")
+	if _, err := os.Stat(logPath); !os.IsNotExist(err) {
+		dat, err := ioutil.ReadFile(logPath)
+		if err != nil {
+			log.Fatal("")
+		}
+		fmt.Print(string(dat))
+
+		//compress the old log file
+		buf := new(bytes.Buffer)
+		w := zip.NewWriter(buf) //create a new zip archive
+		f, err := w.Create(logPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, err = f.Write([]byte(string(dat))) //stream log file data
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = w.Close() //close zipwriter
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		os.Remove(logPath) //remove main log file
 	}
+	os.Create(logPath)
+	info("Created the main log file!")
 
 }

@@ -26,6 +26,8 @@ var logPath = "./log/main.log"
 var clear map[string]func()
 
 func println(str string) {
+	//TODO log to file
+	defer f.Close()
 	fmt.Println(str)
 }
 func print(str string) {

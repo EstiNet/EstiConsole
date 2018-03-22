@@ -75,7 +75,7 @@ func (server *Server) start() {
 	for buff.Scan() {
 		server.Log = append(server.Log, buff.Text())
 		if curServerView != nil && server.Settings.InstanceName == curServerView.Settings.InstanceName {
-			println(buff.Text())
+			println(buff.Text()) //prints reading from stdout
 		}
 	}
 }

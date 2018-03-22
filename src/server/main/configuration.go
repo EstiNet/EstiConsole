@@ -27,7 +27,6 @@ type Users struct {
 type InstanceConfig struct {
 	InstanceName string         `json:"instance_name"`
 	InstancePort uint           `json:"instance_port"`
-	LogDirectory string         `json:"log_directory"`
 	Servers      []ServerConfig `json:"servers"`
 	Users        []Users        `json:"users"`
 }
@@ -58,7 +57,6 @@ func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 	con := InstanceConfig{}
 	con.InstanceName = "Server"
 	con.InstancePort = 6921
-	con.LogDirectory = "./log"
 
 	wi := ServerConfig{}
 	wi.InstanceName = "Server1"
@@ -213,17 +211,12 @@ func LoadConfig() {
 	instanceSettings = config
 }
 
-
 /*
  * Settings verification (crashes with error)
  */
 
 func verifySettings(config *InstanceConfig) {
 	namesUsed := make([]string, 1)
-
-	/*
-	 * Verify instance settings
-	 */
 
 	/*
 	 * Verify each server's settings
@@ -257,7 +250,7 @@ func verifySettings(config *InstanceConfig) {
  * Initializes log files
  */
 //TODO
-func initLog() {
+func InitLog() {
 	if _, err := os.Stat(logDirPath); os.IsNotExist(err) {
 		os.Mkdir(logDirPath, 0755)
 		fmt.Println(time.Now().Format("2006-01-02 15:04:05") + " [INFO] Created the logging directory!")
@@ -265,7 +258,7 @@ func initLog() {
 	if _, err := os.Stat(logPath); !os.IsNotExist(err) {
 		fmt.Println(time.Now().Format("2006-01-02 15:04:05") + " [INFO] Compressing previous log file...")
 
-		ZipFiles(logDirPath + "/" + time.Now().Format("2006-01-02 15-04-05") + ".zip", []string{logPath})
+		ZipFiles(logDirPath+"/"+time.Now().Format("2006-01-02 15-04-05")+".zip", []string{logPath})
 
 		os.Remove(logPath) //remove main log file
 		fmt.Println(time.Now().Format("2006-01-02 15:04:05") + " [INFO] Done!")
@@ -273,6 +266,18 @@ func initLog() {
 	os.Create(logPath)
 	info("Created the main log file!")
 
+}
+
+/*
+ * Initializes log files after configuration is loaded in
+ */
+func PostInitLog() {
+	for i, server := range instanceSettings.Servers {
+		_, err := os.Stat(logDirPath + "/" + server.InstanceName)
+		if os.IsNotExist(err) {
+			os.Mkdir(logDirPath + "/" + server.InstanceName)
+		}
+	}
 }
 
 /*

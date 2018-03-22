@@ -101,7 +101,7 @@ func init() {
 func main() {
 
 	//Start logging
-	initLog()
+	InitLog()
 
 	println("EstiConsole " + version)
 
@@ -121,6 +121,9 @@ func main() {
 	info("Setting up and loading configuration...")
 	LoadConfig()
 	info("Completed!")
+
+	info("Completing post log initialization...")
+	PostInitLog()
 
 	info("Starting network processes...")
 	go NetworkStart()

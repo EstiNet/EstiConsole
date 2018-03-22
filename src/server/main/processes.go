@@ -97,7 +97,7 @@ func (server *Server) input(input string) {
 }
 
 func (server *Server) getLog(beginIndex int, endIndex int) []string {
-	//TODO
+	return server.Log[beginIndex:endIndex]
 }
 
 func (server *Server) getLatestLogID() int {

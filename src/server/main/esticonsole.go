@@ -11,6 +11,8 @@ import (
 	"runtime"
 	"time"
 	"io"
+	"log"
+	"io/ioutil"
 )
 
 var version = "v2.0.1"
@@ -25,20 +27,43 @@ var logPath = "./log/main.log"
 
 var clear map[string]func()
 
+/*
+ * Output and logging related functions
+ */
+
+func addLog(str string) {
+	err := ioutil.WriteFile(logPath, []byte(str + "\n"), 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+func logFatal(err error) {
+	addLog(err.Error())
+	log.Fatal(err)
+}
+func logFatalStr(str string) {
+	addLog(str)
+	log.Fatal(str)
+}
 func println(str string) {
-	//TODO log to file
-	defer f.Close()
+	addLog(str)
 	fmt.Println(str)
 }
 func print(str string) {
+	addLog(str)
 	fmt.Print(str)
 }
 func info(str string) {
+	addLog(str)
 	println(time.Now().Format("2006-01-02 15:04:05") + " [INFO] " + str)
 }
 func debug(str string) {
 	fmt.Println(str)
 }
+
+/*
+ * Program operation related functions
+ */
 
 func init() {
 	commands["version"] = CommandVersion

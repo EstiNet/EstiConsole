@@ -102,6 +102,7 @@ func (rpcserver *RPCServer) Attach(stream pb.RPCServer_AttachServer) error {
 func rpcserverStart() {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 19005))
 	if err != nil {
+		addLog(err.Error())
 		log.Fatal("Oh no! IPC listen error (check if the port has been taken):", err)
 	}
 	grpcServer = grpc.NewServer()

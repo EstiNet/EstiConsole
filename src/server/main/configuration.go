@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"log"
 	"io"
 	"encoding/json"
 	"bytes"
@@ -10,6 +9,8 @@ import (
 	"io/ioutil"
 	"fmt"
 	"archive/zip"
+	"time"
+	"log"
 )
 
 /*
@@ -93,7 +94,7 @@ func LoadConfig() {
 	if os.IsNotExist(err) {
 		var file, err = os.Create(configPath)
 		if err != nil { //Crash if the program can't load config file.
-			log.Fatal(err)
+			logFatal(err)
 		}
 		file.Close()
 		info("Created config.json!")
@@ -102,7 +103,7 @@ func LoadConfig() {
 	//Open file with R&W permissions and read it
 	var file, err2 = os.OpenFile(configPath, os.O_RDWR, 0755)
 	if err2 != nil {
-		log.Fatal(err2)
+		logFatal(err2)
 	}
 	var text = make([]byte, 1024) //Read the file and set it to text
 	for {
@@ -111,7 +112,7 @@ func LoadConfig() {
 			break
 		}
 		if err != nil && err != io.EOF {
-			log.Fatal(err)
+			logFatal(err)
 			break
 		}
 	}
@@ -128,7 +129,7 @@ func LoadConfig() {
 			info("Moved the old config to config.json.old.")
 			var file, err = os.Create(configPath)
 			if err != nil { //Crash if the program can't load config file.
-				log.Fatal(err)
+				logFatal(err)
 			}
 			file.Close()
 			info("Created config.json!")
@@ -140,11 +141,11 @@ func LoadConfig() {
 		js, err := json.MarshalIndent(instance, "", "    ") //pretty JSON
 		if err != nil { //JSON incorrect catch (if there is a programmer error) .-.
 			info("This error shouldn't happen. Please contact an administrator. (Default JSON Incorrect)")
-			log.Fatal(err)
+			logFatal(err)
 		}
 		var file, err2 = os.OpenFile(configPath, os.O_RDWR, 0755) //Check if file is openable (and get file object)
 		if err2 != nil {
-			log.Fatal(err2)
+			logFatal(err2)
 		}
 		file.Write(js) //write JSON to file
 		info("Updated the config. Please check the config.json file and adjust the appropriate settings.")
@@ -189,20 +190,20 @@ func LoadConfig() {
 	js, err := json.MarshalIndent(config, "", "    ") //pretty JSON
 
 	if err != nil {
-		log.Fatal(err)
+		logFatal(err)
 	}
 
 	os.Remove(configPath)
 
 	var file3, err5 = os.Create(configPath)
 	if err5 != nil { //Crash if the program can't load config file.
-		log.Fatal(err5)
+		logFatal(err5)
 	}
 	file3.Close()
 
 	var file2, err4 = os.OpenFile(configPath, os.O_RDWR, 0755) //Check if file is openable (and get file object)
 	if err4 != nil {
-		log.Fatal(err4)
+		logFatal(err4)
 	}
 	file2.Write(js) //write JSON to file
 	file2.Close()
@@ -225,7 +226,7 @@ func verifySettings(config *InstanceConfig) {
 		_, err := os.Stat(server.HomeDirectory)
 		if os.IsNotExist(err) {
 			info(server.InstanceName + "'s home directory does not exist! Please fix this error in the config.")
-			log.Fatal(err)
+			logFatal(err)
 		}
 		if server.HomeDirectory[len(server.HomeDirectory)-1] == '/' {
 			config.Servers[i].HomeDirectory = substring(server.HomeDirectory, 0, len(server.HomeDirectory)-1)
@@ -233,12 +234,12 @@ func verifySettings(config *InstanceConfig) {
 
 		_, err2 := os.Stat(server.HomeDirectory + "/" + server.ExecutableName)
 		if os.IsNotExist(err2) {
-			log.Fatal(server.InstanceName + "'s path for executable " + server.HomeDirectory + "/" + server.ExecutableName + " does not exist! Check your path in the config.")
+			logFatalStr(server.InstanceName + "'s path for executable " + server.HomeDirectory + "/" + server.ExecutableName + " does not exist! Check your path in the config.")
 		}
 
 		for _, k := range namesUsed {
 			if k == server.InstanceName {
-				log.Fatal("The name " + server.InstanceName + " is already taken, check for duplicates!")
+				logFatalStr("The name " + server.InstanceName + " is already taken, check for duplicates!")
 			}
 		}
 		namesUsed = append(namesUsed, server.InstanceName)
@@ -252,19 +253,19 @@ func verifySettings(config *InstanceConfig) {
 func initLog() {
 	if _, err := os.Stat(logDirPath); os.IsNotExist(err) {
 		os.Mkdir(logDirPath, 0755)
-		info("Created the logging directory!")
+		fmt.Println(time.Now().Format("2006-01-02 15:04:05") + "Created the logging directory!")
 	}
 	if _, err := os.Stat(logPath); !os.IsNotExist(err) {
 		dat, err := ioutil.ReadFile(logPath)
 		if err != nil {
-			log.Fatal("")
+			logFatal(err)
 		}
 		fmt.Print(string(dat))
 
 		//compress the old log file
 		buf := new(bytes.Buffer)
 		w := zip.NewWriter(buf) //create a new zip archive
-		f, err := w.Create(logPath)
+		f, err := w.Create(logDirPath + "/" + time.Now().Format("2006-01-02") + ".zip")
 		if err != nil {
 			log.Fatal(err)
 		}

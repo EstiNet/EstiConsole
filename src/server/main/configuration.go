@@ -6,11 +6,9 @@ import (
 	"encoding/json"
 	"bytes"
 	"reflect"
-	"io/ioutil"
 	"fmt"
 	"archive/zip"
 	"time"
-	"log"
 )
 
 /*
@@ -29,6 +27,7 @@ type Users struct {
 type InstanceConfig struct {
 	InstanceName string         `json:"instance_name"`
 	InstancePort uint           `json:"instance_port"`
+	LogDirectory string         `json:"log_directory"`
 	Servers      []ServerConfig `json:"servers"`
 	Users        []Users        `json:"users"`
 }
@@ -59,6 +58,7 @@ func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 	con := InstanceConfig{}
 	con.InstanceName = "Server"
 	con.InstancePort = 6921
+	con.LogDirectory = "./log"
 
 	wi := ServerConfig{}
 	wi.InstanceName = "Server1"
@@ -221,6 +221,13 @@ func LoadConfig() {
 func verifySettings(config *InstanceConfig) {
 	namesUsed := make([]string, 1)
 
+	/*
+	 * Verify instance settings
+	 */
+
+	/*
+	 * Verify each server's settings
+	 */
 	for i, server := range config.Servers {
 
 		_, err := os.Stat(server.HomeDirectory)
@@ -253,35 +260,68 @@ func verifySettings(config *InstanceConfig) {
 func initLog() {
 	if _, err := os.Stat(logDirPath); os.IsNotExist(err) {
 		os.Mkdir(logDirPath, 0755)
-		fmt.Println(time.Now().Format("2006-01-02 15:04:05") + "Created the logging directory!")
+		fmt.Println(time.Now().Format("2006-01-02 15:04:05") + " [INFO] Created the logging directory!")
 	}
 	if _, err := os.Stat(logPath); !os.IsNotExist(err) {
-		dat, err := ioutil.ReadFile(logPath)
-		if err != nil {
-			logFatal(err)
-		}
-		fmt.Print(string(dat))
+		fmt.Println(time.Now().Format("2006-01-02 15:04:05") + " [INFO] Compressing previous log file...")
 
-		//compress the old log file
-		buf := new(bytes.Buffer)
-		w := zip.NewWriter(buf) //create a new zip archive
-		f, err := w.Create(logDirPath + "/" + time.Now().Format("2006-01-02") + ".zip")
-		if err != nil {
-			log.Fatal(err)
-		}
-		_, err = f.Write([]byte(string(dat))) //stream log file data
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		err = w.Close() //close zipwriter
-		if err != nil {
-			log.Fatal(err)
-		}
+		ZipFiles(logDirPath + "/" + time.Now().Format("2006-01-02 15-04-05") + ".zip", []string{logPath})
 
 		os.Remove(logPath) //remove main log file
+		fmt.Println(time.Now().Format("2006-01-02 15:04:05") + " [INFO] Done!")
 	}
 	os.Create(logPath)
 	info("Created the main log file!")
 
+}
+
+/*
+ * Zip file utility
+ */
+
+func ZipFiles(filename string, files []string) error {
+
+	newfile, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer newfile.Close()
+
+	zipWriter := zip.NewWriter(newfile)
+	defer zipWriter.Close()
+
+	// Add files to zip
+	for _, file := range files {
+
+		zipfile, err := os.Open(file)
+		if err != nil {
+			return err
+		}
+		defer zipfile.Close()
+
+		// Get the file information
+		info, err := zipfile.Stat()
+		if err != nil {
+			return err
+		}
+
+		header, err := zip.FileInfoHeader(info)
+		if err != nil {
+			return err
+		}
+
+		// Change to deflate to gain better compression
+		// see http://golang.org/pkg/archive/zip/#pkg-constants
+		header.Method = zip.Deflate
+
+		writer, err := zipWriter.CreateHeader(header)
+		if err != nil {
+			return err
+		}
+		_, err = io.Copy(writer, zipfile)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

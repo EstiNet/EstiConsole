@@ -12,7 +12,6 @@ import (
 	"time"
 	"io"
 	"log"
-	"io/ioutil"
 )
 
 var version = "v2.0.1"
@@ -23,18 +22,25 @@ var commands = make(map[string]interface{})
 var curServerView *Server = nil
 
 var logDirPath = "./log"
-var logPath = "./log/main.log"
+var logPath = logDirPath + "/current.log"
 
 var clear map[string]func()
 
 /*
  * Output and logging related functions
+ * TODO make async with log queue
  */
 
 func addLog(str string) {
-	err := ioutil.WriteFile(logPath, []byte(str + "\n"), 0644)
+	f, err := os.OpenFile(logPath, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
+	}
+
+	defer f.Close()
+
+	if _, err = f.WriteString(str + "\n"); err != nil {
+		panic(err)
 	}
 }
 func logFatal(err error) {

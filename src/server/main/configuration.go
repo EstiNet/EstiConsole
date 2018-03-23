@@ -249,34 +249,41 @@ func verifySettings(config *InstanceConfig) {
 /*
  * Initializes log files
  */
-//TODO
 func InitLog() {
 	if _, err := os.Stat(logDirPath); os.IsNotExist(err) {
 		os.Mkdir(logDirPath, 0755)
 		fmt.Println(time.Now().Format("2006-01-02 15:04:05") + " [INFO] Created the logging directory!")
 	}
-	if _, err := os.Stat(logPath); !os.IsNotExist(err) {
+	InitLogFile(logDirPath)
+}
+
+/*
+ * Initializes the log file and compresses the old one
+ */
+
+func InitLogFile(directory string) {
+	if _, err := os.Stat(directory + "/current.log"); !os.IsNotExist(err) {
 		fmt.Println(time.Now().Format("2006-01-02 15:04:05") + " [INFO] Compressing previous log file...")
 
-		ZipFiles(logDirPath+"/"+time.Now().Format("2006-01-02 15-04-05")+".zip", []string{logPath})
+		ZipFiles(directory+"/"+time.Now().Format("2006-01-02 15-04-05")+".zip", []string{directory + "/current.log"})
 
-		os.Remove(logPath) //remove main log file
+		os.Remove(directory + "/current.log") //remove main log file
 		fmt.Println(time.Now().Format("2006-01-02 15:04:05") + " [INFO] Done!")
 	}
-	os.Create(logPath)
+	os.Create(directory + "/current.log")
 	info("Created the main log file!")
-
 }
 
 /*
  * Initializes log files after configuration is loaded in
  */
 func PostInitLog() {
-	for i, server := range instanceSettings.Servers {
+	for _, server := range instanceSettings.Servers {
 		_, err := os.Stat(logDirPath + "/" + server.InstanceName)
 		if os.IsNotExist(err) {
-			os.Mkdir(logDirPath + "/" + server.InstanceName)
+			os.Mkdir(logDirPath+"/"+server.InstanceName, 0755)
 		}
+		InitLogFile(logDirPath + "/" + server.InstanceName)
 	}
 }
 

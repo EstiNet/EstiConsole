@@ -32,7 +32,7 @@ func (server *Server) start() {
 	server.Process.Dir = server.Settings.HomeDirectory //set working directory
 
 	//Handle minecraft related tasks
-	if (server.Settings.MinecraftMode) {
+	if server.Settings.MinecraftMode {
 		if _, err := os.Stat(server.Settings.HomeDirectory + "/update"); os.IsNotExist(err) {
 			os.Mkdir(server.Settings.HomeDirectory+"/update", 0755)
 			info("Created the update directory!")
@@ -74,6 +74,9 @@ func (server *Server) start() {
 	buff := bufio.NewScanner(server.OutputPipe)
 	for buff.Scan() {
 		server.Log = append(server.Log, buff.Text())
+
+		addToLogFile(buff.Text() + "\n", logDirPath + "/" + server.Settings.InstanceName + "/current.log")
+
 		if curServerView != nil && server.Settings.InstanceName == curServerView.Settings.InstanceName {
 			println(buff.Text()) //prints reading from stdout
 		}

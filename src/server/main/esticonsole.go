@@ -22,7 +22,6 @@ var commands = make(map[string]interface{})
 var curServerView *Server = nil
 
 var logDirPath = "./log"
-var logPath = logDirPath + "/current.log"
 
 var clear map[string]func()
 
@@ -32,7 +31,10 @@ var clear map[string]func()
  */
 
 func addLog(str string) {
-	f, err := os.OpenFile(logPath, os.O_APPEND|os.O_WRONLY, 0600)
+	addToLogFile(str, logDirPath + "/current.log")
+}
+func addToLogFile(str string, directory string) {
+	f, err := os.OpenFile(directory, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		panic(err)
 	}

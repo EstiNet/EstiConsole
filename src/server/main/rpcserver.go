@@ -94,6 +94,7 @@ func (rpcserver *RPCServer) Attach(stream pb.RPCServer_AttachServer) error {
 		//TODO get cpu and ram usage and process command
 
 		if err := stream.Send(reply); err != nil {
+			
 			return err //TODO do something with error and parse
 		}
 	}

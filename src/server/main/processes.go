@@ -62,7 +62,7 @@ func (server *Server) start() {
 		server.InputPipe.Close()
 		server.OutputPipe.Close()
 		info(server.Settings.InstanceName + " has stopped.")
-		if (server.AutoStart) {
+		if server.AutoStart {
 			time.Sleep(time.Second * 2) //Let's not die right TODO
 			go server.start()
 		}
@@ -73,10 +73,7 @@ func (server *Server) start() {
 	//Print output
 	buff := bufio.NewScanner(server.OutputPipe)
 	for buff.Scan() {
-		server.Log = append(server.Log, buff.Text())
-
-		addToLogFile(buff.Text() + "\n", logDirPath + "/" + server.Settings.InstanceName + "/current.log")
-
+		server.addLog(buff.Text())
 		if curServerView != nil && server.Settings.InstanceName == curServerView.Settings.InstanceName {
 			println(buff.Text()) //prints reading from stdout
 		}
@@ -99,12 +96,17 @@ func (server *Server) input(input string) {
 	io.WriteString(server.InputPipe, input+"\n")
 }
 
+func(server *Server) addLog(str string) {
+	server.Log = append(server.Log, str)
+	addToLogFile(str, logDirPath+"/"+server.Settings.InstanceName+"/current.log") //Write
+}
+
 func (server *Server) getLog(beginIndex int, endIndex int) []string {
 	return server.Log[beginIndex:endIndex]
 }
 
 func (server *Server) getLatestLogID() int {
-	return len(server.Log)-1
+	return len(server.Log) - 1
 }
 
 //END OF SERVER METHODS

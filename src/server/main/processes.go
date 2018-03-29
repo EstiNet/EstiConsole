@@ -6,6 +6,7 @@ import (
 	"io"
 	"bufio"
 	"time"
+	linuxproc "github.com/c9s/goprocinfo/linux"
 )
 
 var Servers = make(map[string]*Server)
@@ -197,5 +198,21 @@ func KillClient(name string) string {
 		}
 	} else {
 		return "Server not found."
+	}
+}
+
+func GetCPUUsage() string {
+	stat, err := linuxproc.ReadStat("/proc/stat")
+	if err != nil {
+		info("[ERROR] CPU stat read fail")
+	}
+
+	for _, s := range stat.CPUStats {
+		//TODO LINUX CHECK
+		// s.User
+		// s.Nice
+		// s.System
+		// s.Idle
+		// s.IOWait
 	}
 }

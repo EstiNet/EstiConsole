@@ -71,15 +71,54 @@ func CommandStatus(input string) {
 }
 
 var cpuInfo, ramInfo string
+var attachLog []string
 
 func CommandAttach(input string) { //TODO check if process (input) exists
 	startCon()
 	//go attachCUI()
-	ping := pb.ServerQuery{MessageId:-2, GetRam:true, GetCpu:true, ProcessName:input}
+	ping := pb.ServerQuery{MessageId: -2, GetRam: true, GetCpu: true, ProcessName: input}
+	var urgentCount uint64 = 20 //if the server should check more frequently for messages (message detection)
+
+	ObtainNewLog(input, true) //initially fill slice
 	for {
-		reply, err := client.Attach(context.Background(), &ping)
+		if urgentCount < 20 { //increase urgent count if there are periods of no messages (4 seconds)
+			urgentCount++
+		}
+		reply, err := client.Attach(context.Background(), &ping) //initial ping
 		checkError(err)
-		if reply.messageId
-		time.Sleep(1000) //TODO dynamic time switch for message urgency
+
+		if int(reply.MessageId) > len(attachLog) { //if there are new messages
+			ObtainNewLog(input, false)
+			urgentCount = 0
+		}
+		if urgentCount >= 20 {
+			t, _ := time.ParseDuration("1500ms")
+			time.Sleep(t)
+		} else {
+			t, _ := time.ParseDuration("400ms")
+			time.Sleep(t)
+		}
+	}
+}
+
+func ObtainNewLog(process string, firstGet bool) {
+	obtainNewest := pb.ServerQuery{MessageId: -1, GetRam: false, GetCpu: false, ProcessName: process}
+	reply2, err2 := client.Attach(context.Background(), &obtainNewest)
+	checkError(err2) //caveat: can't accept 100 message gaps
+	if firstGet {
+		if reply2.MessageId == 0 {
+			reply2.MessageId++
+		}
+		attachLog = make([]string, reply2.MessageId-1) //fill with "" values
+		attachLog = append(attachLog, reply2.Messages...)
+		for _, cur := range attachLog {
+			println(cur)
+		}
+	} else {
+		reply2.Messages = reply2.Messages[(len(attachLog) - 1 - int(reply2.MessageId)) : len(reply2.Messages)-1]
+		attachLog = append(attachLog, reply2.Messages...) //append new messages to log slice
+		for _, cur := range reply2.Messages {
+			println(cur)
+		}
 	}
 }

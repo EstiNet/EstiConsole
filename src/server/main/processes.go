@@ -103,6 +103,9 @@ func(server *Server) addLog(str string) {
 }
 
 func (server *Server) getLog(beginIndex int, endIndex int) []string {
+	if beginIndex < 0 {
+		beginIndex = 0
+	}
 	return server.Log[beginIndex:endIndex]
 }
 

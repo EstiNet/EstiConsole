@@ -7,6 +7,7 @@ import (
 	"bufio"
 	"time"
 	linuxproc "github.com/c9s/goprocinfo/linux"
+	"io/ioutil"
 )
 
 var Servers = make(map[string]*Server)
@@ -36,7 +37,19 @@ func (server *Server) start() {
 	if server.Settings.MinecraftMode {
 		if _, err := os.Stat(server.Settings.HomeDirectory + "/update"); os.IsNotExist(err) {
 			os.Mkdir(server.Settings.HomeDirectory+"/update", 0755)
-			info("Created the update directory!")
+			info("Created the update directory for " + server.Settings.InstanceName + "!")
+		}
+		files, err := ioutil.ReadDir(server.Settings.HomeDirectory + "/update")
+		if err != nil {
+			server.addLog("[ERROR] Error reading directory " + server.Settings.HomeDirectory + "/update " + err.Error())
+		}
+
+		for _, f := range files { //move files from /update to plugins
+			err := os.Rename(server.Settings.HomeDirectory+"/update/"+f.Name(), server.Settings.HomeDirectory+"/plugins/"+f.Name())
+			if err != nil {
+				server.addLog("[ERROR] Plugin update error: " + err.Error())
+			}
+			server.addLog("[INFO] Updated plugin " + f.Name())
 		}
 	}
 
@@ -97,7 +110,7 @@ func (server *Server) input(input string) {
 	io.WriteString(server.InputPipe, input+"\n")
 }
 
-func(server *Server) addLog(str string) {
+func (server *Server) addLog(str string) {
 	server.Log = append(server.Log, str)
 	addToLogFile(str, logDirPath+"/"+server.Settings.InstanceName+"/current.log") //Write
 }

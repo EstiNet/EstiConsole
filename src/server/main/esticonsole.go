@@ -31,7 +31,7 @@ var clear map[string]func()
  */
 
 func addLog(str string) {
-	addToLogFile(str, logDirPath + "/current.log")
+	addToLogFile(str, logDirPath+"/current.log")
 }
 func addToLogFile(str string, directory string) {
 	f, err := os.OpenFile(directory, os.O_APPEND|os.O_WRONLY, 0600)

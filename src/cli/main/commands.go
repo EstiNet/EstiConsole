@@ -5,6 +5,7 @@ import (
 	"context"
 	pb "../../protocol"
 	"google.golang.org/grpc/connectivity"
+	"time"
 )
 
 func CommandHelp(input string) {
@@ -62,13 +63,23 @@ func CommandKill(input string) {
 	println(reply.Str)
 }
 
-func CommandAttach(input string) {
-	attachCUI()
-}
-
 func CommandStatus(input string) {
 	startCon()
 	if conn.GetState() == connectivity.Ready {
 		println("Connection successful!")
+	}
+}
+
+var cpuInfo, ramInfo string
+
+func CommandAttach(input string) { //TODO check if process (input) exists
+	startCon()
+	//go attachCUI()
+	ping := pb.ServerQuery{MessageId:-2, GetRam:true, GetCpu:true, ProcessName:input}
+	for {
+		reply, err := client.Attach(context.Background(), &ping)
+		checkError(err)
+		if reply.messageId
+		time.Sleep(1000) //TODO dynamic time switch for message urgency
 	}
 }

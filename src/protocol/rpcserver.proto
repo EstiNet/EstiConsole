@@ -7,7 +7,7 @@ service RPCServer {
     rpc Start(String) returns (String);
     rpc Kill(String) returns (String);
     rpc InstanceStop(String) returns (String);
-    rpc Attach(stream ServerQuery) returns (stream ServerReply);
+    rpc Attach(ServerQuery) returns (ServerReply);
 }
 
 message String {

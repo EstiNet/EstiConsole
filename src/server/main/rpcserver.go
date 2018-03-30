@@ -9,7 +9,6 @@ import (
 	"context"
 	"fmt"
 	"google.golang.org/grpc"
-	"io"
 )
 
 var grpcServer *grpc.Server
@@ -68,53 +67,45 @@ func (rpcserver *RPCServer) InstanceStop(ctx context.Context, str *pb.String) (*
 	return &pb.String{Str: "Host service shutting down."}, nil
 }
 
-func (rpcserver *RPCServer) Attach(stream pb.RPCServer_AttachServer) error {
-	for {
-		query, err := stream.Recv()
-		if err == io.EOF {
-			return nil
-		}
-		if err != nil {
-			return err
+func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (*pb.ServerReply, error) {
+	reply := &pb.ServerReply{}           //begin construction of reply
+	server := Servers[query.ProcessName] //TODO check if process exists
+
+	//Parse ServerQuery object
+
+	if query.MessageId == -1 { //client requests for latest messages
+		reply.Messages = server.getLog(server.getLatestLogID()-100, server.getLatestLogID())
+		if server.getLatestLogID()-100 >= 0 {
+			reply.MessageId = uint64(server.getLatestLogID() - 100)
+		} else {
+			reply.MessageId = 0
 		}
 
-		reply := &pb.ServerReply{} //begin construction of reply
-		server := Servers[query.ProcessName]
-
-		//Parse ServerQuery object
-
-		if query.MessageId == -1 { //client requests for latest messages
-			reply.Messages = server.getLog(server.getLatestLogID()-100, server.getLatestLogID())
-			if server.getLatestLogID()-100 >= 0 {
-				reply.MessageId = uint64(server.getLatestLogID()-100)
-			} else {
-				reply.MessageId = 0
-			}
-
-		} else if query.MessageId > -1 { //client requests for specific message sets
-			reply.Messages = server.getLog(int(query.MessageId-100), int(query.MessageId))
-			if query.MessageId-100 >= 0 {
-				reply.MessageId = uint64(query.MessageId-100)
-			} else {
-				reply.MessageId = 0
-			}
-		} else { //client doesn't require messages
-			reply.MessageId = uint64(server.getLatestLogID())
-			reply.Messages = []string{}
+	} else if query.MessageId > -1 { //client requests for specific message sets
+		reply.Messages = server.getLog(int(query.MessageId-100), int(query.MessageId))
+		if query.MessageId-100 >= 0 {
+			reply.MessageId = uint64(query.MessageId - 100)
+		} else {
+			reply.MessageId = 0
 		}
-
-		if query.GetCpu {
-			reply.CpuUsage = GetCPUUsage()
-		}
-		if query.GetRam {
-			reply.RamUsage = GetMemoryUsage() //TODO redo proc info
-		}
-		
-		if err := stream.Send(reply); err != nil {
-			info("[Error] " + err.Error())
-			return err
-		}
+	} else { //client doesn't require messages
+		reply.MessageId = uint64(server.getLatestLogID())
+		reply.Messages = []string{}
 	}
+
+	if query.GetCpu {
+		reply.CpuUsage = GetCPUUsage()
+	}
+	if query.GetRam {
+		reply.RamUsage = GetMemoryUsage() //TODO redo proc info
+	}
+
+	//send command to process
+	if query.Command != "" {
+		server.input(query.Command)
+		server.addLog("Remote command executed: " + query.Command)
+	}
+	return reply, nil
 }
 
 func rpcserverStart() {

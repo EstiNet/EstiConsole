@@ -206,13 +206,20 @@ func GetCPUUsage() string {
 	if err != nil {
 		info("[ERROR] CPU stat read fail")
 	}
-
-	for _, s := range stat.CPUStats {
-		//TODO LINUX CHECK
-		// s.User
-		// s.Nice
-		// s.System
-		// s.Idle
-		// s.IOWait
+	str := ""
+	for i, s := range stat.CPUStats { //Loop through all cpu cores
+		//TODO DISABLE IF NOT LINUX
+		str += "CPU " + string(i) + ":\n"
+		str += "User: " + string(s.User) + ", Nice: " + string(s.Nice) + ", System: " + string(s.System) + ", Idle: " + string(s.Idle) + ", IOWait: " + string(s.IOWait) + "\n"
 	}
+	return str
+}
+func GetMemoryUsage() string {
+	stat, err := linuxproc.ReadMemInfo("/proc/meminfo")
+	if err != nil {
+		info("[ERROR] Memory stat read fail")
+	}
+	str := ""
+	str += "Free Memory: " + string(stat.MemFree) + "\nMemory Available: " + string(stat.MemAvailable) + "\nMemory Total: " + string(stat.MemTotal) + "\nSwap Free: " + string(stat.SwapFree) + "\nSwap Total: " + string(stat.SwapTotal) + "\n"
+	return str
 }

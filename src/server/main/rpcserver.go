@@ -83,20 +83,36 @@ func (rpcserver *RPCServer) Attach(stream pb.RPCServer_AttachServer) error {
 
 		//Parse ServerQuery object
 
-		if query.MessageId == -1 {
+		if query.MessageId == -1 { //client requests for latest messages
 			reply.Messages = server.getLog(server.getLatestLogID()-100, server.getLatestLogID())
-		} else if query.MessageId > -1 {
+			if server.getLatestLogID()-100 >= 0 {
+				reply.MessageId = uint64(server.getLatestLogID()-100)
+			} else {
+				reply.MessageId = 0
+			}
+
+		} else if query.MessageId > -1 { //client requests for specific message sets
 			reply.Messages = server.getLog(int(query.MessageId-100), int(query.MessageId))
-		} else {
+			if query.MessageId-100 >= 0 {
+				reply.MessageId = uint64(query.MessageId-100)
+			} else {
+				reply.MessageId = 0
+			}
+		} else { //client doesn't require messages
+			reply.MessageId = uint64(server.getLatestLogID())
 			reply.Messages = []string{}
 		}
 
-		//TODO get cpu and ram usage and process command
-
-
+		if query.GetCpu {
+			reply.CpuUsage = GetCPUUsage()
+		}
+		if query.GetRam {
+			reply.RamUsage = GetMemoryUsage() //TODO redo proc info
+		}
+		
 		if err := stream.Send(reply); err != nil {
-			
-			return err //TODO do something with error and parse
+			info("[Error] " + err.Error())
+			return err
 		}
 	}
 }

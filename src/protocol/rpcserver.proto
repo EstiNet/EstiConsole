@@ -15,7 +15,7 @@ message String {
 }
 
 message ServerQuery {
-    int64 message_id = 1; //fetches 100 messages from before this id, -1 for latest, -2 for no messages
+    int64 message_id = 1; //fetches 100 messages from before this id, -1 for latest, -2 for no messages (first id starts at 0, arrays start at 0 wow omigod)
     bool get_ram = 2; //get ram usage
     bool get_cpu = 3; //get cpu usage
     string command = 4; //input command
@@ -23,8 +23,8 @@ message ServerQuery {
 }
 
 message ServerReply {
-    repeated string messages = 1; //returns related messages
-    uint64 message_id = 2; //returns message id from which it starts from
+    repeated string messages = 1; //returns related messages (first id starts at 0, arrays start at 0 wow omigod)
+    uint64 message_id = 2; //returns message id from which it starts from, returns latest message id if no messages were requested (message_id = -2)
     string ram_usage = 3;
     string cpu_usage = 4;
 }

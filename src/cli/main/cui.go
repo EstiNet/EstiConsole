@@ -82,6 +82,14 @@ func attachCUI() {
 		for i := 0; i < maxi; i++ { //cycle through views
 			nextView(gui, view)
 		}
+		(**cuiGUI).Update(func (g *gocui.Gui) error { //move cursor to beginning async
+			out, err := (**cuiGUI).View("v2")
+			if err != nil {
+				return err
+			}
+			out.SetCursor(0, 0) //move cursor
+			return nil
+		})
 		return nil
 	}); err != nil {
 		log.Panicln(err)

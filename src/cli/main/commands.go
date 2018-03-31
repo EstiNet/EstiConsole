@@ -87,11 +87,11 @@ func CommandAttach(input string) {
 
 func StartAttachSupervise(input string) {
 	ping := pb.ServerQuery{MessageId: -2, GetRam: true, GetCpu: true, ProcessName: input}
-	var urgentCount uint64 = 20 //if the server should check more frequently for messages (message detection)
+	var urgentCount uint64 = 30 //if the server should check more frequently for messages (message detection)
 
 	ObtainNewLog(input, true) //initially fill slice
 	for {
-		if urgentCount < 20 { //increase urgent count if there are periods of no messages (4 seconds)
+		if urgentCount < 30 { //increase urgent count if there are periods of no messages (4 seconds)
 			urgentCount++
 		}
 		reply, err := client.Attach(context.Background(), &ping) //initial ping
@@ -101,11 +101,11 @@ func StartAttachSupervise(input string) {
 			ObtainNewLog(input, false)
 			urgentCount = 0
 		}
-		if urgentCount >= 20 { //slow check for messages
-			t, _ := time.ParseDuration("1500ms")
+		if urgentCount >= 30 { //slow check for messages
+			t, _ := time.ParseDuration("1300ms")
 			time.Sleep(t)
 		} else { //burst message detection
-			t, _ := time.ParseDuration("400ms")
+			t, _ := time.ParseDuration("100ms")
 			time.Sleep(t)
 		}
 	}

@@ -97,9 +97,9 @@ func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (
 		}
 
 	} else if query.MessageId > -1 { //client requests for specific message sets
-		reply.Messages = server.getLog(int(query.MessageId-bufferCutoff), int(query.MessageId))
+		reply.Messages = server.getLog(int(query.MessageId-int64(bufferCutoff)), int(query.MessageId))
 		if query.MessageId-100 >= 0 {
-			reply.MessageId = uint64(query.MessageId - bufferCutoff)
+			reply.MessageId = uint64(query.MessageId - int64(bufferCutoff))
 		} else {
 			reply.MessageId = 0
 		}

@@ -118,7 +118,7 @@ func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (
 	//send command to process
 	if query.Command != "" {
 		server.input(query.Command)
-		server.addLog("Remote command executed: " + query.Command)
+		server.addLog("Remote command executed: " + strings.Replace(query.Command, "\n", "", -1))
 	}
 	return reply, nil
 }

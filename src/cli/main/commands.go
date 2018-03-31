@@ -81,13 +81,14 @@ func CommandAttach(input string) {
 	procName = input
 
 	startCon()
-	go StartAttachSupervise(input) //async supervisor
+	go StartAttachSupervise(input) //async supervisor TODO FIX ASYNC load
 	attachCUI() //sync gui
 }
 
+var urgentCount uint64 = 30 //if the server should check more frequently for messages (message detection)
+
 func StartAttachSupervise(input string) {
 	ping := pb.ServerQuery{MessageId: -2, GetRam: true, GetCpu: true, ProcessName: input}
-	var urgentCount uint64 = 30 //if the server should check more frequently for messages (message detection)
 
 	ObtainNewLog(input, true) //initially fill slice
 	for {
@@ -102,8 +103,13 @@ func StartAttachSupervise(input string) {
 			urgentCount = 0
 		}
 		if urgentCount >= 30 { //slow check for messages
-			t, _ := time.ParseDuration("1300ms")
-			time.Sleep(t)
+			t, _ := time.ParseDuration("10ms")
+			for i := 0; i < 130; i++ { //sleep 1300ms
+				if urgentCount == 0 { //leave loop early if new messages are sent
+					break
+				}
+				time.Sleep(t) //sleep 10ms
+			}
 		} else { //burst message detection
 			t, _ := time.ParseDuration("100ms")
 			time.Sleep(t)
@@ -140,4 +146,7 @@ func ObtainLogAtIndex(process string, index int) {
 func SendCommand(command string, process string) {
 	_, err := client.Attach(context.Background(), &pb.ServerQuery{MessageId: -2, Command: command, GetRam: false, GetCpu: false, ProcessName: process}) //initial ping
 	checkError(err)
+	urgentCount = 0
+	ObtainNewLog(process, false)
 }
+

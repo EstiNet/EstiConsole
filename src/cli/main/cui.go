@@ -4,12 +4,16 @@ import (
 	"github.com/jroimartin/gocui"
 	"log"
 	"fmt"
+	"strconv"
+	"strings"
 )
 
 var (
-	viewArr = []string{"v1", "v2", "v3"} //list of switchable views
-	active  = 0
-	cuiGUI  **gocui.Gui //static CUI object
+	viewArr         = []string{"v1", "v2", "v3"} //list of switchable views
+	active          = 0
+	cuiGUI          **gocui.Gui //static CUI object
+	curCommandIndex = -1
+	prevCommands    []string
 )
 
 /*
@@ -39,65 +43,56 @@ func attachCUI() {
 	if err := g.SetKeybinding("", gocui.KeyTab, gocui.ModNone, nextView); err != nil {
 		log.Panicln(err)
 	}
-	if err := g.SetKeybinding("", gocui.KeyEnter, gocui.ModNone, func(gui *gocui.Gui, view *gocui.View) error { //send command
-		out, err := (**cuiGUI).View("v2")
-		if err != nil {
-			log.Fatal(err)
-		}
-		out.Rewind() //move buffer to beginning of line
-		b := out.ViewBuffer()
-		(**cuiGUI).Update(func (g *gocui.Gui) error { //clear the command view's text and move cursor to beginning async
-			out, err := (**cuiGUI).View("v2")
-			if err != nil {
-				return err
-			}
-			out.Clear() //clear text
-			out.SetCursor(0, 0) //move cursor
-			return nil
-		})
-
-		SendCommand(string(b), procName) //send command over grpc to server
-		return nil
-	}); err != nil {
+	if err := g.SetKeybinding("", gocui.KeyEnter, gocui.ModNone, enterClick); err != nil {
 		log.Panicln(err)
 	}
-	if err := g.SetKeybinding("", gocui.MouseLeft, gocui.ModNone, func(gui *gocui.Gui, view *gocui.View) error { //user click on view switch
-		var index int
-		for i := 0; i < len(viewArr); i++ {
-			if viewArr[i] == view.Name() {
-				index = i
-				break
-			}
-		}
-		var maxi, cur int
-		cur = active
-		if cur < 0 {
-			cur = len(viewArr) - 1
-		}
-		if index < cur {
-			maxi = (len(viewArr) - cur) + index
-		} else {
-			maxi = index - cur
-		}
-		for i := 0; i < maxi; i++ { //cycle through views
-			nextView(gui, view)
-		}
-		(**cuiGUI).Update(func (g *gocui.Gui) error { //move cursor to beginning async
-			out, err := (**cuiGUI).View("v2")
-			if err != nil {
-				return err
-			}
-			out.SetCursor(0, 0) //move cursor
-			return nil
-		})
-		return nil
-	}); err != nil {
+	if err := g.SetKeybinding("", gocui.MouseLeft, gocui.ModNone, mouseClick); err != nil {
+		log.Panicln(err)
+	}
+	if err := g.SetKeybinding("v2", gocui.KeyArrowUp, gocui.ModNone, prevCommand); err != nil {
+		log.Panicln(err)
+	}
+	if err := g.SetKeybinding("v2", gocui.KeyArrowDown, gocui.ModNone, forwardCommand); err != nil {
 		log.Panicln(err)
 	}
 
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
 		log.Panicln(err)
 	}
+}
+
+/*
+ * Command scroll up
+ */
+func prevCommand(gui *gocui.Gui, view *gocui.View) error {
+	if curCommandIndex == -1 && len(prevCommands) > 0 {
+		curCommandIndex = len(prevCommands) - 1
+		clearCommandView()
+	} else if curCommandIndex != 0 && curCommandIndex != -1 {
+		curCommandIndex--
+		clearCommandView()
+		writeToView(prevCommands[curCommandIndex], "v2")
+		writeToView(prevCommands[curCommandIndex], "v3")
+	}
+	writeToView(strconv.Itoa(curCommandIndex), "v3")
+	return nil
+}
+
+/*
+ * Command scroll down
+ */
+func forwardCommand(gui *gocui.Gui, view *gocui.View) error {
+	if curCommandIndex == len(prevCommands)-1 && len(prevCommands) > 0 {
+		curCommandIndex = -1
+		clearCommandView()
+	} else if curCommandIndex > -1 && curCommandIndex < len(prevCommands)-1 {
+		curCommandIndex++
+		clearCommandView()
+		writeToView(prevCommands[curCommandIndex], "v2")
+		writeToView(prevCommands[curCommandIndex], "v3")
+	}
+	writeToView(strconv.Itoa(curCommandIndex), "v3")
+	return nil
 }
 
 func setCurrentViewOnTop(g *gocui.Gui, name string) (*gocui.View, error) {
@@ -181,6 +176,73 @@ func layout(g *gocui.Gui) error {
 		v.Wrap = true
 	}
 	return nil
+}
+
+/*
+ * Mouse click event
+ */
+
+func mouseClick(gui *gocui.Gui, view *gocui.View) error { //user click on view switch
+	var index int
+	for i := 0; i < len(viewArr); i++ {
+		if viewArr[i] == view.Name() {
+			index = i
+			break
+		}
+	}
+	var maxi, cur int
+	cur = active
+	if cur < 0 {
+		cur = len(viewArr) - 1
+	}
+	if index < cur {
+		maxi = (len(viewArr) - cur) + index
+	} else {
+		maxi = index - cur
+	}
+	for i := 0; i < maxi; i++ { //cycle through views
+		nextView(gui, view)
+	}
+	(**cuiGUI).Update(func(g *gocui.Gui) error { //move cursor to beginning async
+		out, err := (**cuiGUI).View("v2")
+		if err != nil {
+			return err
+		}
+		out.SetCursor(0, 0) //move cursor
+		return nil
+	})
+	return nil
+}
+
+/*
+ * Enter button click event
+ */
+func enterClick(gui *gocui.Gui, view *gocui.View) error { //send command
+	out, err := (**cuiGUI).View("v2")
+	if err != nil {
+		log.Fatal(err)
+	}
+	out.Rewind() //move buffer to beginning of line
+	b := out.ViewBuffer()
+	b = strings.Replace(b, "\n", "", -1)
+	clearCommandView()
+
+	prevCommands = append(prevCommands, b)
+	curCommandIndex = -1
+	SendCommand(b, procName) //send command over grpc to server
+	return nil
+}
+
+func clearCommandView() {
+	(**cuiGUI).Update(func(g *gocui.Gui) error { //clear the command view's text and move cursor to beginning async
+		out, err := (**cuiGUI).View("v2")
+		if err != nil {
+			return err
+		}
+		out.Clear()         //clear text
+		out.SetCursor(0, 0) //move cursor
+		return nil
+	})
 }
 
 /*

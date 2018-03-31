@@ -46,7 +46,7 @@ type ServerConfig struct {
 	AmountOfLinesToCutOnMax           uint   `json:"amount_of_lines_to_cut_on_max"`
 	StopProcessCommand                string `json:"stop_process_command"`
 	ServerUnresponsiveKillTimeSeconds uint   `json:"server_unresponsive_kill_time_seconds"`
-	MinecraftMode                     bool   `json:"minecraft_mode"` //TODO not implemented
+	MinecraftMode                     bool   `json:"minecraft_mode"`
 }
 
 /*

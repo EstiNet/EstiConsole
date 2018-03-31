@@ -36,7 +36,7 @@ func addLog(str string) {
 func addToLogFile(str string, directory string) {
 	f, err := os.OpenFile(directory, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
-		panic(err)
+		panic(err) //TODO if directory is deleted while the server is on repair file
 	}
 
 	defer f.Close()

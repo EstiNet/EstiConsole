@@ -1,0 +1,41 @@
+{
+    "instance_name": "Server",
+    "instance_port": 6921,
+    "servers": [
+        {
+            "instance_name": "Server1",
+            "home_directory": "/home/devin/Flow/ECExp",
+            "executable_name": "minecraft_server.jar",
+            "min_ram": "512M",
+            "max_ram": "2G",
+            "java_args": "-XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -d64 -server",
+            "max_lines": 2000,
+            "amount_of_lines_to_cut_on_max": 100,
+            "stop_process_command": "stop",
+            "server_unresponsive_kill_time_seconds": 20,
+            "minecraft_mode": true
+        },
+        {
+            "instance_name": "Server2",
+            "home_directory": "",
+            "executable_name": "",
+            "min_ram": "",
+            "max_ram": "",
+            "max_lines": 0,
+            "amount_of_lines_to_cut_on_max": 0,
+            "stop_process_command": "",
+            "server_unresponsive_kill_time_seconds": 0,
+            "minecraft_mode": false
+        }
+    ],
+    "users": [
+        {
+            "name": "default",
+            "password": "password"
+        },
+        {
+            "name": "defaults",
+            "password": "password"
+        }
+    ]
+}

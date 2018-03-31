@@ -9,6 +9,8 @@ import (
 	"context"
 	"fmt"
 	"google.golang.org/grpc"
+	"errors"
+	"strconv"
 )
 
 var grpcServer *grpc.Server
@@ -68,13 +70,26 @@ func (rpcserver *RPCServer) InstanceStop(ctx context.Context, str *pb.String) (*
 }
 
 func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (*pb.ServerReply, error) {
+	found := false
+	for serv := range Servers {
+		if serv == query.ProcessName {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return &pb.ServerReply{}, errors.New("Process name not found.")
+	}
+
 	reply := &pb.ServerReply{}           //begin construction of reply
 	server := Servers[query.ProcessName] //TODO check if process exists
 
 	//Parse ServerQuery object
 
 	if query.MessageId == -1 { //client requests for latest messages
-		reply.Messages = server.getLog(server.getLatestLogID()-100, server.getLatestLogID())
+		info("blah " + strconv.Itoa(server.getLatestLogID()) + " len " + strconv.Itoa(len(server.Log)) + " cap " + strconv.Itoa(cap(server.Log)))
+		reply.Messages = server.getLog(server.getLatestLogID()-100, server.getLatestLogID()+1)
 		if server.getLatestLogID()-100 >= 0 {
 			reply.MessageId = uint64(server.getLatestLogID() - 100)
 		} else {

@@ -73,7 +73,7 @@ func CommandStatus(input string) {
 var cpuInfo, ramInfo string
 var attachLog []string
 
-func CommandAttach(input string) { //TODO check if process (input) exists
+func CommandAttach(input string) {
 	startCon()
 	//go attachCUI()
 	ping := pb.ServerQuery{MessageId: -2, GetRam: true, GetCpu: true, ProcessName: input}
@@ -87,7 +87,7 @@ func CommandAttach(input string) { //TODO check if process (input) exists
 		reply, err := client.Attach(context.Background(), &ping) //initial ping
 		checkError(err)
 
-		if int(reply.MessageId) > len(attachLog) { //if there are new messages
+		if int(reply.MessageId) >= len(attachLog) - 1 { //if there are new messages
 			ObtainNewLog(input, false)
 			urgentCount = 0
 		}
@@ -110,15 +110,18 @@ func ObtainNewLog(process string, firstGet bool) {
 			reply2.MessageId++
 		}
 		attachLog = make([]string, reply2.MessageId-1) //fill with "" values
-		attachLog = append(attachLog, reply2.Messages...)
+		attachLog = append(attachLog, reply2.Messages...) //TODO duplication of previous message
 		for _, cur := range attachLog {
 			println(cur)
 		}
 	} else {
-		reply2.Messages = reply2.Messages[(len(attachLog) - 1 - int(reply2.MessageId)) : len(reply2.Messages)-1]
+		reply2.Messages = reply2.Messages[(len(attachLog) - 1 - int(reply2.MessageId)) : len(reply2.Messages)]
 		attachLog = append(attachLog, reply2.Messages...) //append new messages to log slice
 		for _, cur := range reply2.Messages {
 			println(cur)
 		}
 	}
+}
+func ObtainLogAtIndex(process string, index int) {
+
 }

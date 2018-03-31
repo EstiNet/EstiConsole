@@ -162,7 +162,7 @@ func Shutdown() {
 
 func ConsoleStart() {
 	var reader = bufio.NewReader(os.Stdin)
-	for {
+	for { //command line loop
 		input, err := reader.ReadString('\n')
 		if err == io.EOF {
 			time.Sleep(100 * time.Millisecond)

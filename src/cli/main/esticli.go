@@ -88,7 +88,7 @@ func main() {
 
 func checkError(err error) {
 	if err != nil {
-		log.Fatal("RPC Error: ", err)
+		log.Fatal("[ERROR] ", err)
 	}
 }
 

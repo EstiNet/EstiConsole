@@ -70,12 +70,18 @@ func CommandStatus(input string) {
 	}
 }
 
-var cpuInfo, ramInfo string
+/*
+ * Attach + CUI related code
+ */
+
+var cpuInfo, ramInfo, procName string
 var attachLog []string
 
 func CommandAttach(input string) {
+	procName = input
+
 	startCon()
-	//go attachCUI()
+	go attachCUI()
 	ping := pb.ServerQuery{MessageId: -2, GetRam: true, GetCpu: true, ProcessName: input}
 	var urgentCount uint64 = 20 //if the server should check more frequently for messages (message detection)
 
@@ -112,13 +118,15 @@ func ObtainNewLog(process string, firstGet bool) {
 		attachLog = make([]string, reply2.MessageId-1) //fill with "" values
 		attachLog = append(attachLog, reply2.Messages...) //TODO duplication of previous message
 		for _, cur := range attachLog {
-			println(cur)
+			//println(cur)
+			writeToView(cur, "v1")
 		}
 	} else {
 		reply2.Messages = reply2.Messages[(len(attachLog) - 1 - int(reply2.MessageId)) : len(reply2.Messages)]
 		attachLog = append(attachLog, reply2.Messages...) //append new messages to log slice
 		for _, cur := range reply2.Messages {
-			println(cur)
+			//println(cur)
+			writeToView(cur, "v1")
 		}
 	}
 }

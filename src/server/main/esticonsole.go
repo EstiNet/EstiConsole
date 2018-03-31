@@ -105,7 +105,7 @@ func main() {
 	//Start logging
 	InitLog()
 
-	println("Starting EstiConsole '" + version + "'...")
+	println("EstiConsole " + version + "")
 
 	//System signal hooks
 	info("Registering hooks...")
@@ -134,8 +134,6 @@ func main() {
 	info("Starting command system...")
 	go ConsoleStart()
 	
-	println("Welcome to EstiConsole '" + version + "'!")
-
 	//Receive interrupt
 	<-done
 	Shutdown()

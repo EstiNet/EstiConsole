@@ -93,7 +93,7 @@ func CommandAttach(input string) {
 		reply, err := client.Attach(context.Background(), &ping) //initial ping
 		checkError(err)
 
-		if int(reply.MessageId) >= len(attachLog) - 1 { //if there are new messages
+		if int(reply.MessageId) >= len(attachLog)-1 { //if there are new messages
 			ObtainNewLog(input, false)
 			urgentCount = 0
 		}
@@ -115,14 +115,14 @@ func ObtainNewLog(process string, firstGet bool) {
 		if reply2.MessageId == 0 {
 			reply2.MessageId++
 		}
-		attachLog = make([]string, reply2.MessageId-1) //fill with "" values
+		attachLog = make([]string, reply2.MessageId-1)    //fill with "" values
 		attachLog = append(attachLog, reply2.Messages...) //TODO duplication of previous message
 		for _, cur := range attachLog {
 			//println(cur)
 			writeToView(cur, "v1")
 		}
 	} else {
-		reply2.Messages = reply2.Messages[(len(attachLog) - 1 - int(reply2.MessageId)) : len(reply2.Messages)]
+		reply2.Messages = reply2.Messages[(len(attachLog) - 1 - int(reply2.MessageId)):len(reply2.Messages)]
 		attachLog = append(attachLog, reply2.Messages...) //append new messages to log slice
 		for _, cur := range reply2.Messages {
 			//println(cur)
@@ -132,4 +132,8 @@ func ObtainNewLog(process string, firstGet bool) {
 }
 func ObtainLogAtIndex(process string, index int) {
 
+}
+func SendCommand(command string, process string) {
+	_, err := client.Attach(context.Background(), &pb.ServerQuery{MessageId: -2, Command: command, GetRam: false, GetCpu: false, ProcessName: process}) //initial ping
+	checkError(err)
 }

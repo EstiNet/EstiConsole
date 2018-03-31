@@ -28,6 +28,20 @@ func attachCUI() {
 	if err := g.SetKeybinding("", gocui.KeyTab, gocui.ModNone, nextView); err != nil {
 		log.Panicln(err)
 	}
+	if err := g.SetKeybinding("", gocui.KeyArrowDown, gocui.ModNone, func(gui *gocui.Gui, view *gocui.View) error {
+		writeToView("enter key pressed", "v1")
+		out, err := (**cuiGUI).View("v2")
+		if err != nil {
+			log.Fatal(err)
+		}
+		var b []byte
+		out.Read(b)
+		println(string(b))
+		SendCommand(string(b), procName)
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
 
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
 		log.Panicln(err)
@@ -35,7 +49,7 @@ func attachCUI() {
 }
 
 var (
-	viewArr = []string{"v1", "v2", "v3"}
+	viewArr = []string{"v2", "v3"}
 	active  = 0
 )
 
@@ -101,6 +115,7 @@ func layout(g *gocui.Gui) error {
 		}
 		v.Title = "v3 (editable)"
 		v.Editable = true
+		v.Wrap = true
 	}
 	return nil
 }

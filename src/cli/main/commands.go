@@ -81,7 +81,11 @@ func CommandAttach(input string) {
 	procName = input
 
 	startCon()
-	go attachCUI()
+	go StartAttachSupervise(input) //async supervisor
+	attachCUI() //sync gui
+}
+
+func StartAttachSupervise(input string) {
 	ping := pb.ServerQuery{MessageId: -2, GetRam: true, GetCpu: true, ProcessName: input}
 	var urgentCount uint64 = 20 //if the server should check more frequently for messages (message detection)
 
@@ -97,10 +101,10 @@ func CommandAttach(input string) {
 			ObtainNewLog(input, false)
 			urgentCount = 0
 		}
-		if urgentCount >= 20 {
+		if urgentCount >= 20 { //slow check for messages
 			t, _ := time.ParseDuration("1500ms")
 			time.Sleep(t)
-		} else {
+		} else { //burst message detection
 			t, _ := time.ParseDuration("400ms")
 			time.Sleep(t)
 		}
@@ -115,7 +119,7 @@ func ObtainNewLog(process string, firstGet bool) {
 		if reply2.MessageId == 0 {
 			reply2.MessageId++
 		}
-		attachLog = make([]string, reply2.MessageId-1)    //fill with "" values
+		attachLog = make([]string, reply2.MessageId-1)    //fill initial with "" values
 		attachLog = append(attachLog, reply2.Messages...) //TODO duplication of previous message
 		for _, cur := range attachLog {
 			//println(cur)

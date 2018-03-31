@@ -6,7 +6,15 @@ import (
 	"fmt"
 )
 
-var cuiGUI **gocui.Gui
+var (
+	viewArr = []string{"v1", "v2", "v3"} //list of switchable views
+	active  = 0
+	cuiGUI  **gocui.Gui //static CUI object
+)
+
+/*
+ * Start the CUI
+ */
 
 func attachCUI() {
 	g, err := gocui.NewGui(gocui.OutputNormal)
@@ -16,11 +24,14 @@ func attachCUI() {
 	}
 	defer g.Close()
 
+	//CUI options
 	g.Highlight = true
-	g.Cursor = true
-	g.SelFgColor = gocui.ColorGreen
+	g.SelFgColor = gocui.ColorWhite
+	g.Mouse = true
 
 	g.SetManagerFunc(layout)
+
+	//set keybindings and mouse bindings
 
 	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
 		log.Panicln(err)
@@ -28,16 +39,49 @@ func attachCUI() {
 	if err := g.SetKeybinding("", gocui.KeyTab, gocui.ModNone, nextView); err != nil {
 		log.Panicln(err)
 	}
-	if err := g.SetKeybinding("", gocui.KeyArrowDown, gocui.ModNone, func(gui *gocui.Gui, view *gocui.View) error {
-		writeToView("enter key pressed", "v1")
+	if err := g.SetKeybinding("", gocui.KeyEnter, gocui.ModNone, func(gui *gocui.Gui, view *gocui.View) error { //send command
 		out, err := (**cuiGUI).View("v2")
 		if err != nil {
 			log.Fatal(err)
 		}
-		var b []byte
-		out.Read(b)
-		println(string(b))
-		SendCommand(string(b), procName)
+		out.Rewind() //move buffer to beginning of line
+		b := out.ViewBuffer()
+		(**cuiGUI).Update(func (g *gocui.Gui) error { //clear the command view's text and move cursor to beginning async
+			out, err := (**cuiGUI).View("v2")
+			if err != nil {
+				return err
+			}
+			out.Clear() //clear text
+			out.SetCursor(0, 0) //move cursor
+			return nil
+		})
+
+		SendCommand(string(b), procName) //send command over grpc to server
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+	if err := g.SetKeybinding("", gocui.MouseLeft, gocui.ModNone, func(gui *gocui.Gui, view *gocui.View) error { //user click on view switch
+		var index int
+		for i := 0; i < len(viewArr); i++ {
+			if viewArr[i] == view.Name() {
+				index = i
+				break
+			}
+		}
+		var maxi, cur int
+		cur = active
+		if cur < 0 {
+			cur = len(viewArr) - 1
+		}
+		if index < cur {
+			maxi = (len(viewArr) - cur) + index
+		} else {
+			maxi = index - cur
+		}
+		for i := 0; i < maxi; i++ { //cycle through views
+			nextView(gui, view)
+		}
 		return nil
 	}); err != nil {
 		log.Panicln(err)
@@ -48,11 +92,6 @@ func attachCUI() {
 	}
 }
 
-var (
-	viewArr = []string{"v2", "v3"}
-	active  = 0
-)
-
 func setCurrentViewOnTop(g *gocui.Gui, name string) (*gocui.View, error) {
 	if _, err := g.SetCurrentView(name); err != nil {
 		return nil, err
@@ -60,13 +99,24 @@ func setCurrentViewOnTop(g *gocui.Gui, name string) (*gocui.View, error) {
 	return g.SetViewOnTop(name)
 }
 
+/*
+ * Write text to view box async (from different goroutines)
+ */
+
 func writeToView(str string, view string) {
-	out, err := (**cuiGUI).View(view)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Fprintln(out, str)
+	(**cuiGUI).Update(func(g *gocui.Gui) error {
+		out, err := (**cuiGUI).View(view)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Fprintln(out, str)
+		return nil
+	})
 }
+
+/*
+ * Function to switch focus to next view
+ */
 
 func nextView(g *gocui.Gui, v *gocui.View) error {
 	nextIndex := (active + 1) % len(viewArr)
@@ -76,7 +126,8 @@ func nextView(g *gocui.Gui, v *gocui.View) error {
 		return err
 	}
 
-	if nextIndex == 3 {
+	//set cursor to appear on command view
+	if nextIndex == 1 {
 		g.Cursor = true
 	} else {
 		g.Cursor = false
@@ -85,6 +136,10 @@ func nextView(g *gocui.Gui, v *gocui.View) error {
 	active = nextIndex
 	return nil
 }
+
+/*
+ * Setup CUI layout + views
+ */
 
 func layout(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
@@ -119,6 +174,10 @@ func layout(g *gocui.Gui) error {
 	}
 	return nil
 }
+
+/*
+ * Quit CUI
+ */
 
 func quit(g *gocui.Gui, v *gocui.View) error {
 	return gocui.ErrQuit

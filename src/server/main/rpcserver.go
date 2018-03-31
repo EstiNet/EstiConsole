@@ -10,10 +10,11 @@ import (
 	"fmt"
 	"google.golang.org/grpc"
 	"errors"
-	"strconv"
 )
 
 var grpcServer *grpc.Server
+
+var bufferCutoff = 100
 
 /*
  * Define grpc struct for esticli method calls
@@ -88,18 +89,17 @@ func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (
 	//Parse ServerQuery object
 
 	if query.MessageId == -1 { //client requests for latest messages
-		info("blah " + strconv.Itoa(server.getLatestLogID()) + " len " + strconv.Itoa(len(server.Log)) + " cap " + strconv.Itoa(cap(server.Log)))
-		reply.Messages = server.getLog(server.getLatestLogID()-100, server.getLatestLogID()+1)
-		if server.getLatestLogID()-100 >= 0 {
-			reply.MessageId = uint64(server.getLatestLogID() - 100)
+		reply.Messages = server.getLog(server.getLatestLogID()-bufferCutoff, server.getLatestLogID()+1)
+		if server.getLatestLogID()-bufferCutoff >= 0 {
+			reply.MessageId = uint64(server.getLatestLogID() - bufferCutoff)
 		} else {
 			reply.MessageId = 0
 		}
 
 	} else if query.MessageId > -1 { //client requests for specific message sets
-		reply.Messages = server.getLog(int(query.MessageId-100), int(query.MessageId))
+		reply.Messages = server.getLog(int(query.MessageId-bufferCutoff), int(query.MessageId))
 		if query.MessageId-100 >= 0 {
-			reply.MessageId = uint64(query.MessageId - 100)
+			reply.MessageId = uint64(query.MessageId - bufferCutoff)
 		} else {
 			reply.MessageId = 0
 		}

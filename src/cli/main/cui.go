@@ -14,7 +14,7 @@ var (
 	cuiGUI          **gocui.Gui //static CUI object
 	curCommandIndex = -1
 	prevCommands    []string
-	lightMode = false
+	lightMode       = false
 )
 
 /*
@@ -32,12 +32,13 @@ func attachCUI() {
 	//CUI options
 	g.Highlight = true
 	if lightMode {
-		g.SelBgColor = gocui.ColorDefault
-		g.BgColor = gocui.ColorDefault
-		g.SelFgColor = gocui.ColorWhite
+		g.SelBgColor = gocui.ColorWhite
+		g.BgColor = gocui.ColorWhite
+		g.SelFgColor = gocui.ColorBlue
+		g.FgColor = gocui.ColorBlack
 	} else {
-		g.SelBgColor = gocui.ColorDefault
-		g.BgColor = gocui.ColorDefault
+		g.SelBgColor = gocui.ColorBlack
+		g.BgColor = gocui.ColorBlack
 		g.SelFgColor = gocui.ColorWhite
 	}
 	g.Mouse = true
@@ -304,28 +305,29 @@ func changeViewColour(view string, ansicolour string) {
 			return err
 		}
 		str := ansicolour + out.ViewBuffer() + "\u001b[0m"
-		out.Clear()         //clear text
+		out.Clear() //clear text
 		fmt.Fprintln(out, str)
 		return nil
 	})
 }
 
 func toggleMode(gui *gocui.Gui) {
-	if lightMode {
-		gui.SelBgColor = gocui.ColorDefault
-		gui.BgColor = gocui.ColorDefault
-		gui.SelFgColor = gocui.ColorWhite
-		changeViewColour("v1", "\u001b[0m")
-		changeViewColour("v2", "\u001b[0m")
-		changeViewColour("v3", "\u001b[0m")
-		changeViewColour("v4", "\u001b[0m")
-		changeViewColour("v5", "\u001b[0m")
-		changeViewColour("v6", "\u001b[0m")
-		changeViewColour("modetoggle", "\u001b[0m")
-		lightMode = false
-	} else {
-		lightMode = true
-	}
+	//restart gui for lightmode
+	(**cuiGUI).Update(func(g *gocui.Gui) error {
+		return gocui.ErrQuit
+	})
+	lightMode = !lightMode
+	go func() {
+		t, _ := time.ParseDuration("100ms")
+		time.Sleep(t)
+		(**cuiGUI).SetCurrentView("modetoggle") //TODO FIX DESTROYING GNOME TERMINAL
+		for _, cur := range attachLog { //TODO only write screen height size
+			//println(cur)
+			//writeToView("\033[30;1m" + cur + "\033[0m", "v1")
+			writeToView(cur, "v1")
+		}
+	}()
+	attachCUI()
 }
 
 func aboutPopup(gui *gocui.Gui) { //show popup for extra info

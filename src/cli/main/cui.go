@@ -34,13 +34,13 @@ func attachCUI() {
 	if lightMode {
 		g.SelBgColor = gocui.ColorWhite
 		g.BgColor = gocui.ColorWhite
-		g.SelFgColor = gocui.ColorBlue
-		g.FgColor = 0 << (gocui.ColorDefault + 1)
+		g.SelFgColor = 210
+		g.FgColor = 240
 	} else {
 		g.SelBgColor = gocui.ColorBlack
 		g.BgColor = gocui.ColorBlack
-		g.SelFgColor = gocui.ColorWhite
-		g.FgColor = 0 << (gocui.ColorDefault + 1)
+		g.SelFgColor = 31
+		g.FgColor = 249
 	}
 	g.Mouse = true
 
@@ -329,13 +329,13 @@ func toggleMode(gui *gocui.Gui) {
 	if lightMode {
 		gui.SelBgColor = gocui.ColorWhite
 		gui.BgColor = gocui.ColorWhite
-		gui.SelFgColor = gocui.ColorBlue
-		gui.FgColor = 0 << (gocui.ColorDefault + 1)
+		gui.SelFgColor = 210
+		gui.FgColor = 240 //0 << (gocui.ColorDefault + 1)
 	} else {
 		gui.SelBgColor = gocui.ColorBlack
 		gui.BgColor = gocui.ColorBlack
-		gui.SelFgColor = gocui.ColorWhite
-		gui.FgColor = 0 << (gocui.ColorDefault + 1)
+		gui.SelFgColor = 31
+		gui.FgColor = 249 //0 << (gocui.ColorDefault + 1)
 	}
 	for _, v := range gui.Views() {
 		v.BgColor, v.FgColor = gui.BgColor, gui.FgColor

@@ -84,7 +84,7 @@ func CommandAttach(input string) {
 
 	startCon()
 	ch := make(chan int)
-	go StartAttachSupervise(input, ch) //async supervisor TODO FIX ASYNC load
+	go StartAttachSupervise(input, ch) //async supervisor
 	<-ch
 	attachCUI() //sync gui
 }
@@ -135,6 +135,7 @@ func ObtainNewLog(process string, firstGet bool) {
 		}
 		attachLog = make([]string, reply2.MessageId-1)    //fill initial with "" values
 		attachLog = append(attachLog, reply2.Messages...)
+		//writeslicetoview now in attachCli()
 	} else {
 		reply2.Messages = reply2.Messages[(len(attachLog) - 1 - int(reply2.MessageId)):len(reply2.Messages)]
 		attachLog = append(attachLog, reply2.Messages...) //append new messages to log slice

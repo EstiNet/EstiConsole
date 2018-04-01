@@ -154,19 +154,19 @@ func ClientsStart() {
 
 func ClientsStop() {
 	info("Stopping all clients...")
-	end := func(server *Server) {
-		server.AutoStart = false
-		server.stop()
-		time.Sleep(time.Second * time.Duration(server.Settings.ServerUnresponsiveKillTimeSeconds))
-		if server.IsOnline {
-			server.Process.Process.Kill()
-		}
-		//TODO replace with better solution than blocking shutdown for many seconds...
-	}
+
 	for key, _ := range Servers {
 		if Servers[key].IsOnline {
 			info("Stopping " + key + "...")
-			go end(Servers[key])
+			go func(server *Server) {
+				server.AutoStart = false
+				server.stop()
+				time.Sleep(time.Second * time.Duration(server.Settings.ServerUnresponsiveKillTimeSeconds))
+				if server.IsOnline {
+					server.Process.Process.Kill()
+				}
+				//TODO replace with better solution than blocking shutdown for many seconds...
+			}(Servers[key])
 		}
 	}
 }

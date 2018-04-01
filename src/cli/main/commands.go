@@ -134,12 +134,7 @@ func ObtainNewLog(process string, firstGet bool) {
 			reply2.MessageId++
 		}
 		attachLog = make([]string, reply2.MessageId-1)    //fill initial with "" values
-		attachLog = append(attachLog, reply2.Messages...) //TODO duplication of previous message
-		go func() {
-			t, _ := time.ParseDuration("300ms")
-			time.Sleep(t)
-			writeSliceToView(attachLog, "v1")//TODO only write screen height size
-		}()
+		attachLog = append(attachLog, reply2.Messages...)
 	} else {
 		reply2.Messages = reply2.Messages[(len(attachLog) - 1 - int(reply2.MessageId)):len(reply2.Messages)]
 		attachLog = append(attachLog, reply2.Messages...) //append new messages to log slice

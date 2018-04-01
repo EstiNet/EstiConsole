@@ -67,6 +67,11 @@ func attachCUI() {
 		log.Panicln(err)
 	}
 
+	g.Update(func(g *gocui.Gui) error { //write slice to view once the main cui loop starts
+		writeSliceToView(attachLog, "v1")//TODO only write screen height size
+		return nil
+	})
+
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
 		log.Panicln(err)
 	}
@@ -324,18 +329,22 @@ func changeViewColour(view string, ansicolour string) {
 	})
 }
 
+/*
+ * Toggles the colours of the cui
+ */
+
 func toggleMode(gui *gocui.Gui) {
 	lightMode = !lightMode
 	if lightMode {
 		gui.SelBgColor = gocui.ColorWhite
 		gui.BgColor = gocui.ColorWhite
 		gui.SelFgColor = 210
-		gui.FgColor = 240 //0 << (gocui.ColorDefault + 1)
+		gui.FgColor = 240
 	} else {
 		gui.SelBgColor = gocui.ColorBlack
 		gui.BgColor = gocui.ColorBlack
 		gui.SelFgColor = 31
-		gui.FgColor = 249 //0 << (gocui.ColorDefault + 1)
+		gui.FgColor = 249
 	}
 	for _, v := range gui.Views() {
 		v.BgColor, v.FgColor = gui.BgColor, gui.FgColor

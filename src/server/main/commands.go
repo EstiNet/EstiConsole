@@ -31,7 +31,6 @@ func CommandList(input string) {
 func CommandSwitch(input string) {
 	if _, ok := Servers[input]; ok {
 		curServerView = Servers[input]
-		ClearTerminal()
 		for _, e := range Servers[input].Log {
 			println(e)
 		}

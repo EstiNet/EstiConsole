@@ -7,8 +7,6 @@ import (
 	"strings"
 	"os/signal"
 	"syscall"
-	"os/exec"
-	"runtime"
 	"time"
 	"io"
 	"log"
@@ -22,8 +20,6 @@ var commands = make(map[string]interface{})
 var curServerView *Server = nil
 
 var logDirPath = "./log"
-
-var clear map[string]func()
 
 /*
  * Output and logging related functions
@@ -82,18 +78,6 @@ func init() {
 	commands["instancestop"] = CommandInstanceStop
 	commands["start"] = CommandStart
 	commands["kill"] = CommandKill
-
-	clear = make(map[string]func())
-	clear["linux"] = func() {
-		cmd := exec.Command("clear")
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-	}
-	clear["windows"] = func() {
-		cmd := exec.Command("cmd", "/c", "cls")
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-	}
 }
 
 /*
@@ -144,12 +128,34 @@ func main() {
  */
 func Shutdown() {
 	info("Commencing instance shutdown.")
-	ClientsStop()
+	go ClientsStop()
 
-	//TODO REPLACE WITH THREAD BLOCKING
-	//TODO TEMP SOLUTION SHOULD NOT BE WORKING IN PRODUCTION!!!!!!
-	time.Sleep(time.Second * 8)
+	var maxKillTime uint
+	for _, server := range Servers { //get the longest unresponsive kill time period
+		if server.Settings.ServerUnresponsiveKillTimeSeconds > maxKillTime {
+			maxKillTime = server.Settings.ServerUnresponsiveKillTimeSeconds
+		}
+	}
 
+	for i := 0; uint(i) <= maxKillTime; i++ { //loop until the server is forced to shut down or all the processes have shut down
+		if uint(i) == maxKillTime { //if servers are still online after server unresponsive kill time
+			info("Force shutting down, processes still online.")
+			break
+		}
+
+		stillOnline := false
+		time.Sleep(time.Second)
+
+		for _, server := range Servers{
+			if server.IsOnline {
+				stillOnline = true
+				break
+			}
+		}
+		if !stillOnline {
+			break
+		}
+	}
 	grpcServer.Stop()
 
 	info("Exited EstiConsole " + version)
@@ -211,13 +217,4 @@ func substring(s string, start int, end int) string {
 		i++
 	}
 	return s[start_str_idx:]
-}
-
-func ClearTerminal() {
-	value, ok := clear[runtime.GOOS] //runtime.GOOS -> linux, windows, darwin etc.
-	if ok { //if we defined a clear func for that platform:
-		value() //we execute it
-	} else { //unsupported platform
-		panic("Your platform is unsupported! I can't clear terminal screen :(")
-	}
 }

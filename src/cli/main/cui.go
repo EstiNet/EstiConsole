@@ -11,7 +11,7 @@ import (
 var (
 	viewArr         = []string{"v1", "v2", "v3", "v5", "modetoggle", "v6"} //list of switchable views
 	active          = 0
-	cuiGUI          **gocui.Gui //static CUI object
+	cuiGUI          *gocui.Gui //static CUI object
 	curCommandIndex = -1
 	prevCommands    []string
 	lightMode       = false
@@ -22,10 +22,10 @@ var (
  */
 
 func attachCUI() {
-	g, err := gocui.NewGui(gocui.OutputNormal)
-	cuiGUI = &g
+	g, err := gocui.NewGui(gocui.Output256)
+	cuiGUI = g
 	if err != nil {
-		log.Panicln(err)
+		log.Fatal(err)
 	}
 	defer g.Close()
 
@@ -35,11 +35,12 @@ func attachCUI() {
 		g.SelBgColor = gocui.ColorWhite
 		g.BgColor = gocui.ColorWhite
 		g.SelFgColor = gocui.ColorBlue
-		g.FgColor = gocui.ColorBlack
+		g.FgColor = 0 << (gocui.ColorDefault + 1)
 	} else {
 		g.SelBgColor = gocui.ColorBlack
 		g.BgColor = gocui.ColorBlack
 		g.SelFgColor = gocui.ColorWhite
+		g.FgColor = 0 << (gocui.ColorDefault + 1)
 	}
 	g.Mouse = true
 
@@ -120,12 +121,24 @@ func setCurrentViewOnTop(g *gocui.Gui, name string) (*gocui.View, error) {
  */
 
 func writeToView(str string, view string) {
-	(**cuiGUI).Update(func(g *gocui.Gui) error {
-		out, err := (**cuiGUI).View(view)
+	(*cuiGUI).Update(func(g *gocui.Gui) error {
+		out, err := (*cuiGUI).View(view)
 		if err != nil {
 			log.Fatal(err)
 		}
 		fmt.Fprintln(out, str)
+		return nil
+	})
+}
+func writeSliceToView(slice []string, view string) {
+	(*cuiGUI).Update(func(g *gocui.Gui) error {
+		out, err := (*cuiGUI).View(view)
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, str := range slice {
+			fmt.Fprintln(out, ""+str+"\u001b[0m")
+		}
 		return nil
 	})
 }
@@ -244,8 +257,8 @@ func mouseClick(gui *gocui.Gui, view *gocui.View) error { //user click on view s
 	for i := 0; i < maxi; i++ { //cycle through views
 		nextView(gui, view)
 	}
-	(**cuiGUI).Update(func(g *gocui.Gui) error { //move cursor to beginning async
-		out, err := (**cuiGUI).View("v2")
+	(*cuiGUI).Update(func(g *gocui.Gui) error { //move cursor to beginning async
+		out, err := (*cuiGUI).View("v2")
 		if err != nil {
 			return err
 		}
@@ -271,7 +284,7 @@ func enterClick(gui *gocui.Gui, view *gocui.View) error { //send command
 
 	//otherwise, send command
 
-	out, err := (**cuiGUI).View("v2")
+	out, err := (*cuiGUI).View("v2")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -287,8 +300,8 @@ func enterClick(gui *gocui.Gui, view *gocui.View) error { //send command
 }
 
 func clearCommandView() {
-	(**cuiGUI).Update(func(g *gocui.Gui) error { //clear the command view's text and move cursor to beginning async
-		out, err := (**cuiGUI).View("v2")
+	(*cuiGUI).Update(func(g *gocui.Gui) error { //clear the command view's text and move cursor to beginning async
+		out, err := (*cuiGUI).View("v2")
 		if err != nil {
 			return err
 		}
@@ -299,8 +312,8 @@ func clearCommandView() {
 }
 
 func changeViewColour(view string, ansicolour string) {
-	(**cuiGUI).Update(func(g *gocui.Gui) error {
-		out, err := (**cuiGUI).View(view)
+	(*cuiGUI).Update(func(g *gocui.Gui) error {
+		out, err := (*cuiGUI).View(view)
 		if err != nil {
 			return err
 		}
@@ -312,22 +325,22 @@ func changeViewColour(view string, ansicolour string) {
 }
 
 func toggleMode(gui *gocui.Gui) {
-	//restart gui for lightmode
-	(**cuiGUI).Update(func(g *gocui.Gui) error {
-		return gocui.ErrQuit
-	})
 	lightMode = !lightMode
-	go func() {
-		t, _ := time.ParseDuration("100ms")
-		time.Sleep(t)
-		(**cuiGUI).SetCurrentView("modetoggle") //TODO FIX DESTROYING GNOME TERMINAL
-		for _, cur := range attachLog { //TODO only write screen height size
-			//println(cur)
-			//writeToView("\033[30;1m" + cur + "\033[0m", "v1")
-			writeToView(cur, "v1")
-		}
-	}()
-	attachCUI()
+	if lightMode {
+		gui.SelBgColor = gocui.ColorWhite
+		gui.BgColor = gocui.ColorWhite
+		gui.SelFgColor = gocui.ColorBlue
+		gui.FgColor = 0 << (gocui.ColorDefault + 1)
+	} else {
+		gui.SelBgColor = gocui.ColorBlack
+		gui.BgColor = gocui.ColorBlack
+		gui.SelFgColor = gocui.ColorWhite
+		gui.FgColor = 0 << (gocui.ColorDefault + 1)
+	}
+	for _, v := range gui.Views() {
+		v.BgColor, v.FgColor = gui.BgColor, gui.FgColor
+		v.SelBgColor, v.SelFgColor = gui.SelBgColor, gui.SelFgColor
+	}
 }
 
 func aboutPopup(gui *gocui.Gui) { //show popup for extra info
@@ -339,7 +352,7 @@ func aboutPopup(gui *gocui.Gui) { //show popup for extra info
 		go func() { //delete popup after 1.5 s
 			t, _ := time.ParseDuration("1500ms")
 			time.Sleep(t)
-			(**cuiGUI).Update(func(g *gocui.Gui) error {
+			(*cuiGUI).Update(func(g *gocui.Gui) error {
 				return gui.DeleteView("popup")
 			})
 		}()

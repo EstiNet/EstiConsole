@@ -83,16 +83,19 @@ func CommandAttach(input string) {
 	procName = input
 
 	startCon()
-	go StartAttachSupervise(input) //async supervisor TODO FIX ASYNC load
+	ch := make(chan int)
+	go StartAttachSupervise(input, ch) //async supervisor TODO FIX ASYNC load
+	<-ch
 	attachCUI() //sync gui
 }
 
 var urgentCount uint64 = 30 //if the server should check more frequently for messages (message detection)
 
-func StartAttachSupervise(input string) {
+func StartAttachSupervise(input string, ch chan int) {
 	ping := pb.ServerQuery{MessageId: -2, GetRam: true, GetCpu: true, ProcessName: input}
 
 	ObtainNewLog(input, true) //initially fill slice
+	ch <- 0
 	for {
 		if urgentCount < 30 { //increase urgent count if there are periods of no messages (4 seconds)
 			urgentCount++
@@ -132,32 +135,28 @@ func ObtainNewLog(process string, firstGet bool) {
 		}
 		attachLog = make([]string, reply2.MessageId-1)    //fill initial with "" values
 		attachLog = append(attachLog, reply2.Messages...) //TODO duplication of previous message
-		for _, cur := range attachLog {
-			//println(cur)
-			//writeToView("\033[30;1m" + cur + "\033[0m", "v1")
-			writeToView(cur, "v1")
-		}
+		go func() {
+			t, _ := time.ParseDuration("30ms")
+			time.Sleep(t)
+			writeSliceToView(attachLog, "v1")//TODO only write screen height size
+		}()
 	} else {
 		reply2.Messages = reply2.Messages[(len(attachLog) - 1 - int(reply2.MessageId)):len(reply2.Messages)]
 		attachLog = append(attachLog, reply2.Messages...) //append new messages to log slice
-		for _, cur := range reply2.Messages {
-			//println(cur)
-			//writeToView("\033[30;1m" + cur + "\033[0m", "v1")
-			writeToView(cur, "v1")
-		}
+		writeSliceToView(reply2.Messages, "v1")//TODO only write screen height size
 	}
 }
 func ObtainLogAtIndex(process string, index int) {
 
 }
 func UpdateInfo(cpu string, ram string) {
-	(**cuiGUI).Update(func(g *gocui.Gui) error { //clear the view's text
-		out, err := (**cuiGUI).View("v3")
+	(*cuiGUI).Update(func(g *gocui.Gui) error { //clear the view's text
+		out, err := (*cuiGUI).View("v3")
 		if err != nil {
 			return err
 		}
-		out.Clear()         //clear text
-		fmt.Fprintln(out, cpu + "\n" + ram)
+		out.Clear() //clear text
+		fmt.Fprintln(out, cpu+"\n"+ram)
 		return nil
 	})
 }
@@ -167,4 +166,3 @@ func SendCommand(command string, process string) {
 	urgentCount = 0
 	ObtainNewLog(process, false)
 }
-

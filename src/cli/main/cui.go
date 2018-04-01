@@ -5,14 +5,16 @@ import (
 	"log"
 	"fmt"
 	"strings"
+	"time"
 )
 
 var (
-	viewArr         = []string{"v1", "v2", "v3"} //list of switchable views
+	viewArr         = []string{"v1", "v2", "v3", "v5", "modetoggle", "v6"} //list of switchable views
 	active          = 0
 	cuiGUI          **gocui.Gui //static CUI object
 	curCommandIndex = -1
 	prevCommands    []string
+	lightMode = false
 )
 
 /*
@@ -29,7 +31,15 @@ func attachCUI() {
 
 	//CUI options
 	g.Highlight = true
-	g.SelFgColor = gocui.ColorWhite
+	if lightMode {
+		g.SelBgColor = gocui.ColorDefault
+		g.BgColor = gocui.ColorDefault
+		g.SelFgColor = gocui.ColorWhite
+	} else {
+		g.SelBgColor = gocui.ColorDefault
+		g.BgColor = gocui.ColorDefault
+		g.SelFgColor = gocui.ColorWhite
+	}
 	g.Mouse = true
 
 	g.SetManagerFunc(layout)
@@ -169,13 +179,41 @@ func layout(g *gocui.Gui) error {
 		v.Autoscroll = true
 		v.Editable = true
 	}
-	if v, err := g.SetView("v3", maxX-20, 0, maxX-1, maxY-1); err != nil {
+	if v, err := g.SetView("v3", maxX-20, 0, maxX-1, maxY-12); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
-		v.Title = "v3 (editable)"
+		v.Title = "Info"
 		v.Editable = true
 		v.Wrap = true
+	}
+	if v, err := g.SetView("v4", maxX-20, maxY-11, maxX-1, maxY-1); err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
+		v.Title = "Buttons"
+		v.Wrap = true
+	}
+	if v, err := g.SetView("v5", maxX-19, maxY-10, maxX-2, maxY-8); err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
+		v.Wrap = true
+		fmt.Fprintln(v, "      About")
+	}
+	if v, err := g.SetView("modetoggle", maxX-19, maxY-7, maxX-2, maxY-5); err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
+		v.Wrap = true
+		fmt.Fprintln(v, "  Color Toggle")
+	}
+	if v, err := g.SetView("v6", maxX-19, maxY-4, maxX-2, maxY-2); err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
+		v.Wrap = true
+		fmt.Fprintln(v, "      Exit")
 	}
 	return nil
 }
@@ -220,6 +258,18 @@ func mouseClick(gui *gocui.Gui, view *gocui.View) error { //user click on view s
  * Enter button click event
  */
 func enterClick(gui *gocui.Gui, view *gocui.View) error { //send command
+	if view.Name() == "v6" {
+		return quit(gui, view)
+	} else if view.Name() == "v5" {
+		aboutPopup(gui)
+		return nil
+	} else if view.Name() == "modetoggle" {
+		toggleMode(gui)
+		return nil
+	}
+
+	//otherwise, send command
+
 	out, err := (**cuiGUI).View("v2")
 	if err != nil {
 		log.Fatal(err)
@@ -245,6 +295,53 @@ func clearCommandView() {
 		out.SetCursor(0, 0) //move cursor
 		return nil
 	})
+}
+
+func changeViewColour(view string, ansicolour string) {
+	(**cuiGUI).Update(func(g *gocui.Gui) error {
+		out, err := (**cuiGUI).View(view)
+		if err != nil {
+			return err
+		}
+		str := ansicolour + out.ViewBuffer() + "\u001b[0m"
+		out.Clear()         //clear text
+		fmt.Fprintln(out, str)
+		return nil
+	})
+}
+
+func toggleMode(gui *gocui.Gui) {
+	if lightMode {
+		gui.SelBgColor = gocui.ColorDefault
+		gui.BgColor = gocui.ColorDefault
+		gui.SelFgColor = gocui.ColorWhite
+		changeViewColour("v1", "\u001b[0m")
+		changeViewColour("v2", "\u001b[0m")
+		changeViewColour("v3", "\u001b[0m")
+		changeViewColour("v4", "\u001b[0m")
+		changeViewColour("v5", "\u001b[0m")
+		changeViewColour("v6", "\u001b[0m")
+		changeViewColour("modetoggle", "\u001b[0m")
+		lightMode = false
+	} else {
+		lightMode = true
+	}
+}
+
+func aboutPopup(gui *gocui.Gui) { //show popup for extra info
+	maxX, maxY := gui.Size()
+	if v, err := gui.SetView("popup", maxX/2-10, maxY/2, maxX/2+10, maxY/2+4); err != nil {
+		fmt.Fprintln(v, "EstiCli "+version)
+		fmt.Fprintln(v, "――――――――――――――――――――")
+		fmt.Fprintln(v, "EspiDev approves")
+		go func() { //delete popup after 1.5 s
+			t, _ := time.ParseDuration("1500ms")
+			time.Sleep(t)
+			(**cuiGUI).Update(func(g *gocui.Gui) error {
+				return gui.DeleteView("popup")
+			})
+		}()
+	}
 }
 
 /*

@@ -6,6 +6,8 @@ import (
 	pb "../../protocol"
 	"google.golang.org/grpc/connectivity"
 	"time"
+	"github.com/jroimartin/gocui"
+	"fmt"
 )
 
 func CommandHelp(input string) {
@@ -102,6 +104,9 @@ func StartAttachSupervise(input string) {
 			ObtainNewLog(input, false)
 			urgentCount = 0
 		}
+
+		//UpdateInfo(reply.CpuUsage, reply.RamUsage) TODO cpu and ram usage
+
 		if urgentCount >= 30 { //slow check for messages
 			t, _ := time.ParseDuration("10ms")
 			for i := 0; i < 130; i++ { //sleep 1300ms
@@ -129,6 +134,7 @@ func ObtainNewLog(process string, firstGet bool) {
 		attachLog = append(attachLog, reply2.Messages...) //TODO duplication of previous message
 		for _, cur := range attachLog {
 			//println(cur)
+			//writeToView("\033[30;1m" + cur + "\033[0m", "v1")
 			writeToView(cur, "v1")
 		}
 	} else {
@@ -136,12 +142,24 @@ func ObtainNewLog(process string, firstGet bool) {
 		attachLog = append(attachLog, reply2.Messages...) //append new messages to log slice
 		for _, cur := range reply2.Messages {
 			//println(cur)
+			//writeToView("\033[30;1m" + cur + "\033[0m", "v1")
 			writeToView(cur, "v1")
 		}
 	}
 }
 func ObtainLogAtIndex(process string, index int) {
 
+}
+func UpdateInfo(cpu string, ram string) {
+	(**cuiGUI).Update(func(g *gocui.Gui) error { //clear the view's text
+		out, err := (**cuiGUI).View("v3")
+		if err != nil {
+			return err
+		}
+		out.Clear()         //clear text
+		fmt.Fprintln(out, cpu + "\n" + ram)
+		return nil
+	})
 }
 func SendCommand(command string, process string) {
 	_, err := client.Attach(context.Background(), &pb.ServerQuery{MessageId: -2, Command: command, GetRam: false, GetCpu: false, ProcessName: process}) //initial ping

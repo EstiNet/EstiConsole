@@ -4,7 +4,6 @@ import (
 	"github.com/jroimartin/gocui"
 	"log"
 	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -67,14 +66,17 @@ func attachCUI() {
 func prevCommand(gui *gocui.Gui, view *gocui.View) error {
 	if curCommandIndex == -1 && len(prevCommands) > 0 {
 		curCommandIndex = len(prevCommands) - 1
-		clearCommandView()
+
+		view.Clear()
+		fmt.Fprintln(view, prevCommands[curCommandIndex])
+		view.SetCursor(len(prevCommands[curCommandIndex]), 0)
 	} else if curCommandIndex != 0 && curCommandIndex != -1 {
 		curCommandIndex--
-		clearCommandView()
-		writeToView(prevCommands[curCommandIndex], "v2")
-		writeToView(prevCommands[curCommandIndex], "v3")
+
+		view.Clear()
+		fmt.Fprintln(view, prevCommands[curCommandIndex])
+		view.SetCursor(len(prevCommands[curCommandIndex]), 0)
 	}
-	writeToView(strconv.Itoa(curCommandIndex), "v3")
 	return nil
 }
 
@@ -87,11 +89,11 @@ func forwardCommand(gui *gocui.Gui, view *gocui.View) error {
 		clearCommandView()
 	} else if curCommandIndex > -1 && curCommandIndex < len(prevCommands)-1 {
 		curCommandIndex++
-		clearCommandView()
-		writeToView(prevCommands[curCommandIndex], "v2")
-		writeToView(prevCommands[curCommandIndex], "v3")
+
+		view.Clear()
+		fmt.Fprintln(view, prevCommands[curCommandIndex])
+		view.SetCursor(len(prevCommands[curCommandIndex]), 0)
 	}
-	writeToView(strconv.Itoa(curCommandIndex), "v3")
 	return nil
 }
 
@@ -146,7 +148,7 @@ func nextView(g *gocui.Gui, v *gocui.View) error {
 
 func layout(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
-	if v, err := g.SetView("v1", 0, 0, maxX-21, maxY-4); err != nil {
+	if v, err := g.SetView("v1", 0, 0, maxX-21, maxY-5); err != nil { // y 4
 		if err != gocui.ErrUnknownView {
 			return err
 		}
@@ -158,7 +160,7 @@ func layout(g *gocui.Gui) error {
 		}
 	}
 
-	if v, err := g.SetView("v2", 0, maxY-3, maxX-21, maxY-1); err != nil {
+	if v, err := g.SetView("v2", 0, maxY-4, maxX-21, maxY-1); err != nil { // y 3
 		if err != gocui.ErrUnknownView {
 			return err
 		}

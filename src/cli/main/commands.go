@@ -137,7 +137,11 @@ func ObtainNewLog(process string, firstGet bool) {
 		attachLog = append(attachLog, reply2.Messages...)
 		//writeslicetoview now in attachCli()
 	} else {
-		reply2.Messages = reply2.Messages[(len(attachLog) - 1 - int(reply2.MessageId)):len(reply2.Messages)]
+		begin := (len(attachLog) - 1 - int(reply2.MessageId))
+		if begin < 0 {
+			begin = 0
+		}
+		reply2.Messages = reply2.Messages[begin:len(reply2.Messages)]
 		attachLog = append(attachLog, reply2.Messages...) //append new messages to log slice
 		writeSliceToView(reply2.Messages, "v1")//TODO only write screen height size
 	}

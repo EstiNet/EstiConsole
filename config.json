@@ -5,10 +5,7 @@
         {
             "instance_name": "Server1",
             "home_directory": "/home/devin/Flow/ECExp",
-            "executable_name": "minecraft_server.jar",
-            "min_ram": "512M",
-            "max_ram": "2G",
-            "java_args": "-XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -d64 -server",
+            "command_to_run": "java -Xmx512M -Xms2G -XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -d64 -server -jar minecraft_server.jar",
             "max_lines": 2000,
             "amount_of_lines_to_cut_on_max": 100,
             "stop_process_command": "stop",

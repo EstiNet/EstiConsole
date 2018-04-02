@@ -38,10 +38,7 @@ type InstanceConfig struct {
 type ServerConfig struct {
 	InstanceName                      string `json:"instance_name"`
 	HomeDirectory                     string `json:"home_directory"`
-	ExecutableName                    string `json:"executable_name"`
-	MinRam                            string `json:"min_ram"`
-	MaxRam                            string `json:"max_ram"`
-	JavaArgs                          string `json:"java_args"`
+	CommandToRun					  string `json:"command_to_run"`
 	MaxLines                          uint   `json:"max_lines"`
 	AmountOfLinesToCutOnMax           uint   `json:"amount_of_lines_to_cut_on_max"`
 	StopProcessCommand                string `json:"stop_process_command"`
@@ -61,10 +58,7 @@ func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 	wi := ServerConfig{}
 	wi.InstanceName = "Server1"
 	wi.HomeDirectory = "./"
-	wi.MinRam = "512M"
-	wi.MaxRam = "2G"
-	wi.ExecutableName = "minecraft_server.jar"
-	wi.JavaArgs = "-XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -d64 -server"
+	wi.CommandToRun = "java -Xmx512M -Xms2G -XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -d64 -server -jar minecraft_server.jar"
 	wi.MaxLines = 2000
 	wi.AmountOfLinesToCutOnMax = 100
 	wi.StopProcessCommand = "stop"
@@ -230,11 +224,6 @@ func verifySettings(config *InstanceConfig) {
 		}
 		if server.HomeDirectory[len(server.HomeDirectory)-1] == '/' {
 			config.Servers[i].HomeDirectory = substring(server.HomeDirectory, 0, len(server.HomeDirectory)-1)
-		}
-
-		_, err2 := os.Stat(server.HomeDirectory + "/" + server.ExecutableName)
-		if os.IsNotExist(err2) {
-			logFatalStr(server.InstanceName + "'s path for executable " + server.HomeDirectory + "/" + server.ExecutableName + " does not exist! Check your path in the config.")
 		}
 
 		for _, k := range namesUsed {

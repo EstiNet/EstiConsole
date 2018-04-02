@@ -9,6 +9,7 @@ import (
 	linuxproc "github.com/c9s/goprocinfo/linux"
 	"io/ioutil"
 	"runtime"
+	"strings"
 )
 
 var Servers = make(map[string]*Server)
@@ -23,6 +24,7 @@ type Server struct {
 	Channel    chan string
 	Process    *exec.Cmd
 	OutputPipe io.ReadCloser
+	ErrPipe    io.ReadCloser
 	InputPipe  io.WriteCloser
 	AutoStart  bool
 	IsOnline   bool
@@ -31,8 +33,11 @@ type Server struct {
 //warning: this is a synchronous call.
 func (server *Server) start() {
 	info("Starting " + server.Settings.InstanceName)
-	server.Process = exec.Command("java", "-jar", server.Settings.ExecutableName)
-	server.Process.Dir = server.Settings.HomeDirectory //set working directory
+	server.addLog("Starting " + server.Settings.InstanceName)
+	strs := strings.Split(server.Settings.CommandToRun, " ")
+
+	server.Process = exec.Command(strs[0], strs[1:]...) //doesn't execute the command just yet
+	server.Process.Dir = server.Settings.HomeDirectory  //set working directory
 
 	//Handle minecraft related tasks
 	if server.Settings.MinecraftMode {
@@ -56,16 +61,21 @@ func (server *Server) start() {
 
 	//Initializes input and output pipes
 	server.OutputPipe, _ = server.Process.StdoutPipe()
+	server.ErrPipe, _ = server.Process.StderrPipe()
 	pipe, err := server.Process.StdinPipe()
 	if err != nil {
-		info("Process error for " + server.Settings.InstanceName + ": " + err.Error())
+		errMsg := "Process error for " + server.Settings.InstanceName + ": " + err.Error()
+		info(errMsg)
+		server.addLog(errMsg)
 	}
 	server.InputPipe = pipe
 
 	//Start process
 	err2 := server.Process.Start()
 	if err2 != nil {
-		info("Error starting process " + server.Settings.InstanceName + ": " + err2.Error())
+		errMsg := "Error starting process " + server.Settings.InstanceName + ": " + err2.Error()
+		info(errMsg)
+		server.addLog(errMsg)
 		return
 	}
 	server.IsOnline = true
@@ -77,6 +87,7 @@ func (server *Server) start() {
 		server.InputPipe.Close()
 		server.OutputPipe.Close()
 		info(server.Settings.InstanceName + " has stopped.")
+		server.addLog(server.Settings.InstanceName + " has stopped.")
 		if server.AutoStart {
 			time.Sleep(time.Second * 2) //Let's not die right TODO
 			go server.start()
@@ -91,6 +102,13 @@ func (server *Server) start() {
 		server.addLog(buff.Text())
 		if curServerView != nil && server.Settings.InstanceName == curServerView.Settings.InstanceName {
 			println(buff.Text()) //prints reading from stdout
+		}
+	}
+	buff2 := bufio.NewScanner(server.ErrPipe)
+	for buff2.Scan() {
+		server.addLog(buff2.Text())
+		if curServerView != nil && server.Settings.InstanceName == curServerView.Settings.InstanceName {
+			println(buff2.Text()) //prints reading from stdout
 		}
 	}
 }

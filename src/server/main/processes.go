@@ -6,9 +6,7 @@ import (
 	"io"
 	"bufio"
 	"time"
-	linuxproc "github.com/c9s/goprocinfo/linux"
 	"io/ioutil"
-	"runtime"
 	"strings"
 )
 
@@ -250,7 +248,7 @@ func KillClient(name string) string {
 	}
 }
 
-func GetCPUUsage() string {
+func GetCPUUsage() string { /*
 	if runtime.GOOS == "linux" {
 		stat, err := linuxproc.ReadStat("/proc/stat")
 		if err != nil {
@@ -263,10 +261,11 @@ func GetCPUUsage() string {
 		}
 		return str
 	}
-	return "platform not supported"
+	return "platform not supported" */
+	return ""
 }
 func GetMemoryUsage() string {
-	if runtime.GOOS == "linux" {
+	/*if runtime.GOOS == "linux" { TODO
 		stat, err := linuxproc.ReadMemInfo("/proc/meminfo")
 		if err != nil {
 			info("[ERROR] Memory stat read fail")
@@ -275,5 +274,6 @@ func GetMemoryUsage() string {
 		str += "Free Memory: " + string(stat.MemFree) + "\nMemory Available: " + string(stat.MemAvailable) + "\nMemory Total: " + string(stat.MemTotal) + "\nSwap Free: " + string(stat.SwapFree) + "\nSwap Total: " + string(stat.SwapTotal) + "\n"
 		return str
 	}
-	return "platform not supported"
+	return "platform not supported"*/
+	return ""
 }

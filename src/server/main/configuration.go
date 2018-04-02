@@ -64,7 +64,7 @@ func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 	wi := ServerConfig{}
 	wi.InstanceName = "Server1"
 	wi.HomeDirectory = "./"
-	wi.CommandToRun = "java -Xmx512M -Xms2G -XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -d64 -server -jar minecraft_server.jar"
+	wi.CommandToRun = "java -Xms512M -Xmx2G -XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -d64 -server -jar minecraft_server.jar"
 	wi.MaxLines = 2000
 	wi.AmountOfLinesToCutOnMax = 100
 	wi.StopProcessCommand = "stop"

@@ -12,7 +12,7 @@ import (
 	"log"
 )
 
-var version = "v2.0.1"
+var version = "v2.0.0"
 var instanceSettings InstanceConfig
 
 var commands = make(map[string]interface{})

@@ -132,8 +132,8 @@ func Shutdown() {
 
 	var maxKillTime uint
 	for _, server := range Servers { //get the longest unresponsive kill time period
-		if server.Settings.ServerUnresponsiveKillTimeSeconds > maxKillTime {
-			maxKillTime = server.Settings.ServerUnresponsiveKillTimeSeconds
+		if server.Settings.UnresponsiveKillTimeSeconds > maxKillTime {
+			maxKillTime = server.Settings.UnresponsiveKillTimeSeconds
 		}
 	}
 

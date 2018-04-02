@@ -3,12 +3,12 @@ package main
 import (
 	"os"
 	"io"
-	"encoding/json"
-	"bytes"
 	"reflect"
 	"fmt"
 	"archive/zip"
 	"time"
+	"encoding/json"
+	"bytes"
 )
 
 /*
@@ -25,10 +25,12 @@ type Users struct {
  */
 
 type InstanceConfig struct {
-	InstanceName string         `json:"instance_name"`
-	InstancePort uint           `json:"instance_port"`
-	Servers      []ServerConfig `json:"servers"`
-	Users        []Users        `json:"users"`
+	InstanceName  string         `json:"instance_name"`
+	InstancePort  uint           `json:"instance_port"`
+	SSLEncryption bool           `json:"sslencryption"`
+	CertFilePath  string         `json:"cert_file_path"`
+	Servers       []ServerConfig `json:"servers"`
+	Users         []Users        `json:"users"`
 }
 
 /*
@@ -38,11 +40,11 @@ type InstanceConfig struct {
 type ServerConfig struct {
 	InstanceName                      string `json:"instance_name"`
 	HomeDirectory                     string `json:"home_directory"`
-	CommandToRun					  string `json:"command_to_run"`
+	CommandToRun                      string `json:"command_to_run"`
 	MaxLines                          uint   `json:"max_lines"`
 	AmountOfLinesToCutOnMax           uint   `json:"amount_of_lines_to_cut_on_max"`
 	StopProcessCommand                string `json:"stop_process_command"`
-	ServerUnresponsiveKillTimeSeconds uint   `json:"server_unresponsive_kill_time_seconds"`
+	UnresponsiveKillTimeSeconds uint   `json:"unresponsive_kill_time_seconds"`
 	MinecraftMode                     bool   `json:"minecraft_mode"`
 }
 
@@ -54,6 +56,8 @@ func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 	con := InstanceConfig{}
 	con.InstanceName = "Server"
 	con.InstancePort = 6921
+	con.SSLEncryption = true
+	con.CertFilePath = "./cert.crt"
 
 	wi := ServerConfig{}
 	wi.InstanceName = "Server1"
@@ -62,7 +66,7 @@ func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 	wi.MaxLines = 2000
 	wi.AmountOfLinesToCutOnMax = 100
 	wi.StopProcessCommand = "stop"
-	wi.ServerUnresponsiveKillTimeSeconds = 20
+	wi.UnresponsiveKillTimeSeconds = 20
 	wi.MinecraftMode = true
 
 	users := Users{}
@@ -97,7 +101,11 @@ func LoadConfig() {
 	if err2 != nil {
 		logFatal(err2)
 	}
-	var text = make([]byte, 1024) //Read the file and set it to text
+	fi, e := os.Stat(configPath) //get size of file in bytes
+	if e != nil {
+		logFatal(e)
+	}
+	var text = make([]byte, fi.Size()+1) //Read the file and set it to text
 	for {
 		_, err = file.Read(text)
 		if err == io.EOF {
@@ -113,6 +121,7 @@ func LoadConfig() {
 	info("Extracted config contents!")
 	//Parse json
 	var config InstanceConfig
+
 	err3 := json.Unmarshal(text, &config)
 	if err3 != nil {
 		info(err3.Error())

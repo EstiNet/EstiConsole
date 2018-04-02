@@ -158,7 +158,7 @@ func Shutdown() {
 			break
 		}
 	}
-	//grpcServer.Stop() TODO nullptr
+	grpcServer.Stop()
 
 	info("Exited EstiConsole " + version)
 	os.Exit(0)

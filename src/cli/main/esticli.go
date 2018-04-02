@@ -10,6 +10,7 @@ import (
 	pb "../../protocol"
 	"google.golang.org/grpc/credentials"
 	"crypto/tls"
+	"github.com/jroimartin/gocui"
 )
 
 var version = "v1.0.0"
@@ -94,6 +95,11 @@ func main() {
 
 func checkError(err error) {
 	if err != nil {
+		if cuiGUI != nil {
+			(*cuiGUI).Update(func(g *gocui.Gui) error {
+				return gocui.ErrQuit
+			})
+		}
 		log.Fatal("[ERROR] ", err)
 	}
 }
@@ -110,13 +116,13 @@ func startCon() {
 	} else {
 		// Create the client TLS credentials
 		var creds credentials.TransportCredentials
-		if *verifyTLS { //encryption with IP SANs validation (for mmim attacks)
+		if *verifyTLS { //encryption with IP SANs validation (for mitm attacks)
 			var err error
 			creds, err = credentials.NewClientTLSFromFile(*certFile, "")
 			if err != nil {
 				log.Fatal("Could not load tls cert: ", err)
 			}
-		} else { //YAAAAAAAAAAAA encryption without mmim checks
+		} else { //YAAAAAAAAAAAA encryption without mitm checks
 			creds = credentials.NewTLS(&tls.Config{InsecureSkipVerify: true})
 		}
 

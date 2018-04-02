@@ -8,6 +8,7 @@ import (
 	"time"
 	"github.com/jroimartin/gocui"
 	"fmt"
+	"log"
 )
 
 func CommandHelp(input string) {
@@ -133,21 +134,39 @@ func ObtainNewLog(process string, firstGet bool) {
 		if reply2.MessageId == 0 {
 			reply2.MessageId++
 		}
-		attachLog = make([]string, reply2.MessageId-1)    //fill initial with "" values
+		attachLog = make([]string, reply2.MessageId+1) //fill initial with "" values
 		attachLog = append(attachLog, reply2.Messages...)
 		//writeslicetoview now in attachCli()
 	} else {
-		begin := (len(attachLog) - 1 - int(reply2.MessageId))
+		begin := len(attachLog) - 1 - int(reply2.MessageId)
 		if begin < 0 {
 			begin = 0
 		}
 		reply2.Messages = reply2.Messages[begin:len(reply2.Messages)]
 		attachLog = append(attachLog, reply2.Messages...) //append new messages to log slice
-		writeSliceToView(reply2.Messages, "v1")//TODO only write screen height size
+		writeSliceToView(reply2.Messages, "v1")           //TODO only write screen height size
+		prevBottomLine += len(reply2.Messages)
 	}
 }
 func ObtainLogAtIndex(process string, index int) {
-
+	obtain := pb.ServerQuery{MessageId: int64(index), GetRam: false, GetCpu: false, ProcessName: process}
+	reply2, err2 := client.Attach(context.Background(), &obtain)
+	checkError(err2) //caveat: can't accept 100 message gaps
+	length := len(reply2.Messages)
+	for i := 0; i < length; i++ {
+		attachLog[index-i] = reply2.Messages[length-i-1]
+	}
+	(*cuiGUI).Update(func(g *gocui.Gui) error {
+		out, err := (*cuiGUI).View("v1")
+		if err != nil {
+			log.Fatal(err)
+		}
+		out.Clear()
+		for _, str := range attachLog {
+			fmt.Fprintln(out, ""+str+"\u001b[0m")
+		}
+		return nil
+	})
 }
 func UpdateInfo(cpu string, ram string) {
 	(*cuiGUI).Update(func(g *gocui.Gui) error { //clear the view's text

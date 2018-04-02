@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"strconv"
 )
 
 var (
@@ -15,6 +16,8 @@ var (
 	curCommandIndex = -1
 	prevCommands    []string
 	lightMode       = false
+	prevBottomLine  = 0
+	scrollPos       = 0
 )
 
 /*
@@ -66,9 +69,21 @@ func attachCUI() {
 	if err := g.SetKeybinding("v2", gocui.KeyArrowDown, gocui.ModNone, forwardCommand); err != nil {
 		log.Panicln(err)
 	}
+	if err := g.SetKeybinding("v1", gocui.MouseWheelUp, gocui.ModNone, v1ScrollUp); err != nil {
+		log.Panicln(err)
+	}
+	if err := g.SetKeybinding("v1", gocui.KeyArrowUp, gocui.ModNone, v1ScrollUp); err != nil {
+		log.Panicln(err)
+	}
+	if err := g.SetKeybinding("v1", gocui.MouseWheelDown, gocui.ModNone, v1ScrollDown); err != nil {
+		log.Panicln(err)
+	}
+	if err := g.SetKeybinding("v1", gocui.KeyArrowDown, gocui.ModNone, v1ScrollDown); err != nil {
+		log.Panicln(err)
+	}
 
 	g.Update(func(g *gocui.Gui) error { //write slice to view once the main cui loop starts
-		writeSliceToView(attachLog, "v1")//TODO only write screen height size
+		writeSliceToView(attachLog, "v1") //TODO only write screen height size
 		return nil
 	})
 
@@ -83,13 +98,11 @@ func attachCUI() {
 func prevCommand(gui *gocui.Gui, view *gocui.View) error {
 	if curCommandIndex == -1 && len(prevCommands) > 0 {
 		curCommandIndex = len(prevCommands) - 1
-
 		view.Clear()
 		fmt.Fprintln(view, prevCommands[curCommandIndex])
 		view.SetCursor(len(prevCommands[curCommandIndex]), 0)
 	} else if curCommandIndex != 0 && curCommandIndex != -1 {
 		curCommandIndex--
-
 		view.Clear()
 		fmt.Fprintln(view, prevCommands[curCommandIndex])
 		view.SetCursor(len(prevCommands[curCommandIndex]), 0)
@@ -110,6 +123,41 @@ func forwardCommand(gui *gocui.Gui, view *gocui.View) error {
 		view.Clear()
 		fmt.Fprintln(view, prevCommands[curCommandIndex])
 		view.SetCursor(len(prevCommands[curCommandIndex]), 0)
+	}
+	return nil
+}
+
+/*
+ * v1 scroll up
+ */
+func v1ScrollUp(gui *gocui.Gui, view *gocui.View) error {
+	if x, y := view.Origin(); y != 0 {
+		_, sy := view.Size()
+		if y+4-sy >= 0 && y+4-sy < len(attachLog) && attachLog[y+4-sy] == "" { // y+4 is the y size of v1 (height), catch error with y+4-sy >= 0
+			ObtainLogAtIndex(procName, y+4-sy)
+		}
+		if view.Autoscroll {
+			view.Autoscroll = false
+			prevBottomLine = y
+			scrollPos = prevBottomLine
+		}
+		scrollPos--
+		view.SetOrigin(x, y-1)
+	}
+	return nil
+}
+
+/*
+ * v1 scroll down
+ */
+
+func v1ScrollDown(gui *gocui.Gui, view *gocui.View) error {
+	if x, y := view.Origin(); scrollPos != prevBottomLine {
+		if scrollPos == prevBottomLine-1 {
+			view.Autoscroll = true
+		}
+		scrollPos++
+		view.SetOrigin(x, y+1)
 	}
 	return nil
 }
@@ -204,6 +252,7 @@ func layout(g *gocui.Gui) error {
 		}
 		v.Title = "Info"
 		v.Editable = true
+		v.Autoscroll = true
 		v.Wrap = true
 	}
 	if v, err := g.SetView("v4", maxX-20, maxY-11, maxX-1, maxY-1); err != nil {

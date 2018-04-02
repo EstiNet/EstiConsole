@@ -99,7 +99,7 @@ func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (
 
 	} else if query.MessageId > -1 { //client requests for specific message sets
 		reply.Messages = server.getLog(int(query.MessageId-int64(bufferCutoff)), int(query.MessageId))
-		if query.MessageId-100 >= 0 {
+		if query.MessageId-int64(bufferCutoff) >= 0 {
 			reply.MessageId = uint64(query.MessageId - int64(bufferCutoff))
 		} else {
 			reply.MessageId = 0
@@ -130,7 +130,6 @@ func rpcserverStart() {
 		addLog(err.Error())
 		log.Fatal("Oh no! IPC listen error (check if the port has been taken):", err)
 	}
-	var grpcServer *grpc.Server
 	if instanceSettings.SSLEncryption {
 		creds, err := credentials.NewServerTLSFromFile(instanceSettings.CertFilePath, instanceSettings.KeyFilePath)
 		if err != nil {

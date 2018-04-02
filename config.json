@@ -1,8 +1,9 @@
 {
     "instance_name": "Server",
     "instance_port": 6921,
-    "sslencryption": false,
-    "cert_file_path": "./cert.crt",
+    "sslencryption": true,
+    "cert_file_path": "./server.crt",
+    "key_file_path": "./server.key",
     "servers": [
         {
             "instance_name": "Server1",
@@ -17,6 +18,16 @@
         {
             "instance_name": "Server2",
             "home_directory": "/home/devin/Flow/ECExp2",
+            "command_to_run": "java -Xmx2G -Xms512M -XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -d64 -server -jar minecraft_server.jar",
+            "max_lines": 2000,
+            "amount_of_lines_to_cut_on_max": 100,
+            "stop_process_command": "stop",
+            "unresponsive_kill_time_seconds": 20,
+            "minecraft_mode": true
+        },
+        {
+            "instance_name": "gWars",
+            "home_directory": "/home/devin/Flow/Minecraft Servers/gWars",
             "command_to_run": "java -Xmx2G -Xms512M -XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -d64 -server -jar minecraft_server.jar",
             "max_lines": 2000,
             "amount_of_lines_to_cut_on_max": 100,

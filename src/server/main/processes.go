@@ -180,11 +180,25 @@ func ClientsStop() {
 			go func(server *Server) {
 				server.AutoStart = false
 				server.stop()
-				time.Sleep(time.Second * time.Duration(server.Settings.UnresponsiveKillTimeSeconds))
+				time.Sleep(time.Second * time.Duration(server.Settings.UnresponsiveKillTimeSeconds)) //perhaps remove thread blocking for the length of unresponsive kill time
 				if server.IsOnline {
 					server.Process.Process.Kill()
 				}
-				//TODO replace with better solution than blocking shutdown for many seconds...
+			}(Servers[key])
+		}
+	}
+}
+
+/*
+ * Kill clients
+ */
+
+func ClientsKill() {
+	for key, _ := range Servers {
+		if Servers[key].IsOnline {
+			go func(server *Server) {
+				server.AutoStart = false
+				server.kill()
 			}(Servers[key])
 		}
 	}
@@ -210,10 +224,10 @@ func StartClient(name string) string {
 
 func StopClient(name string) string {
 	if _, ok := Servers[name]; ok {
+		Servers[name].AutoStart = false
 		if !Servers[name].IsOnline {
 			return "Process already offline."
 		} else {
-			Servers[name].AutoStart = false
 			Servers[name].stop()
 			return "Stopped " + Servers[name].Settings.InstanceName
 		}
@@ -224,10 +238,10 @@ func StopClient(name string) string {
 
 func KillClient(name string) string {
 	if _, ok := Servers[name]; ok {
+		Servers[name].AutoStart = false
 		if !Servers[name].IsOnline {
 			return "Process is not online."
 		} else {
-			Servers[name].AutoStart = false
 			Servers[name].kill()
 			return "Killed process " + name + "."
 		}
@@ -244,7 +258,6 @@ func GetCPUUsage() string {
 		}
 		str := ""
 		for i, s := range stat.CPUStats { //Loop through all cpu cores
-			//TODO DISABLE IF NOT LINUX
 			str += "CPU " + string(i) + ":\n"
 			str += "User: " + string(s.User) + ", Nice: " + string(s.Nice) + ", System: " + string(s.System) + ", Idle: " + string(s.Idle) + ", IOWait: " + string(s.IOWait) + "\n"
 		}

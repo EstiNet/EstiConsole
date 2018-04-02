@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"google.golang.org/grpc"
 	"errors"
+	"google.golang.org/grpc/credentials"
 )
 
 var grpcServer *grpc.Server
@@ -84,7 +85,7 @@ func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (
 	}
 
 	reply := &pb.ServerReply{}           //begin construction of reply
-	server := Servers[query.ProcessName] //TODO check if process exists
+	server := Servers[query.ProcessName]
 
 	//Parse ServerQuery object
 
@@ -129,7 +130,16 @@ func rpcserverStart() {
 		addLog(err.Error())
 		log.Fatal("Oh no! IPC listen error (check if the port has been taken):", err)
 	}
-	grpcServer = grpc.NewServer()
+	var grpcServer *grpc.Server
+	if instanceSettings.SSLEncryption {
+		creds, err := credentials.NewServerTLSFromFile(instanceSettings.CertFilePath, instanceSettings.KeyFilePath)
+		if err != nil {
+			logFatal(err)
+		}
+		grpcServer = grpc.NewServer(grpc.Creds(creds))
+	} else {
+		grpcServer = grpc.NewServer()
+	}
 	pb.RegisterRPCServerServer(grpcServer, &RPCServer{})
 	grpcServer.Serve(lis)
 }

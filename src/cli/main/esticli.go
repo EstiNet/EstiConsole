@@ -8,6 +8,8 @@ import (
 	"google.golang.org/grpc"
 
 	pb "../../protocol"
+	"google.golang.org/grpc/credentials"
+	"crypto/tls"
 )
 
 var version = "v1.0.0"
@@ -15,8 +17,9 @@ var version = "v1.0.0"
 var commands = make(map[string]interface{})
 
 var args []string
-var address *string
-var port *string
+var address, port, certFile *string
+var verifyTLS *bool
+var noTLS *bool
 
 var conn *grpc.ClientConn
 
@@ -47,8 +50,11 @@ func main() {
 	//Initialize flags first
 	getVer := flag.Bool("v", false, "get the version of the client")
 
-	address = flag.String("a", "127.0.0.1", "specify the address of the host")
+	address = flag.String("ip", "127.0.0.1", "specify the address of the host")
 	port = flag.String("p", "19005", "specify the port of the host")
+	noTLS = flag.Bool("insecure", false, "specify whether or not to disable encryption")
+	certFile = flag.String("cert", "none", "location of cert file (if using encryption)")
+	verifyTLS = flag.Bool("verify", false, "whether or not to verify tls from server (if using encryption)")
 
 	flag.Parse()       //Get the flag for user
 	args = flag.Args() //os.Args[1:]
@@ -99,7 +105,23 @@ func checkError(err error) {
 func startCon() {
 	var opts []grpc.DialOption
 
-	opts = append(opts, grpc.WithInsecure())
+	if *noTLS {
+		opts = append(opts, grpc.WithInsecure()) //no encryption
+	} else {
+		// Create the client TLS credentials
+		var creds credentials.TransportCredentials
+		if *verifyTLS { //encryption with IP SANs validation (for mmim attacks)
+			var err error
+			creds, err = credentials.NewClientTLSFromFile(*certFile, "")
+			if err != nil {
+				log.Fatal("Could not load tls cert: ", err)
+			}
+		} else { //YAAAAAAAAAAAA encryption without mmim checks
+			creds = credentials.NewTLS(&tls.Config{InsecureSkipVerify: true})
+		}
+
+		opts = append(opts, grpc.WithTransportCredentials(creds))
+	}
 
 	println("Attempting connection to host server...")
 	var err error

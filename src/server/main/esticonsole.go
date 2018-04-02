@@ -44,10 +44,12 @@ func addToLogFile(str string, directory string) {
 func logFatal(err error) {
 	addLog(err.Error())
 	log.Fatal(err)
+	ClientsKill()
 }
 func logFatalStr(str string) {
 	addLog(str)
 	log.Fatal(str)
+	ClientsKill()
 }
 func println(str string) {
 	addLog(str)
@@ -156,7 +158,7 @@ func Shutdown() {
 			break
 		}
 	}
-	grpcServer.Stop()
+	//grpcServer.Stop() TODO nullptr
 
 	info("Exited EstiConsole " + version)
 	os.Exit(0)

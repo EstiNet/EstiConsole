@@ -29,6 +29,7 @@ type InstanceConfig struct {
 	InstancePort  uint           `json:"instance_port"`
 	SSLEncryption bool           `json:"sslencryption"`
 	CertFilePath  string         `json:"cert_file_path"`
+	KeyFilePath   string         `json:"key_file_path"`
 	Servers       []ServerConfig `json:"servers"`
 	Users         []Users        `json:"users"`
 }
@@ -38,14 +39,14 @@ type InstanceConfig struct {
  */
 
 type ServerConfig struct {
-	InstanceName                      string `json:"instance_name"`
-	HomeDirectory                     string `json:"home_directory"`
-	CommandToRun                      string `json:"command_to_run"`
-	MaxLines                          uint   `json:"max_lines"`
-	AmountOfLinesToCutOnMax           uint   `json:"amount_of_lines_to_cut_on_max"`
-	StopProcessCommand                string `json:"stop_process_command"`
+	InstanceName                string `json:"instance_name"`
+	HomeDirectory               string `json:"home_directory"`
+	CommandToRun                string `json:"command_to_run"`
+	MaxLines                    uint   `json:"max_lines"`
+	AmountOfLinesToCutOnMax     uint   `json:"amount_of_lines_to_cut_on_max"`
+	StopProcessCommand          string `json:"stop_process_command"`
 	UnresponsiveKillTimeSeconds uint   `json:"unresponsive_kill_time_seconds"`
-	MinecraftMode                     bool   `json:"minecraft_mode"`
+	MinecraftMode               bool   `json:"minecraft_mode"`
 }
 
 /*
@@ -57,7 +58,8 @@ func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 	con.InstanceName = "Server"
 	con.InstancePort = 6921
 	con.SSLEncryption = true
-	con.CertFilePath = "./cert.crt"
+	con.CertFilePath = "./server.crt"
+	con.KeyFilePath = "./server.key"
 
 	wi := ServerConfig{}
 	wi.InstanceName = "Server1"
@@ -221,9 +223,23 @@ func LoadConfig() {
 func verifySettings(config *InstanceConfig) {
 	namesUsed := make([]string, 1)
 
+	if config.SSLEncryption {
+		_, err := os.Stat(config.CertFilePath)
+		if os.IsNotExist(err) {
+			info(config.CertFilePath + " the cert file does not exist! Please fix this error in the config.")
+			logFatal(err)
+		}
+		_, err2 := os.Stat(config.KeyFilePath)
+		if os.IsNotExist(err2) {
+			info(config.CertFilePath + " the key file does not exist! Please fix this error in the config.")
+			logFatal(err2)
+		}
+	}
+
 	/*
 	 * Verify each server's settings
 	 */
+
 	for i, server := range config.Servers {
 
 		_, err := os.Stat(server.HomeDirectory)

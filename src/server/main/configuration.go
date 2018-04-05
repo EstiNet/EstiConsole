@@ -32,6 +32,8 @@ type InstanceConfig struct {
 	KeyFilePath   string         `json:"key_file_path"`
 	Servers       []ServerConfig `json:"servers"`
 	Users         []Users        `json:"users"`
+	EnableRoot    bool           `json:"enable_root"`
+	MasterKeyLoc  string         `json:"master_key_location"`
 }
 
 /*
@@ -56,10 +58,12 @@ type ServerConfig struct {
 func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 	con := InstanceConfig{}
 	con.InstanceName = "Server"
-	con.InstancePort = 6921
+	con.InstancePort = 19005
 	con.SSLEncryption = true
 	con.CertFilePath = "./server.crt"
 	con.KeyFilePath = "./server.key"
+	con.EnableRoot = true
+	con.MasterKeyLoc = "./masterkey.key"
 
 	wi := ServerConfig{}
 	wi.InstanceName = "Server1"
@@ -81,7 +85,7 @@ func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 var configPath = "./config.json"
 
 /*
- * Setups, and loads the config.json file.
+ * Setup and loads the config.json file.
  */
 
 func LoadConfig() {

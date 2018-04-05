@@ -125,7 +125,7 @@ func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (
 }
 
 func rpcserverStart() {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 19005))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", instanceSettings.InstancePort))
 	if err != nil {
 		addLog(err.Error())
 		log.Fatal("Oh no! IPC listen error (check if the port has been taken):", err)

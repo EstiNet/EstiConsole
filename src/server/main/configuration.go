@@ -9,6 +9,7 @@ import (
 	"time"
 	"encoding/json"
 	"bytes"
+	"github.com/nu7hatch/gouuid"
 )
 
 /*
@@ -262,6 +263,19 @@ func verifySettings(config *InstanceConfig) {
 		}
 		namesUsed = append(namesUsed, server.InstanceName)
 	}
+
+	/*
+	 * Verify user settings
+	 */
+	 _, err := os.Stat(config.MasterKeyLoc)
+	 if os.IsNotExist(err) {
+	 	info("Master key not found! Generating new master key...")
+
+	 }
+
+	 for _, user := range config.Users {
+
+	 }
 }
 
 /*

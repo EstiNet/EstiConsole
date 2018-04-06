@@ -1,9 +1,11 @@
 {
     "instance_name": "Server",
-    "instance_port": 6921,
+    "instance_port": 19005,
     "sslencryption": true,
     "cert_file_path": "./server.crt",
     "key_file_path": "./server.key",
+    "enable_root": true,
+    "master_key_location": "./masterkey.key",
     "servers": [
         {
             "instance_name": "Server1",

@@ -289,20 +289,24 @@ func InitLogFile(directory string) {
 		fmt.Println(time.Now().Format("2006-01-02 15:04:05") + " [INFO] Done!")
 	}
 	os.Create(directory + "/current.log")
-	info("Created the main log file!")
+	info("Created the " + directory + " log file!")
 }
 
 /*
- * Initializes log files after configuration is loaded in
+ * Initializes log files for processes after configuration is loaded in
  */
 func PostInitLog() {
 	for _, server := range instanceSettings.Servers {
-		_, err := os.Stat(logDirPath + "/" + server.InstanceName)
-		if os.IsNotExist(err) {
-			os.Mkdir(logDirPath+"/"+server.InstanceName, 0755)
-		}
-		InitLogFile(logDirPath + "/" + server.InstanceName)
+		ServerInitLog(server)
 	}
+}
+
+func ServerInitLog(server ServerConfig) {
+	_, err := os.Stat(logDirPath + "/" + server.InstanceName)
+	if os.IsNotExist(err) {
+		os.Mkdir(logDirPath+"/"+server.InstanceName, 0755)
+	}
+	InitLogFile(logDirPath + "/" + server.InstanceName)
 }
 
 /*

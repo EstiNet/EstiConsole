@@ -27,29 +27,48 @@ var logDirPath = "./log"
  */
 
 func addLog(str string) {
-	addToLogFile(str, logDirPath+"/current.log")
+	go addToLogFile(str, logDirPath+"/current.log", logDirPath)
 }
-func addToLogFile(str string, directory string) {
-	f, err := os.OpenFile(directory, os.O_APPEND|os.O_WRONLY, 0600)
-	if err != nil {
-		panic(err) //TODO if directory is deleted while the server is on repair file
+func addToLogFile(str string, file string, directory string) {
+	//check if logdirpath exists
+	if _, err := os.Stat(logDirPath); os.IsNotExist(err) {
+		fmt.Println("The entire config directory is gone! WTH are you doing?\nCommencing repair.")
+		InitLog()
+		PostInitLog()
+	}
+	if _, err := os.Stat(directory); os.IsNotExist(err) {
+		fmt.Println("Logging directory " + directory + " disappeared! WAT\nCommencing repair.")
+		os.Mkdir(directory,0755)
+		InitLogFile(directory)
+	}
+
+	f, err := os.OpenFile(file, os.O_APPEND|os.O_WRONLY, 0600)
+	if os.IsNotExist(err) {
+		fmt.Println("Config file disappeared! WTH are you doing?\nCommencing repair.")
+		InitLog()
+		PostInitLog()
+		f, err = os.OpenFile(file, os.O_APPEND|os.O_WRONLY, 0600)
+	} else if err != nil {
+		ClientsKill()
+		log.Fatal(err)
 	}
 
 	defer f.Close()
 
 	if _, err = f.WriteString(str + "\n"); err != nil {
-		panic(err)
+		ClientsKill()
+		log.Fatal(err)
 	}
 }
 func logFatal(err error) {
 	addLog(err.Error())
-	log.Fatal(err)
 	ClientsKill()
+	log.Fatal(err)
 }
 func logFatalStr(str string) {
 	addLog(str)
-	log.Fatal(str)
 	ClientsKill()
+	log.Fatal(str)
 }
 func println(str string) {
 	addLog(str)

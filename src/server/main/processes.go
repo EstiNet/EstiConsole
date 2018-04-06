@@ -8,6 +8,7 @@ import (
 	"time"
 	"io/ioutil"
 	"strings"
+	"strconv"
 )
 
 var Servers = make(map[string]*Server)
@@ -112,6 +113,7 @@ func (server *Server) start() {
 }
 
 func (server *Server) kill() {
+	server.AutoStart = false
 	if err := server.Process.Process.Kill(); err != nil {
 		info("Failed to kill process" + server.Settings.InstanceName + ": " + err.Error())
 	} else {
@@ -129,7 +131,7 @@ func (server *Server) input(input string) {
 
 func (server *Server) addLog(str string) {
 	server.Log = append(server.Log, str)
-	addToLogFile(str, logDirPath+"/"+server.Settings.InstanceName+"/current.log") //Write
+	addToLogFile(str, logDirPath+"/"+server.Settings.InstanceName+"/current.log", logDirPath+"/"+server.Settings.InstanceName) //Write to log file
 }
 
 func (server *Server) getLog(beginIndex int, endIndex int) []string {
@@ -220,6 +222,10 @@ func StartClient(name string) string {
 	}
 }
 
+/*
+ * WARNING: Blocking thread
+ */
+
 func StopClient(name string) string {
 	if _, ok := Servers[name]; ok {
 		Servers[name].AutoStart = false
@@ -227,7 +233,14 @@ func StopClient(name string) string {
 			return "Process already offline."
 		} else {
 			Servers[name].stop()
-			return "Stopped " + Servers[name].Settings.InstanceName
+			for i := +0; uint(i) < Servers[name].Settings.UnresponsiveKillTimeSeconds; i++ {
+				time.Sleep(time.Second)
+				if !Servers[name].IsOnline {
+					return "Stopped " + Servers[name].Settings.InstanceName
+				}
+			}
+			Servers[name].kill()
+			return "Didn't stop in time, killed " + Servers[name].Settings.InstanceName + " after waiting " + strconv.Itoa(int(Servers[name].Settings.UnresponsiveKillTimeSeconds)) + " seconds."
 		}
 	} else {
 		return "Server not found."

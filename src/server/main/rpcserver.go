@@ -2,7 +2,6 @@ package main
 
 import (
 	"net"
-	"log"
 	"strings"
 
 	pb "../../protocol"
@@ -11,6 +10,7 @@ import (
 	"google.golang.org/grpc"
 	"errors"
 	"google.golang.org/grpc/credentials"
+	"strconv"
 )
 
 var grpcServer *grpc.Server
@@ -84,7 +84,7 @@ func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (
 		return &pb.ServerReply{}, errors.New("Process name not found.")
 	}
 
-	reply := &pb.ServerReply{}           //begin construction of reply
+	reply := &pb.ServerReply{} //begin construction of reply
 	server := Servers[query.ProcessName]
 
 	//Parse ServerQuery object
@@ -128,7 +128,7 @@ func rpcserverStart() {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", instanceSettings.InstancePort))
 	if err != nil {
 		addLog(err.Error())
-		log.Fatal("Oh no! IPC listen error (check if the port has been taken):", err)
+		logFatalStr("Oh no! IPC listen error (check if the port has been taken):" + err.Error())
 	}
 	if instanceSettings.SSLEncryption {
 		creds, err := credentials.NewServerTLSFromFile(instanceSettings.CertFilePath, instanceSettings.KeyFilePath)
@@ -140,5 +140,6 @@ func rpcserverStart() {
 		grpcServer = grpc.NewServer()
 	}
 	pb.RegisterRPCServerServer(grpcServer, &RPCServer{})
+	info("Starting RPCServer on port " + strconv.Itoa(int(instanceSettings.InstancePort)))
 	grpcServer.Serve(lis)
 }

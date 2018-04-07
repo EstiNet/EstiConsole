@@ -297,10 +297,14 @@ func verifySettings(config *InstanceConfig) {
 		config.Users = append(config.Users, Users{Name: "root", Password: masterKey}) //add root user with masterkey as password
 	}
 
-	/* TODO load users
-	for _, user := range config.Users { MAKE SURE THAT NO USER IS CALLED ROOT
+	var prevNames map[string]bool
 
-	}*/
+	for _, user := range config.Users {
+		if _, ok := prevNames[user.Name]; ok {
+			logFatalStr("There are users with the same name! Change this in the config.")
+		}
+		config.Users = append(config.Users, Users{Name: user.Name, Password: user.Password})
+	}
 }
 
 /*

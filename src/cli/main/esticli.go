@@ -11,9 +11,9 @@ import (
 	"google.golang.org/grpc/credentials"
 	"crypto/tls"
 	"github.com/jroimartin/gocui"
-	"github.com/howeyc/gopass"
 	"context"
 	"io/ioutil"
+	"github.com/howeyc/gopass"
 )
 
 var (
@@ -144,7 +144,7 @@ func startCon() {
 		log.Fatal("Error connecting to host process " + *address + ":" + *port+", is the address and port correct?:", err)
 	}
 	client = pb.NewRPCServerClient(conn)
-	if *user == "root" || *masterKey != "none" {
+	if *masterKey != "none" {
 		dat, err := ioutil.ReadFile(*masterKey)
 		if err != nil {
 			log.Fatal(err)
@@ -155,7 +155,7 @@ func startCon() {
 		}
 		token = tok.Str
 	} else if *user != "none" {
-		println("Password: ")
+		print("Password: ")
 		pass, err := gopass.GetPasswd()
 		if err != nil {
 			log.Fatal(err)

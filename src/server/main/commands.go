@@ -1,4 +1,4 @@
- package main
+package main
 
 func CommandVersion(input string) {
 	println("Version " + version)

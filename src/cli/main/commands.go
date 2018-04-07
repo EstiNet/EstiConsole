@@ -153,9 +153,11 @@ func ObtainLogAtIndex(process string, index int) {
 	reply2, err2 := client.Attach(context.Background(), &obtain)
 	checkError(err2) //caveat: can't accept 100 message gaps
 	length := len(reply2.Messages)
+
 	for i := 0; i < length; i++ {
 		attachLog[index-i] = reply2.Messages[length-i-1]
 	}
+
 	(*cuiGUI).Update(func(g *gocui.Gui) error {
 		out, err := (*cuiGUI).View("v1")
 		if err != nil {

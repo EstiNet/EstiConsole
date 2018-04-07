@@ -18,17 +18,19 @@ var Servers = make(map[string]*Server)
  */
 
 type Server struct {
-	Settings   ServerConfig
-	Log        []string
-	Channel    chan string
-	Process    *exec.Cmd
-	OutputPipe io.ReadCloser
-	ErrPipe    io.ReadCloser
-	InputPipe  io.WriteCloser
-	AutoStart  bool
-	IsOnline   bool
-	LogCycle   int
+	Settings      ServerConfig
+	Log           []string
+	Process       *exec.Cmd
+	OutputPipe    io.ReadCloser
+	ErrPipe       io.ReadCloser
+	InputPipe     io.WriteCloser
+	AutoStart     bool // whether or not to automagically start the process on stop
+	IsOnline      bool // true if the process is online
+	LogCycle      int  // count the amount of lines in the current.log file
+	LogStartIndex int  // the index at which the log slice starts at (not 0 after cutoff)
 }
+
+var maxCut = 20000 //cut off for creating a new log file
 
 //warning: this is a synchronous call.
 func (server *Server) start() {
@@ -131,24 +133,80 @@ func (server *Server) input(input string) {
 }
 
 func (server *Server) addLog(str string) {
-	if server.LogCycle >= 20000 { //if the log file is over 20000 lines long
+	if server.LogCycle >= maxCut { //if the log file is over 20000 lines long
 		ServerInitLog(server.Settings)
 		server.LogCycle = 0
+	}
+	if uint(len(server.Log)) > server.Settings.MaxLines {
+		server.Log = server.Log[server.Settings.AmountOfLinesToCutOnMax:]
+		server.LogStartIndex += int(server.Settings.AmountOfLinesToCutOnMax)
 	}
 	server.Log = append(server.Log, str)
 	addToLogFile(str, logDirPath+"/"+server.Settings.InstanceName+"/current.log", logDirPath+"/"+server.Settings.InstanceName) //Write to log file
 	server.LogCycle++
 }
 
+/*
+ * Get a slice of lines from the log, using a begin and end index.
+ * Operations that are outside of the cache may be slower because of decompression
+ * of previous log files.
+ */
+
 func (server *Server) getLog(beginIndex int, endIndex int) []string {
 	if beginIndex < 0 {
 		beginIndex = 0
 	}
-	return server.Log[beginIndex:endIndex]
+	startOfFileIndex := server.getLatestLogID() - server.LogCycle + 1
+
+	if beginIndex >= server.LogStartIndex {
+
+		return server.Log[beginIndex-server.LogStartIndex : endIndex-server.LogStartIndex]
+
+	} else if beginIndex >= startOfFileIndex { //if the log index can be taken from the current.log file
+
+		f, err := os.Open(logDirPath + "/" + server.Settings.InstanceName + "/current.log")
+		defer f.Close()
+
+		if err != nil {
+
+			server.addLog("error while reading " + logDirPath + "/" + server.Settings.InstanceName + "/current.log " + err.Error())
+			info("error while reading " + logDirPath + "/" + server.Settings.InstanceName + "/current.log " + err.Error())
+
+		} else { //ugh logic
+			ret := []string{}
+
+			scan := bufio.NewReader(f)
+			var maxL int
+			if endIndex >= server.LogStartIndex {
+				maxL = server.LogStartIndex - startOfFileIndex
+			} else {
+				maxL = endIndex - startOfFileIndex
+			}
+
+			for i := 0; i <= maxL; i++ { //read specified lines from file into ret
+
+				str, err := scan.ReadString('\n')
+				if err != nil {
+					server.addLog("error while reading " + logDirPath + "/" + server.Settings.InstanceName + "/current.log " + err.Error())
+					info("error while reading " + logDirPath + "/" + server.Settings.InstanceName + "/current.log " + err.Error())
+				}
+				if i >= beginIndex {
+					ret = append(ret, strings.TrimSuffix(str, "\n"))
+				}
+			}
+
+			if endIndex >= server.LogStartIndex {
+				return append(ret, server.Log[:endIndex-server.LogStartIndex-1]...)
+			} else {
+				return ret
+			}
+		}
+	}
+	return []string{"Reached end of stored log."}
 }
 
 func (server *Server) getLatestLogID() int {
-	return len(server.Log) - 1
+	return len(server.Log) - 1 + server.LogStartIndex
 }
 
 //END OF SERVER METHODS
@@ -157,6 +215,7 @@ func (server *Server) getLatestLogID() int {
 
 /*
  * Init and start all clients
+ * SHOULD ONLY BE CALLED AT INSTANCE STARTUP!
  */
 
 func ClientsStart() {
@@ -180,7 +239,7 @@ func ClientsStart() {
 func ClientsStop() {
 	info("Stopping all clients...")
 
-	for key, _ := range Servers {
+	for key := range Servers {
 		if Servers[key].IsOnline {
 			info("Stopping " + key + "...")
 			go func(server *Server) {
@@ -200,7 +259,7 @@ func ClientsStop() {
  */
 
 func ClientsKill() {
-	for key, _ := range Servers {
+	for key := range Servers {
 		if Servers[key].IsOnline {
 			go func(server *Server) {
 				server.AutoStart = false

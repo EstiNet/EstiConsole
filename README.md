@@ -24,3 +24,6 @@ go get github.com/howeyc/gopass
 
 ## Why did you write it in Golang?
 Because golang is cool.
+
+## TODO
+* Unzip file for extraction (and time delay to delete zip cache)

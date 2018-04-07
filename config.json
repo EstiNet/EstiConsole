@@ -10,8 +10,8 @@
             "instance_name": "Server1",
             "home_directory": "/home/devin/Flow/ECExp",
             "command_to_run": "java -Xmx2G -Xms512M -XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -d64 -server -jar minecraft_server.jar",
-            "max_lines": 2000,
-            "amount_of_lines_to_cut_on_max": 100,
+            "max_lines": 200,
+            "amount_of_lines_to_cut_on_max": 10,
             "stop_process_command": "stop",
             "unresponsive_kill_time_seconds": 20,
             "minecraft_mode": true
@@ -43,7 +43,7 @@
             "password": "password"
         }
     ],
-    "require_authentication": false,
+    "require_authentication": true,
     "enable_root": true,
     "master_key_location": "./masterkey.key"
 }

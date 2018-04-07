@@ -29,7 +29,7 @@ type Users struct {
 type InstanceConfig struct {
 	InstanceName  string         `json:"instance_name"`
 	InstancePort  uint           `json:"instance_port"`
-	LogDirectory  string         `json:"log_directory_location"` //TODO LOAD MODULE BEFORE LOGGING
+	//LogDirectory  string         `json:"log_directory_location"` //TODO LOAD MODULE BEFORE LOGGING
 	SSLEncryption bool           `json:"sslencryption"`
 	CertFilePath  string         `json:"cert_file_path"`
 	KeyFilePath   string         `json:"key_file_path"`
@@ -63,7 +63,7 @@ func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 	con := InstanceConfig{}
 	con.InstanceName = "Server"
 	con.InstancePort = 19005
-	con.LogDirectory = "./log"
+	//con.LogDirectory = "./log"
 	con.SSLEncryption = true
 	con.CertFilePath = "./server.crt"
 	con.KeyFilePath = "./server.key"
@@ -76,7 +76,7 @@ func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 	wi.InstanceName = "Server1"
 	wi.HomeDirectory = "./"
 	wi.CommandToRun = "java -Xms512M -Xmx2G -XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -d64 -server -jar minecraft_server.jar"
-	wi.MaxLines = 2000
+	wi.MaxLines = 5000
 	wi.AmountOfLinesToCutOnMax = 100
 	wi.StopProcessCommand = "stop"
 	wi.UnresponsiveKillTimeSeconds = 20
@@ -172,14 +172,18 @@ func LoadConfig() {
 	inst := reflect.Indirect(reflect.ValueOf(instance))
 	conf := reflect.Indirect(reflect.ValueOf(config))
 	confSet := reflect.ValueOf(&config).Elem()
+
 	for i := 0; i < conf.NumField(); i++ {
 		if conf.Field(i).Interface() == "" || conf.Field(i).Interface() == 0 {
 			info("Please check your config, a setting has been updated. (" + inst.Field(i).String() + ")")
 			confSet.Field(i).SetString(inst.Field(i).String())
 		}
 	}
+
 	for i := 0; i < len(config.Servers); i++ {
+
 		sever := reflect.ValueOf(config.Servers[i])
+
 		for j := 0; j < sever.NumField(); j++ {
 			//fmt.Println(sever.Field(j).Interface()) //TODO
 			//debug(" " + sever.Field(j).String())
@@ -190,9 +194,12 @@ func LoadConfig() {
 			}
 		}
 	}
+
 	for i := 0; i < len(config.Users); i++ {
+
 		sever := reflect.ValueOf(config.Users[i])
 		severSet := reflect.ValueOf(&config.Users[i]).Elem();
+
 		for j := 0; j < sever.NumField(); j++ {
 			if sever.Field(j).Interface() == nil {
 				info("Please check your config, a setting has been updated. (" + sever.Field(j).String() + ")")
@@ -234,7 +241,7 @@ func LoadConfig() {
 func verifySettings(config *InstanceConfig) {
 	namesUsed := make([]string, 1)
 
-	logDirPath = config.LogDirectory
+	//logDirPath = config.LogDirectory
 
 	if config.SSLEncryption {
 		_, err := os.Stat(config.CertFilePath)
@@ -263,6 +270,9 @@ func verifySettings(config *InstanceConfig) {
 		if server.HomeDirectory[len(server.HomeDirectory)-1] == '/' {
 			config.Servers[i].HomeDirectory = substring(server.HomeDirectory, 0, len(server.HomeDirectory)-1)
 		}
+		if server.AmountOfLinesToCutOnMax >= server.MaxLines {
+			logFatalStr(server.InstanceName + "'s max lines is smaller than or equal to the amount of lines to cut on max! Please fix this error in the config.")
+		}
 
 		for _, k := range namesUsed {
 			if k == server.InstanceName {
@@ -279,7 +289,9 @@ func verifySettings(config *InstanceConfig) {
 	if config.EnableRoot {
 		_, err := os.Stat(config.MasterKeyLoc)
 		if os.IsNotExist(err) {
+
 			info("Master key not found! Generating new master key...")
+
 			for i := 0; i < 10; i++ { //generate master key from 10 UUIDs
 				id, err := uuid.NewV4()
 				if err != nil {
@@ -357,7 +369,6 @@ func ServerInitLog(server ServerConfig) {
  */
 
 func ZipFiles(filename string, files []string) error {
-
 	newfile, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -369,7 +380,6 @@ func ZipFiles(filename string, files []string) error {
 
 	// Add files to zip
 	for _, file := range files {
-
 		zipfile, err := os.Open(file)
 		if err != nil {
 			return err
@@ -381,7 +391,6 @@ func ZipFiles(filename string, files []string) error {
 		if err != nil {
 			return err
 		}
-
 		header, err := zip.FileInfoHeader(info)
 		if err != nil {
 			return err

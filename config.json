@@ -1,11 +1,10 @@
 {
     "instance_name": "Server",
     "instance_port": 19005,
+    "log_directory_location": "./log",
     "sslencryption": true,
     "cert_file_path": "./server.crt",
     "key_file_path": "./server.key",
-    "enable_root": true,
-    "master_key_location": "./masterkey.key",
     "servers": [
         {
             "instance_name": "Server1",
@@ -43,5 +42,8 @@
             "name": "default",
             "password": "password"
         }
-    ]
+    ],
+    "require_authentication": false,
+    "enable_root": true,
+    "master_key_location": "./masterkey.key"
 }

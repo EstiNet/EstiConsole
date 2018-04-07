@@ -26,49 +26,49 @@ func CommandHelp(input string) {
 
 func CommandVersion(input string) {
 	startCon()
-	reply, err := client.Version(context.Background(), &pb.String{Str: "test reply"})
+	reply, err := client.Version(context.Background(), &pb.StringRequest{Str: "test reply", AuthToken: token})
 	checkError(err)
 	println("Version: ", reply.Str)
 }
 
 func CommandList(input string) {
 	startCon()
-	reply, err := client.List(context.Background(), &pb.String{Str: ""})
+	reply, err := client.List(context.Background(), &pb.StringRequest{Str: "", AuthToken: token})
 	checkError(err)
 	println(reply.Str)
 }
 
 func CommandStop(input string) {
 	startCon()
-	reply, err := client.Stop(context.Background(), &pb.String{Str: input})
+	reply, err := client.Stop(context.Background(), &pb.StringRequest{Str: input, AuthToken: token})
 	checkError(err)
 	println(reply.Str)
 }
 
 func CommandInstanceStop(input string) {
 	startCon()
-	reply, err := client.InstanceStop(context.Background(), &pb.String{Str: ""})
+	reply, err := client.InstanceStop(context.Background(), &pb.StringRequest{Str: "", AuthToken: token})
 	checkError(err)
 	println(reply.Str)
 }
 
 func CommandStart(input string) {
 	startCon()
-	reply, err := client.Start(context.Background(), &pb.String{Str: input})
+	reply, err := client.Start(context.Background(), &pb.StringRequest{Str: input, AuthToken: token})
 	checkError(err)
 	println(reply.Str)
 }
 
 func CommandKill(input string) {
 	startCon()
-	reply, err := client.Kill(context.Background(), &pb.String{Str: input})
+	reply, err := client.Kill(context.Background(), &pb.StringRequest{Str: input, AuthToken: token})
 	checkError(err)
 	println(reply.Str)
 }
 
 func CommandStatus(input string) {
 	startCon()
-	if conn.GetState() == connectivity.Ready {
+	if conn.GetState() == connectivity.Idle {
 		println("Connection successful!")
 	}
 }
@@ -93,7 +93,7 @@ func CommandAttach(input string) {
 var urgentCount uint64 = 30 //if the server should check more frequently for messages (message detection)
 
 func StartAttachSupervise(input string, ch chan int) {
-	ping := pb.ServerQuery{MessageId: -2, GetRam: true, GetCpu: true, ProcessName: input}
+	ping := pb.ServerQuery{MessageId: -2, GetRam: true, GetCpu: true, ProcessName: input, AuthToken: token}
 
 	ObtainNewLog(input, true) //initially fill slice
 	ch <- 0
@@ -127,7 +127,7 @@ func StartAttachSupervise(input string, ch chan int) {
 }
 
 func ObtainNewLog(process string, firstGet bool) {
-	obtainNewest := pb.ServerQuery{MessageId: -1, GetRam: false, GetCpu: false, ProcessName: process}
+	obtainNewest := pb.ServerQuery{MessageId: -1, GetRam: false, GetCpu: false, ProcessName: process, AuthToken: token}
 	reply2, err2 := client.Attach(context.Background(), &obtainNewest)
 	checkError(err2) //caveat: can't accept 100 message gaps
 	if firstGet {
@@ -149,7 +149,7 @@ func ObtainNewLog(process string, firstGet bool) {
 	}
 }
 func ObtainLogAtIndex(process string, index int) {
-	obtain := pb.ServerQuery{MessageId: int64(index), GetRam: false, GetCpu: false, ProcessName: process}
+	obtain := pb.ServerQuery{MessageId: int64(index), GetRam: false, GetCpu: false, ProcessName: process, AuthToken: token}
 	reply2, err2 := client.Attach(context.Background(), &obtain)
 	checkError(err2) //caveat: can't accept 100 message gaps
 	length := len(reply2.Messages)
@@ -180,7 +180,7 @@ func UpdateInfo(cpu string, ram string) {
 	})
 }
 func SendCommand(command string, process string) {
-	_, err := client.Attach(context.Background(), &pb.ServerQuery{MessageId: -2, Command: command, GetRam: false, GetCpu: false, ProcessName: process}) //initial ping
+	_, err := client.Attach(context.Background(), &pb.ServerQuery{MessageId: -2, Command: command, GetRam: false, GetCpu: false, ProcessName: process, AuthToken: token}) //initial ping
 	checkError(err)
 	urgentCount = 0
 	ObtainNewLog(process, false)

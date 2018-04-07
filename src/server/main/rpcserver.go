@@ -13,9 +13,13 @@ import (
 	"strconv"
 )
 
-var grpcServer *grpc.Server
+var (
+	grpcServer *grpc.Server
 
-var bufferCutoff = 100
+	bufferCutoff = 100
+
+	invalidToken = errors.New("invalid authentication token")
+)
 
 /*
  * Define grpc struct for esticli method calls
@@ -23,11 +27,19 @@ var bufferCutoff = 100
 
 type RPCServer struct{}
 
-func (rpcserver *RPCServer) Version(ctx context.Context, str *pb.String) (*pb.String, error) {
-	return &pb.String{Str: version}, nil
+func (rpcserver *RPCServer) Version(ctx context.Context, str *pb.StringRequest) (*pb.String, error) {
+	if _, ok := checkToken(str.AuthToken); ok && instanceSettings.RequireAuth {
+		return &pb.String{Str: version}, nil
+	} else {
+		return nil, invalidToken
+	}
 }
 
-func (rpcserver *RPCServer) List(ctx context.Context, str *pb.String) (*pb.String, error) {
+func (rpcserver *RPCServer) List(ctx context.Context, str *pb.StringRequest) (*pb.String, error) {
+	if _, ok := checkToken(str.AuthToken); !ok && instanceSettings.RequireAuth { //TODO check permissions of user
+		return nil, invalidToken
+	}
+
 	ret := ""
 	ret += "Clients:\n"
 	for k, v := range Servers {
@@ -42,7 +54,11 @@ func (rpcserver *RPCServer) List(ctx context.Context, str *pb.String) (*pb.Strin
 	return &pb.String{Str: ret}, nil
 }
 
-func (rpcserver *RPCServer) Stop(ctx context.Context, str *pb.String) (*pb.String, error) {
+func (rpcserver *RPCServer) Stop(ctx context.Context, str *pb.StringRequest) (*pb.String, error) {
+	if _, ok := checkToken(str.AuthToken); !ok && instanceSettings.RequireAuth { //TODO check permissions of user
+		return nil, invalidToken
+	}
+
 	output := StopClient(str.Str)
 	if strings.Split(output, " ")[0] == "Stopped" {
 		info(output)
@@ -50,7 +66,11 @@ func (rpcserver *RPCServer) Stop(ctx context.Context, str *pb.String) (*pb.Strin
 	return &pb.String{Str: output}, nil
 }
 
-func (rpcserver *RPCServer) Start(ctx context.Context, str *pb.String) (*pb.String, error) {
+func (rpcserver *RPCServer) Start(ctx context.Context, str *pb.StringRequest) (*pb.String, error) {
+	if _, ok := checkToken(str.AuthToken); !ok && instanceSettings.RequireAuth { //TODO check permissions of user
+		return nil, invalidToken
+	}
+
 	output := StartClient(str.Str)
 	if strings.Split(output, " ")[0] == "Started" {
 		info(output)
@@ -58,7 +78,11 @@ func (rpcserver *RPCServer) Start(ctx context.Context, str *pb.String) (*pb.Stri
 	return &pb.String{Str: output}, nil
 }
 
-func (rpcserver *RPCServer) Kill(ctx context.Context, str *pb.String) (*pb.String, error) {
+func (rpcserver *RPCServer) Kill(ctx context.Context, str *pb.StringRequest) (*pb.String, error) {
+	if _, ok := checkToken(str.AuthToken); !ok && instanceSettings.RequireAuth { //TODO check permissions of user
+		return nil, invalidToken
+	}
+
 	output := KillClient(str.Str)
 	if strings.Split(output, " ")[0] == "Killed" {
 		info(output)
@@ -66,12 +90,20 @@ func (rpcserver *RPCServer) Kill(ctx context.Context, str *pb.String) (*pb.Strin
 	return &pb.String{Str: output}, nil
 }
 
-func (rpcserver *RPCServer) InstanceStop(ctx context.Context, str *pb.String) (*pb.String, error) {
+func (rpcserver *RPCServer) InstanceStop(ctx context.Context, str *pb.StringRequest) (*pb.String, error) {
+	if _, ok := checkToken(str.AuthToken); !ok && instanceSettings.RequireAuth { //TODO check permissions of user
+		return nil, invalidToken
+	}
+
 	go Shutdown()
 	return &pb.String{Str: "Host service shutting down."}, nil
 }
 
 func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (*pb.ServerReply, error) {
+	if _, ok := checkToken(query.AuthToken); !ok && instanceSettings.RequireAuth { //TODO check permissions of user
+		return nil, invalidToken
+	}
+
 	found := false
 	for serv := range Servers {
 		if serv == query.ProcessName {
@@ -81,7 +113,7 @@ func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (
 	}
 
 	if !found {
-		return &pb.ServerReply{}, errors.New("Process name not found.")
+		return &pb.ServerReply{}, errors.New("process name not found")
 	}
 
 	reply := &pb.ServerReply{} //begin construction of reply
@@ -122,6 +154,19 @@ func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (
 		server.addLog("Remote command executed: " + strings.Replace(query.Command, "\n", "", -1))
 	}
 	return reply, nil
+}
+
+func (rpcserver *RPCServer) Auth(ctx context.Context, query *pb.User) (*pb.String, error) {
+	for _, user := range instanceSettings.Users {
+		if user.Name == query.Name {
+			if user.Password == query.Password {
+				return &pb.String{Str: getNewToken(user.Name)}, nil
+			} else {
+				return nil, errors.New("invalid credentials")
+			}
+		}
+	}
+	return nil, errors.New("invalid credentials")
 }
 
 func rpcserverStart() {

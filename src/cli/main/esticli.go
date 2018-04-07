@@ -11,20 +11,26 @@ import (
 	"google.golang.org/grpc/credentials"
 	"crypto/tls"
 	"github.com/jroimartin/gocui"
+	"github.com/howeyc/gopass"
+	"context"
+	"io/ioutil"
 )
 
-var version = "v1.0.0"
+var (
+	version = "v1.0.0"
 
-var commands = make(map[string]interface{})
+	commands = make(map[string]interface{})
 
-var args []string
-var address, port, certFile *string
-var verifyTLS *bool
-var noTLS *bool
+	args                                     []string
+	address, port, certFile, user, masterKey *string
+	verifyTLS                                *bool
+	noTLS                                    *bool
+	token                                    string
 
-var conn *grpc.ClientConn
+	conn *grpc.ClientConn
 
-var client pb.RPCServerClient
+	client pb.RPCServerClient
+)
 
 /*
  * Initialize command functions
@@ -56,6 +62,8 @@ func main() {
 	noTLS = flag.Bool("insecure", false, "specify whether or not to disable encryption")
 	certFile = flag.String("cert", "none", "location of cert file (if using encryption)")
 	verifyTLS = flag.Bool("verify", false, "whether or not to verify tls from server (if using encryption)")
+	user = flag.String("username", "none", "specify the username to connect with (if using authentication)")
+	masterKey = flag.String("masterkey", "none", "specify the location of the master key file (if using root authentication)")
 
 	flag.Parse()       //Get the flag for user
 	args = flag.Args() //os.Args[1:]
@@ -136,4 +144,26 @@ func startCon() {
 		log.Fatal("Error connecting to host process " + *address + ":" + *port+", is the address and port correct?:", err)
 	}
 	client = pb.NewRPCServerClient(conn)
+	if *user == "root" || *masterKey != "none" {
+		dat, err := ioutil.ReadFile(*masterKey)
+		if err != nil {
+			log.Fatal(err)
+		}
+		tok, err := client.Auth(context.Background(), &pb.User{Name: "root", Password: string(dat)})
+		if err != nil {
+			log.Fatal(err)
+		}
+		token = tok.Str
+	} else if *user != "none" {
+		println("Password: ")
+		pass, err := gopass.GetPasswd()
+		if err != nil {
+			log.Fatal(err)
+		}
+		tok, err := client.Auth(context.Background(), &pb.User{Name: *user, Password: string(pass)})
+		if err != nil {
+			log.Fatal(err)
+		}
+		token = tok.Str
+	}
 }

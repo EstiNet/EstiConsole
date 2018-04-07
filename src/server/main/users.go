@@ -1,12 +1,23 @@
 package main
 
-var tokenMap = make(map[string]interface{}) //token to user
+import "github.com/nu7hatch/gouuid"
 
-func checkToken(token string) bool {
-	_, ok := tokenMap["foo"]
-	return ok
+var tokenMap = make(map[string]string) //token to user
+
+func checkToken(token string) (user string, ok bool) {
+	user, ok = tokenMap[token]
+	return
 }
 
-func getToken(user string) string {
-
+func getNewToken(user string) (strToken string) { //TODO token expiry date
+	token, err := uuid.NewV4()
+	if err != nil {
+		logFatalStr("Can't obtain a new token for " + user + " " + err.Error())
+	}
+	strToken = token.String()
+	if _, ok := checkToken(strToken); ok { //get new token if it's already taken
+		strToken = getNewToken(user) //hopefully doesn't stack overflow
+	}
+	tokenMap[strToken] = user
+	return
 }

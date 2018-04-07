@@ -1,17 +1,26 @@
 syntax = "proto3";
 
 service RPCServer {
-    rpc Version(String) returns (String);
-    rpc List(String) returns (String);
-    rpc Stop(String) returns (String);
-    rpc Start(String) returns (String);
-    rpc Kill(String) returns (String);
-    rpc InstanceStop(String) returns (String);
+    rpc Version(StringRequest) returns (String);
+    rpc List(StringRequest) returns (String);
+    rpc Stop(StringRequest) returns (String);
+    rpc Start(StringRequest) returns (String);
+    rpc Kill(StringRequest) returns (String);
+    rpc InstanceStop(StringRequest) returns (String);
     rpc Attach(ServerQuery) returns (ServerReply);
+    rpc Auth(User) returns (String); //obtain auth token
 }
 
 message String {
     string str = 1;
+}
+message User {
+    string name = 1;
+    string password = 2;
+}
+message StringRequest {
+    string str = 1;
+    string auth_token = 2; //leave blank if authentication is not required
 }
 
 message ServerQuery {
@@ -20,6 +29,7 @@ message ServerQuery {
     bool get_cpu = 3; //get cpu usage
     string command = 4; //input command
     string process_name = 5;//input process name
+    string auth_token = 6; //authentication token required if authentication is required
 }
 
 message ServerReply {

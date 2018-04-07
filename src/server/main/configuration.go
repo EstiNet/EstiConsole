@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"bytes"
 	"github.com/nu7hatch/gouuid"
+	"io/ioutil"
 )
 
 /*
@@ -28,11 +29,13 @@ type Users struct {
 type InstanceConfig struct {
 	InstanceName  string         `json:"instance_name"`
 	InstancePort  uint           `json:"instance_port"`
+	LogDirectory  string         `json:"log_directory_location"` //TODO LOAD MODULE BEFORE LOGGING
 	SSLEncryption bool           `json:"sslencryption"`
 	CertFilePath  string         `json:"cert_file_path"`
 	KeyFilePath   string         `json:"key_file_path"`
 	Servers       []ServerConfig `json:"servers"`
 	Users         []Users        `json:"users"`
+	RequireAuth   bool           `json:"require_authentication"`
 	EnableRoot    bool           `json:"enable_root"`
 	MasterKeyLoc  string         `json:"master_key_location"`
 }
@@ -60,10 +63,13 @@ func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 	con := InstanceConfig{}
 	con.InstanceName = "Server"
 	con.InstancePort = 19005
+	con.LogDirectory = "./log"
 	con.SSLEncryption = true
 	con.CertFilePath = "./server.crt"
 	con.KeyFilePath = "./server.key"
-	con.EnableRoot = true
+
+	con.RequireAuth = false
+	con.EnableRoot = false
 	con.MasterKeyLoc = "./masterkey.key"
 
 	wi := ServerConfig{}
@@ -228,6 +234,8 @@ func LoadConfig() {
 func verifySettings(config *InstanceConfig) {
 	namesUsed := make([]string, 1)
 
+	logDirPath = config.LogDirectory
+
 	if config.SSLEncryption {
 		_, err := os.Stat(config.CertFilePath)
 		if os.IsNotExist(err) {
@@ -267,15 +275,32 @@ func verifySettings(config *InstanceConfig) {
 	/*
 	 * Verify user settings
 	 */
-	 _, err := os.Stat(config.MasterKeyLoc)
-	 if os.IsNotExist(err) {
-	 	info("Master key not found! Generating new master key...")
 
-	 }
+	if config.EnableRoot {
+		_, err := os.Stat(config.MasterKeyLoc)
+		if os.IsNotExist(err) {
+			info("Master key not found! Generating new master key...")
+			for i := 0; i < 10; i++ { //generate master key from 10 UUIDs
+				id, err := uuid.NewV4()
+				if err != nil {
+					logFatal(err)
+				}
+				masterKey += id.String()
+			}
+			err := ioutil.WriteFile(config.MasterKeyLoc, []byte(masterKey), 0644)
+			logFatal(err)
+		}
+		dat, err := ioutil.ReadFile(config.MasterKeyLoc)
+		logFatal(err)
 
-	 for _, user := range config.Users {
+		masterKey = string(dat)
+		config.Users = append(config.Users, Users{Name: "root", Password: masterKey}) //add root user with masterkey as password
+	}
 
-	 }
+	/* TODO load users
+	for _, user := range config.Users { MAKE SURE THAT NO USER IS CALLED ROOT
+
+	}*/
 }
 
 /*

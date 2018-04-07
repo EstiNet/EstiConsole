@@ -12,18 +12,21 @@ import (
 	"log"
 )
 
-var version = "v2.0.0"
-var instanceSettings InstanceConfig
+var (
+	version          = "v2.0.0"
+	instanceSettings InstanceConfig
 
-var commands = make(map[string]interface{})
+	commands = make(map[string]interface{})
 
-var curServerView *Server = nil
+	curServerView *Server = nil
 
-var logDirPath = "./log"
+	logDirPath = "./log"
+	masterKey  string
+)
 
 /*
  * Output and logging related functions
- * TODO make async with log queue
+ * TODO reduce chance of write collision with log buffer
  */
 
 func addLog(str string) {
@@ -38,7 +41,7 @@ func addToLogFile(str string, file string, directory string) {
 	}
 	if _, err := os.Stat(directory); os.IsNotExist(err) {
 		fmt.Println("Logging directory " + directory + " disappeared! WAT\nCommencing repair.")
-		os.Mkdir(directory,0755)
+		os.Mkdir(directory, 0755)
 		InitLogFile(directory)
 	}
 
@@ -61,9 +64,11 @@ func addToLogFile(str string, file string, directory string) {
 	}
 }
 func logFatal(err error) {
-	addLog(err.Error())
-	ClientsKill()
-	log.Fatal(err)
+	if err != nil {
+		addLog(err.Error())
+		ClientsKill()
+		log.Fatal(err)
+	}
 }
 func logFatalStr(str string) {
 	addLog(str)
@@ -138,7 +143,7 @@ func main() {
 	go ClientsStart()
 	info("Starting command system...")
 	go ConsoleStart()
-	
+
 	//Receive interrupt
 	<-done
 	Shutdown()
@@ -167,7 +172,7 @@ func Shutdown() {
 		stillOnline := false
 		time.Sleep(time.Second)
 
-		for _, server := range Servers{
+		for _, server := range Servers {
 			if server.IsOnline {
 				stillOnline = true
 				break

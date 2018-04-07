@@ -27,6 +27,7 @@ type Server struct {
 	InputPipe  io.WriteCloser
 	AutoStart  bool
 	IsOnline   bool
+	LogCycle   int
 }
 
 //warning: this is a synchronous call.
@@ -130,8 +131,13 @@ func (server *Server) input(input string) {
 }
 
 func (server *Server) addLog(str string) {
+	if server.LogCycle >= 20000 { //if the log file is over 20000 lines long
+		ServerInitLog(server.Settings)
+		server.LogCycle = 0
+	}
 	server.Log = append(server.Log, str)
 	addToLogFile(str, logDirPath+"/"+server.Settings.InstanceName+"/current.log", logDirPath+"/"+server.Settings.InstanceName) //Write to log file
+	server.LogCycle++
 }
 
 func (server *Server) getLog(beginIndex int, endIndex int) []string {

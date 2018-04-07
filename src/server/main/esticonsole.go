@@ -22,6 +22,7 @@ var (
 
 	logDirPath = "./log"
 	masterKey  string
+	logCycle = 0
 )
 
 /*
@@ -30,7 +31,13 @@ var (
  */
 
 func addLog(str string) {
+	if logCycle >= 20000 {
+		InitLog()
+		logCycle = 0
+	}
+
 	go addToLogFile(str, logDirPath+"/current.log", logDirPath)
+	logCycle++
 }
 func addToLogFile(str string, file string, directory string) {
 	//check if logdirpath exists

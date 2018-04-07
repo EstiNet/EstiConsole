@@ -36,6 +36,7 @@ func addLog(str string) {
 		logCycle = 0
 	}
 
+	//TODO get rid of goroutine so that when it crashes it actually writes to the file
 	go addToLogFile(str, logDirPath+"/current.log", logDirPath)
 	logCycle++
 }

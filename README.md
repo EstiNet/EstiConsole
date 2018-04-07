@@ -1,4 +1,4 @@
-# EstiConsole
+# EstiConsole README WIP
 Version: v2.0.0
 
 ## What the heck is this thing?
@@ -27,3 +27,20 @@ Because golang is cool.
 
 ## TODO
 * Unzip file for extraction (and time delay to delete zip cache)
+
+systemd unit file
+~~~~
+[Unit]
+Description=EstiConsole
+
+[Service]
+WorkingDirectory=/home/estinet/EstiConsole
+User=estinet
+
+Restart=always
+ExecStart=/home/estinet/EstiConsole/esticonsole
+ExecStop=/home/estinet/EstiConsole/esticli -masterkey /home/estinet/EstiConsole/masterkey.key instancestop
+
+[Install]
+WantedBy=multi-user.target
+~~~~

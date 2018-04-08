@@ -246,11 +246,11 @@ func verifySettings(config *InstanceConfig) {
 	if config.SSLEncryption {
 		_, err := os.Stat(config.CertFilePath)
 		if os.IsNotExist(err) {
-			logFatalStr(config.CertFilePath + " the cert file does not exist! Please fix this error in the config." + err.Error())
+			logFatalStr(config.CertFilePath + " the cert file does not exist! Please fix this error in the config.\n" + err.Error())
 		}
 		_, err2 := os.Stat(config.KeyFilePath)
 		if os.IsNotExist(err2) {
-			logFatalStr(config.CertFilePath + " the key file does not exist! Please fix this error in the config." + err2.Error())
+			logFatalStr(config.CertFilePath + " the key file does not exist! Please fix this error in the config.\n" + err2.Error())
 		}
 	}
 

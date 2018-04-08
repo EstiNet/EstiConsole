@@ -142,7 +142,13 @@ func (server *Server) addLog(str string) {
 		server.LogStartIndex += int(server.Settings.AmountOfLinesToCutOnMax)
 	}
 	server.Log = append(server.Log, str)
-	addToLogFile(str, logDirPath+"/"+server.Settings.InstanceName+"/current.log", logDirPath+"/"+server.Settings.InstanceName) //Write to log file
+
+	logQueue = append(logQueue, LogAddition{Str: str, File: logDirPath+"/"+server.Settings.InstanceName+"/current.log", Directory: logDirPath+"/"+server.Settings.InstanceName})
+	if !logDumpInProgress {
+		logDumpInProgress = true
+		go startLogDump()
+	}
+
 	server.LogCycle++
 }
 

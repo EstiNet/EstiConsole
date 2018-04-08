@@ -20,10 +20,37 @@ var (
 
 	curServerView *Server = nil
 
-	logDirPath = "./log"
-	masterKey  string
-	logCycle = 0
+	logDirPath        = "./log"
+	masterKey         string
+	logCycle          = 0
+	logDumpInProgress = false
+	logQueue          = make([]LogAddition, 0)
 )
+
+type LogAddition struct {
+	Str       string
+	File      string
+	Directory string
+}
+
+/*
+ * Start the synchronous queue dump for logs
+ * Note: please set logDumpInProgress to true before calling
+ */
+
+func startLogDump() {
+	fmt.Println("heeeede")
+	for !(len(logQueue) == 0) {
+		addToLogFile(logQueue[0].Str, logQueue[0].File, logQueue[0].Directory)
+		if len(logQueue) == 1 {
+			logQueue = make([]LogAddition, 0)
+		} else {
+			logQueue = logQueue[1:]
+		}
+		time.Sleep(time.Millisecond * 1)
+	}
+	logDumpInProgress = false
+}
 
 /*
  * Output and logging related functions
@@ -36,8 +63,13 @@ func addLog(str string) {
 		logCycle = 0
 	}
 
-	//TODO get rid of goroutine so that when it crashes it actually writes to the file
-	go addToLogFile(str, logDirPath+"/current.log", logDirPath)
+	logQueue = append(logQueue, LogAddition{Str: str, File: logDirPath + "/current.log", Directory: logDirPath})
+
+	if !logDumpInProgress {
+		logDumpInProgress = true
+		go startLogDump()
+	}
+
 	logCycle++
 }
 func addToLogFile(str string, file string, directory string) {
@@ -75,12 +107,19 @@ func logFatal(err error) {
 	if err != nil {
 		addLog(err.Error())
 		ClientsKill()
+
+		for i := 0; i < 2000 && logDumpInProgress; i++ { //wait for log dump to finish and exit
+			time.Sleep(time.Millisecond)
+		}
 		log.Fatal(err)
 	}
 }
 func logFatalStr(str string) {
 	addLog(str)
 	ClientsKill()
+	for i := 0; i < 2000 && logDumpInProgress; i++ { //wait for log dump to finish and exit
+		time.Sleep(time.Millisecond)
+	}
 	log.Fatal(str)
 }
 func println(str string) {

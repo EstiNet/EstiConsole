@@ -1,7 +1,6 @@
 {
     "instance_name": "Server",
     "instance_port": 19005,
-    "log_directory_location": "./log",
     "sslencryption": true,
     "cert_file_path": "./server.crt",
     "key_file_path": "./server.key",

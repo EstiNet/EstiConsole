@@ -82,6 +82,12 @@ func attachCUI() {
 	if err := g.SetKeybinding("v1", gocui.KeyArrowDown, gocui.ModNone, v1ScrollDown); err != nil {
 		log.Panicln(err)
 	}
+	if err := g.SetKeybinding("v2", gocui.MouseRelease, gocui.ModNone, func(gui *gocui.Gui, view *gocui.View) error {
+		view.SetCursor(0, 0) //move cursor
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
 
 	g.Update(func(g *gocui.Gui) error { //write slice to view once the main cui loop starts
 		writeSliceToView(attachLog, "v1") //TODO only write screen height size
@@ -286,6 +292,7 @@ func layout(g *gocui.Gui) error {
 	}
 	return nil
 }
+
 
 /*
  * Mouse click event

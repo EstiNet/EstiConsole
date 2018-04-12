@@ -39,7 +39,6 @@ type LogAddition struct {
  */
 
 func startLogDump() {
-	fmt.Println("heeeede")
 	for !(len(logQueue) == 0) {
 		addToLogFile(logQueue[0].Str, logQueue[0].File, logQueue[0].Directory)
 		if len(logQueue) == 1 {

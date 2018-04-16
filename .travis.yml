@@ -4,7 +4,15 @@ go:
   - "1.10.x"
   - master
 
-env:
+install: true
+
+matrix:
+  # It's ok if our code fails on unstable development versions of Go.
+  allow_failures:
+    - go: master
+  # Don't wait for tip tests to finish. Mark the test run green if the
+  # tests pass on the stable versions of Go.
+  fast_finish: true
 
 before_install:
   - go get -t github.com/c9s/goprocinfo/linux
@@ -17,3 +25,6 @@ script:
   - ./build
   - go test -cpu=1,2 -v ./src/server/main
   - go test -cpu=1,2 -v ./src/cli/main
+
+notifications:
+  email: false

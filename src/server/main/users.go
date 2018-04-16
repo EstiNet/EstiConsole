@@ -1,6 +1,9 @@
 package main
 
-import "github.com/nu7hatch/gouuid"
+import (
+	"github.com/nu7hatch/gouuid"
+	"time"
+)
 
 var tokenMap = make(map[string]string) //token to user
 
@@ -19,5 +22,10 @@ func getNewToken(user string) (strToken string) { //TODO token expiry date
 		strToken = getNewToken(user) //hopefully doesn't stack overflow
 	}
 	tokenMap[strToken] = user
+	go func() {
+		//token expiry
+		time.Sleep(time.Hour)
+		delete(tokenMap, strToken)
+	}()
 	return
 }

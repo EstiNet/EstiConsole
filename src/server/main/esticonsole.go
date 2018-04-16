@@ -10,6 +10,7 @@ import (
 	"time"
 	"io"
 	"log"
+	pb "../../protocol"
 )
 
 var (
@@ -17,6 +18,8 @@ var (
 	instanceSettings InstanceConfig
 
 	commands = make(map[string]interface{})
+
+	proxiedServerCon = make(map[string]ProxiedServer)
 
 	curServerView *Server = nil
 
@@ -26,6 +29,11 @@ var (
 	logDumpInProgress = false
 	logQueue          = make([]LogAddition, 0)
 )
+
+type ProxiedServer struct {
+	client pb.RPCServerClient
+	token  string
+}
 
 type LogAddition struct {
 	Str       string
@@ -53,7 +61,6 @@ func startLogDump() {
 
 /*
  * Output and logging related functions
- * TODO reduce chance of write collision with log buffer
  */
 
 func addLog(str string) {

@@ -27,17 +27,18 @@ type Users struct {
  */
 
 type InstanceConfig struct {
-	InstanceName  string         `json:"instance_name"`
-	InstancePort  uint           `json:"instance_port"`
 	//LogDirectory  string         `json:"log_directory_location"` //TODO LOAD MODULE BEFORE LOGGING
-	SSLEncryption bool           `json:"sslencryption"`
-	CertFilePath  string         `json:"cert_file_path"`
-	KeyFilePath   string         `json:"key_file_path"`
-	Servers       []ServerConfig `json:"servers"`
-	Users         []Users        `json:"users"`
-	RequireAuth   bool           `json:"require_authentication"`
-	EnableRoot    bool           `json:"enable_root"`
-	MasterKeyLoc  string         `json:"master_key_location"`
+	InstanceName   string                `json:"instance_name"`
+	InstancePort   uint                  `json:"instance_port"`
+	SSLEncryption  bool                  `json:"sslencryption"`
+	CertFilePath   string                `json:"cert_file_path"`
+	KeyFilePath    string                `json:"key_file_path"`
+	RequireAuth    bool                  `json:"require_authentication"`
+	EnableRoot     bool                  `json:"enable_root"`
+	MasterKeyLoc   string                `json:"master_key_location"`
+	Servers        []ServerConfig        `json:"servers"`
+	ProxiedServers []ProxiedServerConfig `json:"proxied_servers"`
+	Users          []Users               `json:"users"`
 }
 
 /*
@@ -56,10 +57,25 @@ type ServerConfig struct {
 }
 
 /*
+ * Struct containing settings for proxied servers
+ */
+type ProxiedServerConfig struct {
+	ProcessName string `json:"process_name"`
+	IP          string `json:"ip"`
+	Port        uint   `json:"port"`
+	RequireAuth bool   `json:"require_authentication"`
+	Username    string `json:"username"`
+	Password    string `json:"password"`
+	HasTLS      bool `json:"enable_encryption"`
+	CheckTLS    bool   `json:"check_encryption"`
+	CertFile    string `json:"cert_file_location"`
+}
+
+/*
  * Returns the configuration structs with default values.
  */
 
-func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
+func ConfigDefault() (InstanceConfig, ServerConfig, ProxiedServerConfig, Users) {
 	con := InstanceConfig{}
 	con.InstanceName = "Server"
 	con.InstancePort = 19005
@@ -82,11 +98,21 @@ func ConfigDefault() (InstanceConfig, ServerConfig, Users) {
 	wi.UnresponsiveKillTimeSeconds = 20
 	wi.MinecraftMode = true
 
+	psc := ProxiedServerConfig{}
+	psc.ProcessName = "ProxiedServer1"
+	psc.IP = "localhost"
+	psc.Port = 19005
+	psc.RequireAuth = true
+	psc.Username = "default"
+	psc.Password = "password"
+	psc.CheckTLS = false
+	psc.CertFile = "./server.crt"
+
 	users := Users{}
 	users.Name = "default"
 	users.Password = "password"
 
-	return con, wi, users
+	return con, wi, psc, users
 }
 
 var configPath = "./config.json"
@@ -149,8 +175,9 @@ func LoadConfig() {
 			info("Created config.json!")
 		}
 		//Create default values
-		instance, server, users := ConfigDefault()
+		instance, server, proxiedServers, users := ConfigDefault()
 		instance.Servers = []ServerConfig{server}
+		instance.ProxiedServers = []ProxiedServerConfig{proxiedServers}
 		instance.Users = []Users{users}
 		js, err := json.MarshalIndent(instance, "", "    ") //pretty JSON
 		if err != nil { //JSON incorrect catch (if there is a programmer error) .-.
@@ -168,7 +195,7 @@ func LoadConfig() {
 	}
 
 	//Verify that all of the settings are there (possible config update)
-	instance, server, users := ConfigDefault()
+	instance, server, proxiedServers, users := ConfigDefault()
 	inst := reflect.Indirect(reflect.ValueOf(instance))
 	conf := reflect.Indirect(reflect.ValueOf(config))
 	confSet := reflect.ValueOf(&config).Elem()
@@ -185,8 +212,6 @@ func LoadConfig() {
 		sever := reflect.ValueOf(config.Servers[i])
 
 		for j := 0; j < sever.NumField(); j++ {
-			//fmt.Println(sever.Field(j).Interface()) //TODO
-			//debug(" " + sever.Field(j).String())
 			if sever.Field(j).Interface() == nil {
 				info("Please check your config, a setting has been updated. (" + sever.Field(j).String() + ")")
 				severSet := reflect.ValueOf(&config.Servers[i]).Elem()
@@ -195,11 +220,23 @@ func LoadConfig() {
 		}
 	}
 
+	for i := 0; i < len(config.ProxiedServers); i++ {
+
+		sever := reflect.ValueOf(config.ProxiedServers[i])
+
+		for j := 0; j < sever.NumField(); j++ {
+			if sever.Field(j).Interface() == nil {
+				info("Please check your config, a setting has been updated. (" + sever.Field(j).String() + ")")
+				severSet := reflect.ValueOf(&config.ProxiedServers[i]).Elem()
+				severSet.Field(j).Set(reflect.ValueOf(proxiedServers).Field(j))
+			}
+		}
+	}
+
 	for i := 0; i < len(config.Users); i++ {
 
 		sever := reflect.ValueOf(config.Users[i])
 		severSet := reflect.ValueOf(&config.Users[i]).Elem();
-
 		for j := 0; j < sever.NumField(); j++ {
 			if sever.Field(j).Interface() == nil {
 				info("Please check your config, a setting has been updated. (" + sever.Field(j).String() + ")")
@@ -279,6 +316,16 @@ func verifySettings(config *InstanceConfig) {
 		}
 		namesUsed = append(namesUsed, server.InstanceName)
 	}
+
+	/*
+	 * Verify each proxied server's settings
+	 */
+
+	 for _, server := range config.ProxiedServers {
+		//TODO
+		//check duplicates
+		//check if valid file
+	 }
 
 	/*
 	 * Verify user settings

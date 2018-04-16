@@ -3,3 +3,17 @@ language: go
 go:
   - "1.10.x"
   - master
+
+env:
+
+before_install:
+  - go get -t github.com/c9s/goprocinfo/linux
+  - go get -t google.golang.org/grpc
+  - go get -t github.com/jroimartin/gocui
+  - go get -t github.com/nu7hatch/gouuid
+  - go get -t github.com/howeyc/gopass
+
+script:
+  - ./build
+  - go test -cpu=1,2 -v ./src/server/main
+  - go test -cpu=1,2 -v ./src/cli/main

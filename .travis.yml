@@ -22,9 +22,7 @@ before_install:
   - go get -t github.com/howeyc/gopass
 
 script:
-  - ./build
-  - go test -cpu=1,2 -v ./src/server/main
-  - go test -cpu=1,2 -v ./src/cli/main
+  - ./buildServer.sh
 
 notifications:
   email: false

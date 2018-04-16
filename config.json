@@ -4,6 +4,9 @@
     "sslencryption": true,
     "cert_file_path": "./server.crt",
     "key_file_path": "./server.key",
+    "require_authentication": true,
+    "enable_root": true,
+    "master_key_location": "./masterkey.key",
     "servers": [
         {
             "instance_name": "Server1",
@@ -36,13 +39,23 @@
             "minecraft_mode": true
         }
     ],
+    "proxied_servers": [
+        {
+            "process_name": "Creative",
+            "ip": "192.168.2.60",
+            "port": 19005,
+            "require_authentication": true,
+            "username": "estinet",
+            "password": "EstiNetwork?123",
+            "enable_encryption": true,
+            "check_encryption": false,
+            "cert_file_location": "none"
+        }
+    ],
     "users": [
         {
             "name": "default",
             "password": "password"
         }
-    ],
-    "require_authentication": true,
-    "enable_root": true,
-    "master_key_location": "./masterkey.key"
+    ]
 }

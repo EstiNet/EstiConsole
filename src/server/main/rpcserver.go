@@ -35,13 +35,12 @@ func (rpcserver *RPCServer) Version(ctx context.Context, str *pb.StringRequest) 
 	}
 }
 
-func (rpcserver *RPCServer) List(ctx context.Context, str *pb.StringRequest) (*pb.String, error) {
+func (rpcserver *RPCServer) List(ctx context.Context, str *pb.StringRequest) (*pb.ListResponse, error) {
 	if _, ok := checkToken(str.AuthToken); !ok && instanceSettings.RequireAuth { //TODO check permissions of user
 		return nil, invalidToken
 	}
 
-	ret := ""
-	ret += "Clients:\n"
+	ret := &pb.ListResponse{}
 	for k, v := range Servers {
 		var state string
 		if v.IsOnline {
@@ -49,12 +48,13 @@ func (rpcserver *RPCServer) List(ctx context.Context, str *pb.StringRequest) (*p
 		} else {
 			state = "Offline"
 		}
-		ret += k + " (" + state + ")\n"
+		ret.Processes = append(ret.Processes, &pb.Process{Name: k, State: state})
 	}
 
 	//TODO show proxied processes
 
-	return &pb.String{Str: ret}, nil
+
+	return ret, nil
 }
 
 func (rpcserver *RPCServer) Stop(ctx context.Context, str *pb.StringRequest) (*pb.String, error) {
@@ -210,5 +210,5 @@ func rpcserverStart() {
 	}
 	pb.RegisterRPCServerServer(grpcServer, &RPCServer{})
 	info("Starting RPCServer on port " + strconv.Itoa(int(instanceSettings.InstancePort)))
-	grpcServer.Serve(lis)
+	go grpcServer.Serve(lis)
 }

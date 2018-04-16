@@ -11,6 +11,7 @@ import (
 	"io"
 	"log"
 	pb "../../protocol"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -32,6 +33,7 @@ var (
 
 type ProxiedServer struct {
 	client pb.RPCServerClient
+	connection *grpc.ClientConn
 	token  string
 }
 
@@ -191,7 +193,7 @@ func main() {
 	PostInitLog()
 
 	info("Starting network processes...")
-	go NetworkStart()
+	NetworkStart() //synchronous startup
 	info("Starting client processes...")
 	go ClientsStart()
 	info("Starting command system...")

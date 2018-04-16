@@ -66,7 +66,7 @@ type ProxiedServerConfig struct {
 	RequireAuth bool   `json:"require_authentication"`
 	Username    string `json:"username"`
 	Password    string `json:"password"`
-	HasTLS      bool `json:"enable_encryption"`
+	HasTLS      bool   `json:"enable_encryption"`
 	CheckTLS    bool   `json:"check_encryption"`
 	CertFile    string `json:"cert_file_location"`
 }
@@ -105,6 +105,7 @@ func ConfigDefault() (InstanceConfig, ServerConfig, ProxiedServerConfig, Users) 
 	psc.RequireAuth = true
 	psc.Username = "default"
 	psc.Password = "password"
+	psc.HasTLS = true
 	psc.CheckTLS = false
 	psc.CertFile = "./server.crt"
 
@@ -321,11 +322,12 @@ func verifySettings(config *InstanceConfig) {
 	 * Verify each proxied server's settings
 	 */
 
-	 for _, server := range config.ProxiedServers {
+	//for _, server := range config.ProxiedServers {
+
 		//TODO
 		//check duplicates
 		//check if valid file
-	 }
+	//}
 
 	/*
 	 * Verify user settings

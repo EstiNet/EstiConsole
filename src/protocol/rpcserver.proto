@@ -2,7 +2,7 @@ syntax = "proto3";
 
 service RPCServer {
     rpc Version(StringRequest) returns (String);
-    rpc List(StringRequest) returns (String);
+    rpc List(StringRequest) returns (ListResponse);
     rpc Stop(StringRequest) returns (String);
     rpc Start(StringRequest) returns (String);
     rpc Kill(StringRequest) returns (String);
@@ -17,6 +17,13 @@ message String {
 message User {
     string name = 1;
     string password = 2;
+}
+message ListResponse {
+    repeated Process processes = 1;
+}
+message Process {
+    string name = 1;
+    string state = 2;
 }
 message StringRequest {
     string str = 1;

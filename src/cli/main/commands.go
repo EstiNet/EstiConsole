@@ -35,7 +35,11 @@ func CommandList(input string) {
 	startCon()
 	reply, err := client.List(context.Background(), &pb.StringRequest{Str: "", AuthToken: token})
 	checkError(err)
-	println(reply.Str)
+
+	println("Clients:")
+	for _, server := range reply.Processes {
+		println(server.Name + ": " + server.State)
+	}
 }
 
 func CommandStop(input string) {

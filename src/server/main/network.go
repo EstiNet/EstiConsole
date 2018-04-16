@@ -4,7 +4,6 @@ import (
 	pb "../../protocol"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"log"
 	"crypto/tls"
 	"strconv"
 	"context"
@@ -13,20 +12,20 @@ import (
 func NetworkStart() {
 	info("Starting client connection process...")
 
-	go rpcserverStart()
+	rpcserverStart()
 	go func() { //Start connections with proxied processes and add them to map
 		for _, server := range instanceSettings.ProxiedServers {
-			cli, token := StartRPCCon(server)
-			proxiedServerCon[server.ProcessName] = ProxiedServer{client: cli, token: token}
+			cli, conn, token := StartRPCCon(server)
+			proxiedServerCon[server.ProcessName] = ProxiedServer{client: cli, connection: conn, token: token}
 		}
-	} ()
+	}()
 }
 
 //TODO check if the rpc connection went offline and auto repair
 //TODO REGEN TOKEN AFTER 1 HOUR
 //TODO CHECK IF PROCESS ACTUALLY EXISTS ON PROXIED
 
-func StartRPCCon(server ProxiedServerConfig) (client pb.RPCServerClient, token string) {
+func StartRPCCon(server ProxiedServerConfig) (client pb.RPCServerClient, conn *grpc.ClientConn, token string) {
 	var opts []grpc.DialOption
 
 	if !server.HasTLS {
@@ -48,14 +47,15 @@ func StartRPCCon(server ProxiedServerConfig) (client pb.RPCServerClient, token s
 	}
 
 	info("Attempting proxy connection to " + server.ProcessName + "...")
-	conn, err2 := grpc.Dial(server.IP+":"+strconv.Itoa(int(server.Port)), opts...)
-	if err2 != nil {
-		logFatalStr("Error connecting to process "+server.IP+":"+strconv.Itoa(int(server.Port))+", is the address and port correct?:"  + err2.Error())
+	var err error
+	conn, err = grpc.Dial(server.IP+":"+strconv.Itoa(int(server.Port)), opts...)
+	if err != nil {
+		info("Error connecting to process " + server.IP + ":" + strconv.Itoa(int(server.Port)) + ", is the address and port correct?:" + err .Error())
 	}
 	client = pb.NewRPCServerClient(conn)
 	tok, err := client.Auth(context.Background(), &pb.User{Name: server.Username, Password: server.Password})
 	if err != nil {
-		log.Fatal(err)
+		info("Proxied process (" + server.ProcessName + ") authentication error: " + err.Error())
 	}
 	token = tok.Str
 	return

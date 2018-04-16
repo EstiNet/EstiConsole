@@ -22,7 +22,7 @@ before_install:
   - go get -t github.com/howeyc/gopass
 
 script:
-  - ./buildServer.sh
+  - ./buildServer.sh .
 
 notifications:
   email: false

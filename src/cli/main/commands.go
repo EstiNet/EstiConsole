@@ -129,7 +129,10 @@ func StartAttachSupervise(input string, ch chan int) {
 func ObtainNewLog(process string, firstGet bool) {
 	obtainNewest := pb.ServerQuery{MessageId: -1, GetRam: false, GetCpu: false, ProcessName: process, AuthToken: token}
 	reply2, err2 := client.Attach(context.Background(), &obtainNewest)
-	checkError(err2) //caveat: can't accept 100 message gaps
+	if obtainCheckError(err2) { //caveat: can't accept 100 message gaps
+		reply2, err2 = client.Attach(context.Background(), &obtainNewest)
+		checkError(err2)
+	}
 	if firstGet {
 		if reply2.MessageId == 0 {
 			reply2.MessageId++
@@ -151,7 +154,10 @@ func ObtainNewLog(process string, firstGet bool) {
 func ObtainLogAtIndex(process string, index int) {
 	obtain := pb.ServerQuery{MessageId: int64(index), GetRam: false, GetCpu: false, ProcessName: process, AuthToken: token}
 	reply2, err2 := client.Attach(context.Background(), &obtain)
-	checkError(err2) //caveat: can't accept 100 message gaps
+	if obtainCheckError(err2) { //caveat: can't accept 100 message gaps
+		reply2, err2 = client.Attach(context.Background(), &obtain)
+		checkError(err2)
+	}
 	length := len(reply2.Messages)
 
 	for i := 0; i < length; i++ {

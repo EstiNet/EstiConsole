@@ -14,6 +14,7 @@ import (
 	"context"
 	"io/ioutil"
 	"github.com/howeyc/gopass"
+	"errors"
 )
 
 var (
@@ -26,6 +27,8 @@ var (
 	verifyTLS                                *bool
 	noTLS                                    *bool
 	token                                    string
+
+	password []byte
 
 	conn *grpc.ClientConn
 
@@ -112,6 +115,32 @@ func checkError(err error) {
 	}
 }
 
+func obtainCheckError(err error) bool {
+	if err != nil && err == errors.New("invalid authentication token") {
+		if *masterKey != "none" {
+			dat, err := ioutil.ReadFile(*masterKey)
+			if err != nil {
+				log.Fatal(err)
+			}
+			tok, err := client.Auth(context.Background(), &pb.User{Name: "root", Password: string(dat)})
+			if err != nil {
+				log.Fatal(err)
+			}
+			token = tok.Str
+		} else if *user != "none" {
+			tok, err := client.Auth(context.Background(), &pb.User{Name: *user, Password: string(password)})
+			if err != nil {
+				log.Fatal(err)
+			}
+			token = tok.Str
+		}
+		return true
+	} else {
+		checkError(err)
+	}
+	return false
+}
+
 /*
  * Initialize connection with server
  */
@@ -156,11 +185,12 @@ func startCon() {
 		token = tok.Str
 	} else if *user != "none" {
 		print("Password: ")
-		pass, err := gopass.GetPasswd()
+		var err error
+		password, err = gopass.GetPasswd()
 		if err != nil {
 			log.Fatal(err)
 		}
-		tok, err := client.Auth(context.Background(), &pb.User{Name: *user, Password: string(pass)})
+		tok, err := client.Auth(context.Background(), &pb.User{Name: *user, Password: string(password)})
 		if err != nil {
 			log.Fatal(err)
 		}

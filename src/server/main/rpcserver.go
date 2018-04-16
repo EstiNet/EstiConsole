@@ -51,12 +51,20 @@ func (rpcserver *RPCServer) List(ctx context.Context, str *pb.StringRequest) (*p
 		}
 		ret += k + " (" + state + ")\n"
 	}
+
+	//TODO show proxied processes
+
 	return &pb.String{Str: ret}, nil
 }
 
 func (rpcserver *RPCServer) Stop(ctx context.Context, str *pb.StringRequest) (*pb.String, error) {
 	if _, ok := checkToken(str.AuthToken); !ok && instanceSettings.RequireAuth { //TODO check permissions of user
 		return nil, invalidToken
+	}
+
+	//check if to proxy the request to proxied process
+	if sCon, ok := proxiedServerCon[str.Str]; ok {
+		return sCon.client.Stop(ctx, &pb.StringRequest{Str: str.Str, AuthToken: sCon.token})
 	}
 
 	output := StopClient(str.Str)
@@ -71,6 +79,11 @@ func (rpcserver *RPCServer) Start(ctx context.Context, str *pb.StringRequest) (*
 		return nil, invalidToken
 	}
 
+	//check if to proxy the request to proxied process
+	if sCon, ok := proxiedServerCon[str.Str]; ok {
+		return sCon.client.Start(ctx, &pb.StringRequest{Str: str.Str, AuthToken: sCon.token})
+	}
+
 	output := StartClient(str.Str)
 	if strings.Split(output, " ")[0] == "Started" {
 		info(output)
@@ -81,6 +94,11 @@ func (rpcserver *RPCServer) Start(ctx context.Context, str *pb.StringRequest) (*
 func (rpcserver *RPCServer) Kill(ctx context.Context, str *pb.StringRequest) (*pb.String, error) {
 	if _, ok := checkToken(str.AuthToken); !ok && instanceSettings.RequireAuth { //TODO check permissions of user
 		return nil, invalidToken
+	}
+
+	//check if to proxy the request to proxied process
+	if sCon, ok := proxiedServerCon[str.Str]; ok {
+		return sCon.client.Kill(ctx, &pb.StringRequest{Str: str.Str, AuthToken: sCon.token})
 	}
 
 	output := KillClient(str.Str)
@@ -102,6 +120,12 @@ func (rpcserver *RPCServer) InstanceStop(ctx context.Context, str *pb.StringRequ
 func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (*pb.ServerReply, error) {
 	if _, ok := checkToken(query.AuthToken); !ok && instanceSettings.RequireAuth { //TODO check permissions of user
 		return nil, invalidToken
+	}
+
+	//check if to proxy the request to proxied process
+	if sCon, ok := proxiedServerCon[query.ProcessName]; ok {
+		query.AuthToken = sCon.token
+		return sCon.client.Attach(ctx, query)
 	}
 
 	found := false

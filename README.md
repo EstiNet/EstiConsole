@@ -28,7 +28,6 @@ Because golang is cool.
 ## TODO
 * Unzip file for extraction (and time delay to delete zip cache)
 * Add configuration option to disable logging for process
-* Add configuration option to disable automatically starting the process
 * Add config reload
 
 systemd unit file

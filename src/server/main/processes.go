@@ -143,7 +143,7 @@ func (server *Server) addLog(str string) {
 	}
 	server.Log = append(server.Log, str)
 
-	logQueue = append(logQueue, LogAddition{Str: str, File: logDirPath+"/"+server.Settings.InstanceName+"/current.log", Directory: logDirPath+"/"+server.Settings.InstanceName})
+	logQueue = append(logQueue, LogAddition{Str: str, File: logDirPath + "/" + server.Settings.InstanceName + "/current.log", Directory: logDirPath + "/" + server.Settings.InstanceName})
 	if !logDumpInProgress {
 		logDumpInProgress = true
 		go startLogDump()
@@ -233,7 +233,9 @@ func ClientsStart() {
 
 		info("Initialized server " + server.Settings.InstanceName + ".")
 
-		go server.start()
+		if element.StartOnInitialize {
+			go server.start()
+		}
 	}
 	info("Completed process initialization!")
 }

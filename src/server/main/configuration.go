@@ -54,6 +54,7 @@ type ServerConfig struct {
 	StopProcessCommand          string `json:"stop_process_command"`
 	UnresponsiveKillTimeSeconds uint   `json:"unresponsive_kill_time_seconds"`
 	MinecraftMode               bool   `json:"minecraft_mode"`
+	StartOnInitialize           bool   `json:"start_process_on_initialize"`
 }
 
 /*
@@ -97,6 +98,7 @@ func ConfigDefault() (InstanceConfig, ServerConfig, ProxiedServerConfig, Users) 
 	wi.StopProcessCommand = "stop"
 	wi.UnresponsiveKillTimeSeconds = 20
 	wi.MinecraftMode = true
+	wi.StartOnInitialize = true
 
 	psc := ProxiedServerConfig{}
 	psc.ProcessName = "ProxiedServer1"

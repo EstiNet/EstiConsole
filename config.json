@@ -17,32 +17,12 @@
             "stop_process_command": "stop",
             "unresponsive_kill_time_seconds": 20,
             "minecraft_mode": true
-        },
-        {
-            "instance_name": "Server2",
-            "home_directory": "/home/devin/Flow/ECExp2",
-            "command_to_run": "java -Xmx2G -Xms512M -XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -d64 -server -jar minecraft_server.jar",
-            "max_lines": 2000,
-            "amount_of_lines_to_cut_on_max": 100,
-            "stop_process_command": "stop",
-            "unresponsive_kill_time_seconds": 20,
-            "minecraft_mode": true
-        },
-        {
-            "instance_name": "gWars",
-            "home_directory": "/home/devin/Flow/Minecraft Servers/gWars",
-            "command_to_run": "java -Xmx2G -Xms512M -XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -d64 -server -jar minecraft_server.jar",
-            "max_lines": 2000,
-            "amount_of_lines_to_cut_on_max": 100,
-            "stop_process_command": "stop",
-            "unresponsive_kill_time_seconds": 20,
-            "minecraft_mode": true
         }
     ],
     "proxied_servers": [
         {
-            "process_name": "Creative",
-            "ip": "192.168.2.60",
+            "process_name": "Server1",
+            "ip": "localhost",
             "port": 19005,
             "require_authentication": true,
             "username": "estinet",

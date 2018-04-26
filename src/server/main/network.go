@@ -14,9 +14,10 @@ func NetworkStart() {
 
 	rpcserverStart()
 	go func() { //Start connections with proxied processes and add them to map
-		for _, server := range instanceSettings.ProxiedServers {
-			cli, conn, token := StartRPCCon(server)
+		for i, server := range instanceSettings.ProxiedServers {
+			cli, conn, token := StartRPCCon(&server)
 			proxiedServerCon[server.ProcessName] = ProxiedServer{client: cli, connection: conn, token: token}
+			instanceSettings.ProxiedServers[i] = server
 		}
 	}()
 }
@@ -25,7 +26,7 @@ func NetworkStart() {
 //TODO REGEN TOKEN AFTER 1 HOUR
 //TODO CHECK IF PROCESS ACTUALLY EXISTS ON PROXIED
 
-func StartRPCCon(server ProxiedServerConfig) (client pb.RPCServerClient, conn *grpc.ClientConn, token string) {
+func StartRPCCon(server *ProxiedServerConfig) (client pb.RPCServerClient, conn *grpc.ClientConn, token string) {
 	var opts []grpc.DialOption
 
 	if !server.HasTLS {
@@ -46,6 +47,8 @@ func StartRPCCon(server ProxiedServerConfig) (client pb.RPCServerClient, conn *g
 		opts = append(opts, grpc.WithTransportCredentials(creds))
 	}
 
+
+
 	info("Attempting proxy connection to " + server.ProcessName + "...")
 	var err error
 	conn, err = grpc.Dial(server.IP+":"+strconv.Itoa(int(server.Port)), opts...)
@@ -56,7 +59,25 @@ func StartRPCCon(server ProxiedServerConfig) (client pb.RPCServerClient, conn *g
 	tok, err := client.Auth(context.Background(), &pb.User{Name: server.Username, Password: server.Password})
 	if err != nil {
 		info("Proxied process (" + server.ProcessName + ") authentication error: " + err.Error())
+		server.Disabled = true
+		return //prevent null dereference
 	}
 	token = tok.Str
+	list, err := client.List(context.Background(), &pb.StringRequest{Str: "", AuthToken: token})
+	if err != nil {
+		info("Error: " + err.Error())
+	} else {
+		notFound := true
+		for _, k := range list.Processes {
+			if k.Name == server.ProcessName {
+				notFound = false
+				break
+			}
+		}
+		if notFound {
+			info("Proxied process (" + server.ProcessName + ") not found on server!")
+			server.Disabled = true
+		}
+	}
 	return
 }

@@ -69,6 +69,8 @@ type ProxiedServerConfig struct {
 	HasTLS      bool   `json:"enable_encryption"`
 	CheckTLS    bool   `json:"check_encryption"`
 	CertFile    string `json:"cert_file_location"`
+
+	Disabled    bool
 }
 
 /*
@@ -322,12 +324,15 @@ func verifySettings(config *InstanceConfig) {
 	 * Verify each proxied server's settings
 	 */
 
-	//for _, server := range config.ProxiedServers {
+	for _, server := range config.ProxiedServers {
+		for _, k := range namesUsed {
+			if k == server.ProcessName {
+				logFatalStr("The name " + server.ProcessName + " is already taken, check for duplicates!")
+			}
+		}
 
-		//TODO
-		//check duplicates
-		//check if valid file
-	//}
+		namesUsed = append(namesUsed, server.ProcessName)
+	}
 
 	/*
 	 * Verify user settings

@@ -3,6 +3,7 @@ before_script:
 
 build_esticonsole:
   script:
+    - export PATH=$PATH:/usr/local/go/bin
     - go get github.com/c9s/goprocinfo/linux
     - go get google.golang.org/grpc
     - go get github.com/jroimartin/gocui

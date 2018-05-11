@@ -27,8 +27,6 @@ func NetworkStart() {
 	}()
 }
 
-//TODO check if the rpc connection went offline and auto repair
-//TODO REGEN TOKEN AFTER 1 HOUR
 
 func StartRPCCon(server *ProxiedServerConfig) (client pb.RPCServerClient, conn *grpc.ClientConn, token string) {
 

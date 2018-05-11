@@ -13,15 +13,16 @@ import (
 
 func CommandHelp(input string) {
 	println("-----Help-----")
-	println("-h               | Get the help interface for flags.")
-	println("version          | Get the version of this instance.")
-	println("status           | Get the status of the instance")
-	println("instancestop     | Stop this instance of EstiConsole.")
-	println("list             | List all of the client servers.")
-	println("attach [process] | Switch view to another process.")
-	println("stop [process]   | Stop the process using the default stop command.")
-	println("start [process]  | Start the process.")
-	println("kill [process]   | Forcibly kill the process.")
+	println("-h                | Get the help interface for flags.")
+	println("version           | Get the version of this instance.")
+	println("status            | Get the status of the instance")
+	println("instancestop      | Stop this instance of EstiConsole.")
+	println("list              | List all of the client servers.")
+	println("attach [process]  | Switch view to another process.")
+	println("stop [process]    | Stop the process using the default stop command.")
+	println("start [process]   | Start the process.")
+	println("restart [process] | Restart the process.")
+	println("kill [process]    | Forcibly kill the process.")
 }
 
 func CommandVersion(input string) {
@@ -59,6 +60,16 @@ func CommandInstanceStop(input string) {
 func CommandStart(input string) {
 	startCon()
 	reply, err := client.Start(context.Background(), &pb.StringRequest{Str: input, AuthToken: token})
+	checkError(err)
+	println(reply.Str)
+}
+
+func CommandRestart(input string) {
+	startCon()
+	reply, err := client.Stop(context.Background(), &pb.StringRequest{Str: input, AuthToken: token})
+	checkError(err)
+	println(reply.Str)
+	reply, err = client.Start(context.Background(), &pb.StringRequest{Str: input, AuthToken: token})
 	checkError(err)
 	println(reply.Str)
 }

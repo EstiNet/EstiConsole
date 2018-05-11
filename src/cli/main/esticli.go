@@ -47,6 +47,7 @@ func init() {
 	commands["instancestop"] = CommandInstanceStop
 	commands["stop"] = CommandStop
 	commands["start"] = CommandStart
+	commands["restart"] = CommandRestart
 	commands["kill"] = CommandKill
 	commands["attach"] = CommandAttach
 }

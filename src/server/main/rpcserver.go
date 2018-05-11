@@ -151,14 +151,14 @@ func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (
 	//check if to proxy the request to proxied process
 	if sCon, ok := proxiedServerCon[query.ProcessName]; ok {
 		query.AuthToken = sCon.token
+		alias := query.ProcessName
 		query.ProcessName = sCon.config.ProcessName
 
 		reply, err := sCon.client.Attach(ctx, query)
 
 		if err != nil && err.Error() == "rpc error: code = Unknown desc = "+invalidToken.Error() { // regen the token if it's invalid
-			RegenProxyToken(&sCon, query.ProcessName)
-			query.AuthToken = proxiedServerCon[query.ProcessName].token
-			info(query.AuthToken)
+			RegenProxyToken(&sCon, alias)
+			query.AuthToken = proxiedServerCon[alias].token
 			reply, err = sCon.client.Attach(ctx, query)
 		}
 
@@ -240,12 +240,9 @@ func RegenProxyToken(sCon *ProxiedServer, pName string) {
 		info("Proxied process (" + sCon.config.ProcessAlias + ") authentication error: " + err.Error())
 	}
 	info("Regenerated token with " + sCon.config.ProcessAlias + ".")
-	info(sCon.token + "wut")
 	ps := proxiedServerCon[pName]
 	ps.token = tok.Str
 	proxiedServerCon[pName] = ps
-	info(tok.Str)
-	info(proxiedServerCon[pName].token)
 }
 
 func rpcserverStart() {

@@ -7,6 +7,7 @@ import (
 	"crypto/tls"
 	"strconv"
 	"context"
+	"google.golang.org/grpc/connectivity"
 )
 
 func NetworkStart() {
@@ -28,7 +29,6 @@ func NetworkStart() {
 
 //TODO check if the rpc connection went offline and auto repair
 //TODO REGEN TOKEN AFTER 1 HOUR
-//TODO CHECK IF PROCESS ACTUALLY EXISTS ON PROXIED
 
 func StartRPCCon(server *ProxiedServerConfig) (client pb.RPCServerClient, conn *grpc.ClientConn, token string) {
 
@@ -63,11 +63,17 @@ func StartRPCCon(server *ProxiedServerConfig) (client pb.RPCServerClient, conn *
 	conn, err = grpc.Dial(server.IP+":"+strconv.Itoa(int(server.Port)), opts...)
 	if err != nil {
 		info("Error connecting to process " + server.IP + ":" + strconv.Itoa(int(server.Port)) + ", is the address and port correct?:" + err.Error())
-		server.Disabled = true
 		return
 	}
 	client = pb.NewRPCServerClient(conn)
+
 	tok, err := client.Auth(context.Background(), &pb.User{Name: server.Username, Password: server.Password})
+
+	if err != nil && conn.GetState() == connectivity.TransientFailure { //if the state is failing ignore other errors
+		info("Error connecting to process " + server.IP + ":" + strconv.Itoa(int(server.Port)) + ", is the address and port correct?:" + err.Error())
+		return
+	}
+
 	if err != nil {
 		info("Proxied process (" + server.ProcessAlias + ") authentication error: " + err.Error())
 		server.Disabled = true

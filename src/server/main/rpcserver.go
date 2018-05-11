@@ -1,14 +1,14 @@
 package main
 
 import (
-	"net"
 	"strings"
 
 	pb "../../protocol"
 	"context"
-	"fmt"
 	"google.golang.org/grpc"
 	"errors"
+	"net"
+	"fmt"
 	"google.golang.org/grpc/credentials"
 	"strconv"
 )
@@ -51,8 +51,13 @@ func (rpcserver *RPCServer) List(ctx context.Context, str *pb.StringRequest) (*p
 		ret.Processes = append(ret.Processes, &pb.Process{Name: k, State: state})
 	}
 
-	//TODO show proxied processes
-
+	for k, v := range proxiedServerCon {
+		state := v.connection.GetState().String()
+		if v.config.Disabled {
+			state = "Disabled"
+		}
+		ret.Processes = append(ret.Processes, &pb.Process{Name: k, State: state})
+	}
 
 	return ret, nil
 }
@@ -64,7 +69,14 @@ func (rpcserver *RPCServer) Stop(ctx context.Context, str *pb.StringRequest) (*p
 
 	//check if to proxy the request to proxied process
 	if sCon, ok := proxiedServerCon[str.Str]; ok {
-		return sCon.client.Stop(ctx, &pb.StringRequest{Str: sCon.config.ProcessName, AuthToken: sCon.token})
+
+		str, err := sCon.client.Stop(ctx, &pb.StringRequest{Str: sCon.config.ProcessName, AuthToken: sCon.token})
+		if err != nil && err.Error() == "rpc error: code = Unknown desc = "+invalidToken.Error() { // regen the token if it's invalid
+			RegenProxyToken(&sCon, str.Str)
+			str, err = sCon.client.Stop(ctx, &pb.StringRequest{Str: sCon.config.ProcessName, AuthToken: proxiedServerCon[str.Str].token})
+		}
+
+		return str, err
 	}
 
 	output := StopClient(str.Str)
@@ -81,7 +93,14 @@ func (rpcserver *RPCServer) Start(ctx context.Context, str *pb.StringRequest) (*
 
 	//check if to proxy the request to proxied process
 	if sCon, ok := proxiedServerCon[str.Str]; ok {
-		return sCon.client.Start(ctx, &pb.StringRequest{Str: sCon.config.ProcessName, AuthToken: sCon.token})
+
+		str, err := sCon.client.Start(ctx, &pb.StringRequest{Str: sCon.config.ProcessName, AuthToken: sCon.token})
+		if err != nil && err.Error() == "rpc error: code = Unknown desc = "+invalidToken.Error() { // regen the token if it's invalid
+			RegenProxyToken(&sCon, str.Str)
+			str, err = sCon.client.Start(ctx, &pb.StringRequest{Str: sCon.config.ProcessName, AuthToken: proxiedServerCon[str.Str].token})
+		}
+
+		return str, err
 	}
 
 	output := StartClient(str.Str)
@@ -98,7 +117,14 @@ func (rpcserver *RPCServer) Kill(ctx context.Context, str *pb.StringRequest) (*p
 
 	//check if to proxy the request to proxied process
 	if sCon, ok := proxiedServerCon[str.Str]; ok {
-		return sCon.client.Kill(ctx, &pb.StringRequest{Str: sCon.config.ProcessName, AuthToken: sCon.token})
+
+		str, err := sCon.client.Kill(ctx, &pb.StringRequest{Str: sCon.config.ProcessName, AuthToken: sCon.token})
+		if err != nil && err.Error() == "rpc error: code = Unknown desc = "+invalidToken.Error() { // regen the token if it's invalid
+			RegenProxyToken(&sCon, str.Str)
+			str, err = sCon.client.Kill(ctx, &pb.StringRequest{Str: sCon.config.ProcessName, AuthToken: proxiedServerCon[str.Str].token})
+		}
+
+		return str, err
 	}
 
 	output := KillClient(str.Str)
@@ -126,7 +152,17 @@ func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (
 	if sCon, ok := proxiedServerCon[query.ProcessName]; ok {
 		query.AuthToken = sCon.token
 		query.ProcessName = sCon.config.ProcessName
-		return sCon.client.Attach(ctx, query)
+
+		reply, err := sCon.client.Attach(ctx, query)
+
+		if err != nil && err.Error() == "rpc error: code = Unknown desc = "+invalidToken.Error() { // regen the token if it's invalid
+			RegenProxyToken(&sCon, query.ProcessName)
+			query.AuthToken = proxiedServerCon[query.ProcessName].token
+			info(query.AuthToken)
+			reply, err = sCon.client.Attach(ctx, query)
+		}
+
+		return reply, err
 	}
 
 	found := false
@@ -192,6 +228,24 @@ func (rpcserver *RPCServer) Auth(ctx context.Context, query *pb.User) (*pb.Strin
 		}
 	}
 	return nil, errors.New("invalid credentials")
+}
+
+/*
+ * Refresh a proxied server's token when it expires
+ */
+
+func RegenProxyToken(sCon *ProxiedServer, pName string) {
+	tok, err := sCon.client.Auth(context.Background(), &pb.User{Name: sCon.config.Username, Password: sCon.config.Password})
+	if err != nil {
+		info("Proxied process (" + sCon.config.ProcessAlias + ") authentication error: " + err.Error())
+	}
+	info("Regenerated token with " + sCon.config.ProcessAlias + ".")
+	info(sCon.token + "wut")
+	ps := proxiedServerCon[pName]
+	ps.token = tok.Str
+	proxiedServerCon[pName] = ps
+	info(tok.Str)
+	info(proxiedServerCon[pName].token)
 }
 
 func rpcserverStart() {

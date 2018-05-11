@@ -14,7 +14,7 @@
             "command_to_run": "bash",
             "max_lines": 200,
             "amount_of_lines_to_cut_on_max": 10,
-            "stop_process_command": "stop",
+            "stop_process_command": "exit",
             "unresponsive_kill_time_seconds": 20,
             "minecraft_mode": true,
             "start_process_on_initialize": true

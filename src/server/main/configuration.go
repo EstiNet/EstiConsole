@@ -61,17 +61,17 @@ type ServerConfig struct {
  * Struct containing settings for proxied servers
  */
 type ProxiedServerConfig struct {
-	ProcessName string `json:"process_name"`
-	IP          string `json:"ip"`
-	Port        uint   `json:"port"`
-	RequireAuth bool   `json:"require_authentication"`
-	Username    string `json:"username"`
-	Password    string `json:"password"`
-	HasTLS      bool   `json:"enable_encryption"`
-	CheckTLS    bool   `json:"check_encryption"`
-	CertFile    string `json:"cert_file_location"`
-
-	Disabled    bool
+	ProcessName  string `json:"process_name"`
+	ProcessAlias string `json:"process_alias"`
+	IP           string `json:"ip"`
+	Port         uint   `json:"port"`
+	RequireAuth  bool   `json:"require_authentication"`
+	Username     string `json:"username"`
+	Password     string `json:"password"`
+	HasTLS       bool   `json:"enable_encryption"`
+	CheckTLS     bool   `json:"check_encryption"`
+	CertFile     string `json:"cert_file_location"`
+	Disabled     bool   `json:"disabled"`
 }
 
 /*
@@ -104,6 +104,7 @@ func ConfigDefault() (InstanceConfig, ServerConfig, ProxiedServerConfig, Users) 
 
 	psc := ProxiedServerConfig{}
 	psc.ProcessName = "ProxiedServer1"
+	psc.ProcessAlias = ""
 	psc.IP = "localhost"
 	psc.Port = 19005
 	psc.RequireAuth = true
@@ -326,14 +327,19 @@ func verifySettings(config *InstanceConfig) {
 	 * Verify each proxied server's settings
 	 */
 
-	for _, server := range config.ProxiedServers {
+	for i, server := range config.ProxiedServers {
 		for _, k := range namesUsed {
-			if k == server.ProcessName {
-				logFatalStr("The name " + server.ProcessName + " is already taken, check for duplicates!")
+
+			if server.ProcessAlias == "" {
+				config.ProxiedServers[i].ProcessAlias = server.ProcessName
+				server.ProcessAlias = server.ProcessName
+			}
+			if k == server.ProcessAlias { // if no alias is defined
+				logFatalStr("The name " + server.ProcessAlias + " is already taken, check for duplicates!")
 			}
 		}
 
-		namesUsed = append(namesUsed, server.ProcessName)
+		namesUsed = append(namesUsed, server.ProcessAlias)
 	}
 
 	/*

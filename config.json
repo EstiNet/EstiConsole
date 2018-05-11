@@ -11,25 +11,28 @@
         {
             "instance_name": "Server1",
             "home_directory": "/home/devin/Flow/ECExp",
-            "command_to_run": "java -Xmx2G -Xms512M -XX:+UseG1GC -XX:ParallelGCThreads=2 -XX:+AggressiveOpts -d64 -server -jar minecraft_server.jar",
+            "command_to_run": "bash",
             "max_lines": 200,
             "amount_of_lines_to_cut_on_max": 10,
             "stop_process_command": "stop",
             "unresponsive_kill_time_seconds": 20,
-            "minecraft_mode": true
+            "minecraft_mode": true,
+            "start_process_on_initialize": true
         }
     ],
     "proxied_servers": [
         {
             "process_name": "Server1",
+            "process_alias": "Server2",
             "ip": "localhost",
             "port": 19005,
             "require_authentication": true,
-            "username": "estinet",
-            "password": "EstiNetwork?123",
+            "username": "default",
+            "password": "password",
             "enable_encryption": true,
             "check_encryption": false,
-            "cert_file_location": "none"
+            "cert_file_location": "none",
+            "disabled": false
         }
     ],
     "users": [

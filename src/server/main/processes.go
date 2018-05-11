@@ -30,7 +30,7 @@ type Server struct {
 	LogStartIndex int  // the index at which the log slice starts at (not 0 after cutoff)
 }
 
-var maxCut = 20000 //cut off for creating a new log file
+var maxCut = 50000 //cut off for creating a new log file
 
 //warning: this is a synchronous call.
 func (server *Server) start() {
@@ -129,11 +129,13 @@ func (server *Server) stop() {
 }
 
 func (server *Server) input(input string) {
-	io.WriteString(server.InputPipe, input+"\n")
+	if server.InputPipe != nil {
+		io.WriteString(server.InputPipe, input+"\n")
+	}
 }
 
 func (server *Server) addLog(str string) {
-	if server.LogCycle >= maxCut { //if the log file is over 20000 lines long
+	if server.LogCycle >= maxCut { //if the log file is over maxCut lines long
 		ServerInitLog(server.Settings)
 		server.LogCycle = 0
 	}

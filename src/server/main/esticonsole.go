@@ -32,9 +32,10 @@ var (
 )
 
 type ProxiedServer struct {
-	client pb.RPCServerClient
+	client     pb.RPCServerClient
 	connection *grpc.ClientConn
-	token  string
+	token      string
+	config     ProxiedServerConfig
 }
 
 type LogAddition struct {

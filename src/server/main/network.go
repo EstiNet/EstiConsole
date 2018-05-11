@@ -16,7 +16,11 @@ func NetworkStart() {
 	go func() { //Start connections with proxied processes and add them to map
 		for i, server := range instanceSettings.ProxiedServers {
 			cli, conn, token := StartRPCCon(&server)
-			proxiedServerCon[server.ProcessName] = ProxiedServer{client: cli, connection: conn, token: token}
+			if server.Disabled {
+				info("Skipping " + server.ProcessAlias + ".")
+				continue
+			}
+			proxiedServerCon[server.ProcessAlias] = ProxiedServer{client: cli, connection: conn, token: token, config: server}
 			instanceSettings.ProxiedServers[i] = server
 		}
 	}()
@@ -27,6 +31,11 @@ func NetworkStart() {
 //TODO CHECK IF PROCESS ACTUALLY EXISTS ON PROXIED
 
 func StartRPCCon(server *ProxiedServerConfig) (client pb.RPCServerClient, conn *grpc.ClientConn, token string) {
+
+	if server.Disabled {
+		return
+	}
+
 	var opts []grpc.DialOption
 
 	if !server.HasTLS {
@@ -39,6 +48,8 @@ func StartRPCCon(server *ProxiedServerConfig) (client pb.RPCServerClient, conn *
 			creds, err = credentials.NewClientTLSFromFile(server.CertFile, "")
 			if err != nil {
 				info("Could not load tls cert: " + err.Error())
+				server.Disabled = true
+				return
 			}
 		} else { //YAAAAAAAAAAAA encryption without mitm checks
 			creds = credentials.NewTLS(&tls.Config{InsecureSkipVerify: true})
@@ -47,21 +58,22 @@ func StartRPCCon(server *ProxiedServerConfig) (client pb.RPCServerClient, conn *
 		opts = append(opts, grpc.WithTransportCredentials(creds))
 	}
 
-
-
-	info("Attempting proxy connection to " + server.ProcessName + "...")
+	info("Attempting proxy connection to " + server.ProcessAlias + "...")
 	var err error
 	conn, err = grpc.Dial(server.IP+":"+strconv.Itoa(int(server.Port)), opts...)
 	if err != nil {
-		info("Error connecting to process " + server.IP + ":" + strconv.Itoa(int(server.Port)) + ", is the address and port correct?:" + err .Error())
+		info("Error connecting to process " + server.IP + ":" + strconv.Itoa(int(server.Port)) + ", is the address and port correct?:" + err.Error())
+		server.Disabled = true
+		return
 	}
 	client = pb.NewRPCServerClient(conn)
 	tok, err := client.Auth(context.Background(), &pb.User{Name: server.Username, Password: server.Password})
 	if err != nil {
-		info("Proxied process (" + server.ProcessName + ") authentication error: " + err.Error())
+		info("Proxied process (" + server.ProcessAlias + ") authentication error: " + err.Error())
 		server.Disabled = true
 		return //prevent null dereference
 	}
+	info("Connected and authenticated with " + server.ProcessAlias + ".")
 	token = tok.Str
 	list, err := client.List(context.Background(), &pb.StringRequest{Str: "", AuthToken: token})
 	if err != nil {

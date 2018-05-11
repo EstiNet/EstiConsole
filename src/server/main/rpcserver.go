@@ -64,7 +64,7 @@ func (rpcserver *RPCServer) Stop(ctx context.Context, str *pb.StringRequest) (*p
 
 	//check if to proxy the request to proxied process
 	if sCon, ok := proxiedServerCon[str.Str]; ok {
-		return sCon.client.Stop(ctx, &pb.StringRequest{Str: str.Str, AuthToken: sCon.token})
+		return sCon.client.Stop(ctx, &pb.StringRequest{Str: sCon.config.ProcessName, AuthToken: sCon.token})
 	}
 
 	output := StopClient(str.Str)
@@ -81,7 +81,7 @@ func (rpcserver *RPCServer) Start(ctx context.Context, str *pb.StringRequest) (*
 
 	//check if to proxy the request to proxied process
 	if sCon, ok := proxiedServerCon[str.Str]; ok {
-		return sCon.client.Start(ctx, &pb.StringRequest{Str: str.Str, AuthToken: sCon.token})
+		return sCon.client.Start(ctx, &pb.StringRequest{Str: sCon.config.ProcessName, AuthToken: sCon.token})
 	}
 
 	output := StartClient(str.Str)
@@ -98,7 +98,7 @@ func (rpcserver *RPCServer) Kill(ctx context.Context, str *pb.StringRequest) (*p
 
 	//check if to proxy the request to proxied process
 	if sCon, ok := proxiedServerCon[str.Str]; ok {
-		return sCon.client.Kill(ctx, &pb.StringRequest{Str: str.Str, AuthToken: sCon.token})
+		return sCon.client.Kill(ctx, &pb.StringRequest{Str: sCon.config.ProcessName, AuthToken: sCon.token})
 	}
 
 	output := KillClient(str.Str)
@@ -125,6 +125,7 @@ func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (
 	//check if to proxy the request to proxied process
 	if sCon, ok := proxiedServerCon[query.ProcessName]; ok {
 		query.AuthToken = sCon.token
+		query.ProcessName = sCon.config.ProcessName
 		return sCon.client.Attach(ctx, query)
 	}
 

@@ -16,6 +16,6 @@
 /.idea/
 /log/
 /bin/
-/config.json/
+/config.json
 *.crt
 *.key

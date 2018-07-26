@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	version          = "v2.0.0"
+	version          = "v2.0.1"
 	instanceSettings InstanceConfig
 
 	commands = make(map[string]interface{})
@@ -54,7 +54,7 @@ func startLogDump() {
 		addToLogFile(logQueue[0].Str, logQueue[0].File, logQueue[0].Directory)
 		if len(logQueue) == 1 {
 			logQueue = make([]LogAddition, 0)
-		} else {
+		} else if len(logQueue) > 1 {
 			logQueue = logQueue[1:]
 		}
 		time.Sleep(time.Millisecond * 1)

@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	version          = "v2.0.1"
+	version          = "v2.0.2"
 	instanceSettings InstanceConfig
 
 	commands = make(map[string]interface{})
@@ -51,7 +51,9 @@ type LogAddition struct {
 
 func startLogDump() {
 	for !(len(logQueue) == 0) {
-		addToLogFile(logQueue[0].Str, logQueue[0].File, logQueue[0].Directory)
+		if logQueue[0].Str != "" && logQueue[0].File != "" && logQueue[0].Directory != "" {
+			addToLogFile(logQueue[0].Str, logQueue[0].File, logQueue[0].Directory)
+		}
 		if len(logQueue) == 1 {
 			logQueue = make([]LogAddition, 0)
 		} else if len(logQueue) > 1 {
@@ -96,7 +98,7 @@ func addToLogFile(str string, file string, directory string) {
 
 	f, err := os.OpenFile(file, os.O_APPEND|os.O_WRONLY, 0600)
 	if os.IsNotExist(err) {
-		fmt.Println("Config file disappeared! WTH are you doing?\nCommencing repair.")
+		fmt.Println("Config file " + file + " disappeared! WTH are you doing?\nCommencing repair.")
 		InitLog()
 		PostInitLog()
 		f, err = os.OpenFile(file, os.O_APPEND|os.O_WRONLY, 0600)

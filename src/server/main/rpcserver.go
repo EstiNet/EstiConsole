@@ -165,6 +165,8 @@ func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (
 		return reply, err
 	}
 
+	// Check if process exists
+
 	found := false
 	for serv := range Servers {
 		if serv == query.ProcessName {
@@ -177,12 +179,12 @@ func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (
 		return &pb.ServerReply{}, errors.New("process name not found")
 	}
 
-	reply := &pb.ServerReply{} //begin construction of reply
+	reply := &pb.ServerReply{} // begin construction of reply
 	server := Servers[query.ProcessName]
 
-	//Parse ServerQuery object
+	// Parse ServerQuery object
 
-	if query.MessageId == -1 { //client requests for latest messages
+	if query.MessageId == -1 { // client requests for latest messages
 		reply.Messages = server.getLog(server.getLatestLogID()-bufferCutoff, server.getLatestLogID()+1)
 		if server.getLatestLogID()-bufferCutoff >= 0 {
 			reply.MessageId = uint64(server.getLatestLogID() - bufferCutoff)
@@ -190,14 +192,14 @@ func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (
 			reply.MessageId = 0
 		}
 
-	} else if query.MessageId > -1 { //client requests for specific message sets
+	} else if query.MessageId > -1 { // client requests for specific message sets
 		reply.Messages = server.getLog(int(query.MessageId-int64(bufferCutoff)), int(query.MessageId))
 		if query.MessageId-int64(bufferCutoff) >= 0 {
 			reply.MessageId = uint64(query.MessageId - int64(bufferCutoff))
 		} else {
 			reply.MessageId = 0
 		}
-	} else { //client doesn't require messages
+	} else { // client doesn't require messages
 		reply.MessageId = uint64(server.getLatestLogID())
 		reply.Messages = []string{}
 	}
@@ -209,7 +211,7 @@ func (rpcserver *RPCServer) Attach(ctx context.Context, query *pb.ServerQuery) (
 		reply.RamUsage = GetMemoryUsage() //TODO redo proc info
 	}
 
-	//send command to process
+	// send command to process
 	if query.Command != "" {
 		server.input(query.Command)
 		server.addLog("Remote command executed: " + strings.Replace(query.Command, "\n", "", -1))

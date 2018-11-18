@@ -1,5 +1,5 @@
 # EstiConsole README WIP
-Version: v2.0.1
+Version: v2.0.2
 
 ## What the heck is this thing?
 EstiConsole is a program that was developed to remotely control console processes.

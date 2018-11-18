@@ -32,16 +32,16 @@ type Server struct {
 
 var maxCut = 50000 //cut off for creating a new log file
 
-//warning: this is a synchronous call.
+// warning: this is a synchronous call.
 func (server *Server) start() {
 	info("Starting " + server.Settings.InstanceName)
 	server.addLog("Starting " + server.Settings.InstanceName)
 	strs := strings.Split(server.Settings.CommandToRun, " ")
 
-	server.Process = exec.Command(strs[0], strs[1:]...) //doesn't execute the command just yet
-	server.Process.Dir = server.Settings.HomeDirectory  //set working directory
+	server.Process = exec.Command(strs[0], strs[1:]...) // doesn't execute the command just yet
+	server.Process.Dir = server.Settings.HomeDirectory  // set working directory
 
-	//Handle minecraft related tasks
+	// Handle minecraft related tasks
 	if server.Settings.MinecraftMode {
 		if _, err := os.Stat(server.Settings.HomeDirectory + "/update"); os.IsNotExist(err) {
 			os.Mkdir(server.Settings.HomeDirectory+"/update", 0755)
@@ -52,7 +52,7 @@ func (server *Server) start() {
 			server.addLog("[ERROR] Error reading directory " + server.Settings.HomeDirectory + "/update " + err.Error())
 		}
 
-		for _, f := range files { //move files from /update to plugins
+		for _, f := range files { // move files from /update to plugins
 			err := os.Rename(server.Settings.HomeDirectory+"/update/"+f.Name(), server.Settings.HomeDirectory+"/plugins/"+f.Name())
 			if err != nil {
 				server.addLog("[ERROR] Plugin update error: " + err.Error())
@@ -61,7 +61,7 @@ func (server *Server) start() {
 		}
 	}
 
-	//Initializes input and output pipes
+	// Initializes input and output pipes (stdin, stdout, stderr)
 	server.OutputPipe, _ = server.Process.StdoutPipe()
 	server.ErrPipe, _ = server.Process.StderrPipe()
 	pipe, err := server.Process.StdinPipe()
@@ -72,7 +72,7 @@ func (server *Server) start() {
 	}
 	server.InputPipe = pipe
 
-	//Start process
+	// Start process
 	err2 := server.Process.Start()
 	if err2 != nil {
 		errMsg := "Error starting process " + server.Settings.InstanceName + ": " + err2.Error()
@@ -82,7 +82,7 @@ func (server *Server) start() {
 	}
 	server.IsOnline = true
 
-	//Function called when process ends
+	// Function called when process ends
 	deferFunc := func() {
 		server.Process.Wait()
 		server.IsOnline = false
@@ -98,19 +98,19 @@ func (server *Server) start() {
 
 	defer deferFunc()
 
-	//Print output
+	// Print output
 	buff := bufio.NewScanner(server.OutputPipe)
 	for buff.Scan() {
 		server.addLog(buff.Text())
 		if curServerView != nil && server.Settings.InstanceName == curServerView.Settings.InstanceName {
-			println(buff.Text()) //prints reading from stdout
+			println(buff.Text()) // prints reading from stdout
 		}
 	}
 	buff2 := bufio.NewScanner(server.ErrPipe)
 	for buff2.Scan() {
 		server.addLog(buff2.Text())
 		if curServerView != nil && server.Settings.InstanceName == curServerView.Settings.InstanceName {
-			println(buff2.Text()) //prints reading from stdout
+			println(buff2.Text()) // prints reading from stdout
 		}
 	}
 }

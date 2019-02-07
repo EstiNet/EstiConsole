@@ -416,7 +416,7 @@ func aboutPopup(gui *gocui.Gui) { //show popup for extra info
 	if v, err := gui.SetView("popup", maxX/2-10, maxY/2, maxX/2+10, maxY/2+4); err != nil {
 		fmt.Fprintln(v, "EstiCli "+version)
 		fmt.Fprintln(v, "――――――――――――――――――――")
-		fmt.Fprintln(v, "EspiDev approves")
+		fmt.Fprintln(v, "EspiDev and Penguin approves")
 		go func() { //delete popup after 1.5 s
 			t, _ := time.ParseDuration("1500ms")
 			time.Sleep(t)
